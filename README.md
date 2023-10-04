@@ -5,7 +5,7 @@ Diese werden dann dynamisch mit Daten gefüllt. Z.B. Rechnungsstellung oder Aufl
 
 ## Authors
 Hauke Ingwersen\
-hauke.ingwersen@stud.hs-flensburg.de
+hauke.ingwersen@stud.hs-flensburg.de\
 Hochschule Flensburg
 
 Robert Pfeiffer\
