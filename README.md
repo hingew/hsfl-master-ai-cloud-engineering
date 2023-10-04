@@ -8,12 +8,12 @@ Hauke Ingwersen\
 hauke.ingwersen@stud.hs-flensburg.de
 Hochschule Flensburg
 
-Max Mustermann\
-max.mustermann@stud.hs-flensburg.de\
+Robert Pfeiffer\
+robert.pfeiffer@stud.hs-flensburg.de\
 Hochschule Flensburg
 
-Max Mustermann\
-max.mustermann@stud.hs-flensburg.de\
+Jannes Nebendahl\
+jannes.nebendahl@stud.hs-flensburg.de\
 Hochschule Flensburg
 
 ## TODO
