@@ -1,13 +1,19 @@
-# \<Enter your project name here\>
-\<Add a simple description of your project here\>
+# PDF-Designer
+
+Mit dem Projekt PDF Designer ist es möglich PDFs anhand eines selbst erstellten Templates erstellen zu können.\
+Diese werden dann dynamisch mit Daten gefüllt. Z.B. Rechnungsstellung oder Auflistung von Daten in einer Tabelle.
 
 ## Authors
-Erika Musterfrau\
-erika.musterfrau@stud.hs-flensburg.de\
+Hauke Ingwersen\
+hauke.ingwersen@stud.hs-flensburg.de
 Hochschule Flensburg
 
 Max Mustermann\
 max.mustermann@stud.hs-flensburg.de\
 Hochschule Flensburg
 
-## \<Add more sections here\>
+Max Mustermann\
+max.mustermann@stud.hs-flensburg.de\
+Hochschule Flensburg
+
+## TODO
