@@ -2,10 +2,9 @@ package router
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"regexp"
-
-	"github.com/hingew/hsfl-master-ai-cloud-engineering/pdf-templating-service/pdftemplates"
 )
 
 type route struct {
@@ -19,19 +18,11 @@ type Router struct {
 	routes []route
 }
 
-func New(templateController pdftemplates.Controller) *Router {
-	router := Router{}
-
-	router.GET("api/v1/pdftemplates", templateController.GetTemplates)
-	router.POST("api/v1/pdftemplates", templateController.PostTemplates)
-	router.GET("api/v1/templates/:pdftemplateID", templateController.GetTemplate)
-	router.PUT("api/v1/templates/:pdftemplateID", templateController.PutTemplates)
-	router.DELETE("api/v1/templates/:pdftemplateID", templateController.DeleteTemplates)
-
-	return &router
+func New() *Router {
+	return &Router{}
 }
 
-func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (router *Router) ServeHttp(w http.ResponseWriter, r *http.Request) {
 	for _, route := range router.routes {
 		if r.Method != route.method {
 			continue
@@ -40,16 +31,18 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		matches := route.pattern.FindStringSubmatch(r.URL.Path)
 
 		if len(matches) > 0 {
-			r = createRequestContext(r, route.params, matches[1:])
+			r = createRequestContect(r, route.params, matches[1:])
 			route.handler(w, r)
 			return
+
 		}
+
 	}
 
 	w.WriteHeader(http.StatusNotFound)
 }
 
-func createRequestContext(r *http.Request, paramKeys []string, paramValues []string) *http.Request {
+func createRequestContect(r *http.Request, paramKeys []string, paramValues []string) *http.Request {
 	if len(paramKeys) == 0 {
 		return r
 	}
@@ -63,16 +56,23 @@ func createRequestContext(r *http.Request, paramKeys []string, paramValues []str
 }
 
 func (router *Router) addRoute(method string, pattern string, handler http.HandlerFunc) {
-	paramMatcher := regexp.MustCompile(":([a-zA-Z]+)")
-	paramMatches := paramMatcher.FindAllStringSubmatch(pattern, -1)
 
-	params := make([]string, len(paramMatches))
+	matcher := regexp.MustCompile(":([a-zA-Z]+)")
+	matches := matcher.FindAllStringSubmatch(pattern, -1)
 
-	if len(paramMatches) > 0 {
-		pattern = paramMatcher.ReplaceAllLiteralString(pattern, "([^/]+)")
+	params := make([]string, len(matches))
 
-		for i, match := range paramMatches {
+	if len(matches) > 0 {
+		pattern = matcher.ReplaceAllLiteralString(pattern, "([^/]+)")
+
+		for i, match := range matches {
 			params[i] = match[1]
+		}
+	}
+
+	for _, route := range router.routes {
+		if route.method == method && route.pattern.String() == ("^"+pattern+"$") {
+			panic(fmt.Sprintf("The route %s with the method %s is already defined!", pattern, method))
 		}
 	}
 
@@ -82,6 +82,7 @@ func (router *Router) addRoute(method string, pattern string, handler http.Handl
 		handler: handler,
 		params:  params,
 	})
+
 }
 
 func (router *Router) GET(pattern string, handler http.HandlerFunc) {
