@@ -36,13 +36,12 @@ Detail JSON
             "height": 0
         },
         {
-
             "type": "text"
             "x": 0, 
             "y": 0, 
             "width": 0, 
             "height": 0
-            "content": "Hello world",
+            "value_from": "title"
             "font": "JetBrainsMono"
             "size": 18
     ]
@@ -56,5 +55,11 @@ PUT /templates/:id -> Update template
 DELETE /templates/:id -> Delete templates
 
 ## Pdf Creation Service
+
+```json
+{
+    "title": "Hello world"
+}
+```
 
 POST /render/:id -> Render a pdf by template and data
