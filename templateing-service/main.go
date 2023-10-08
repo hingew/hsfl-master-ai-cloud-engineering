@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/hingew/hsfl-master-ai-cloud-engineering/pdf-templating-service/api/router"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/router"
 )
 
 func main() {
