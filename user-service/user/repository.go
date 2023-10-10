@@ -1,6 +1,6 @@
 package user
 
-import "github.com/hingew/hsfl-master-ai-cloud-engineering/user-serivce/user/model"
+import "github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/user/model"
 
 type Repository interface {
 	Migrate() error

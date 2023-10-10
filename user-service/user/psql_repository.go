@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/database"
-	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-serivce/user/model"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/user/model"
 
 	_ "github.com/lib/pq"
 )
