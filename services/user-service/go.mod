@@ -10,4 +10,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/hingew/hsfl-master-ai-cloud-engineering/lib v0.0.0 => ../lib/
+replace github.com/hingew/hsfl-master-ai-cloud-engineering/lib v0.0.0 => ../../lib/
