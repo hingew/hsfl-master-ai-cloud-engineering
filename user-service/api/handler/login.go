@@ -5,6 +5,10 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/auth"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/crypto"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/user"
 )
 
 type loginRequest struct {
