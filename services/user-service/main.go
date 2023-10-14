@@ -43,13 +43,13 @@ func main() {
 
 	hasher := crypto.NewBcryptHasher()
 
-	handler := router.New(
+	router := router.New(
 		handler.NewRegisterHandler(userRepository, hasher),
 		handler.NewLoginHandler(userRepository, hasher, tokenGenerator),
 	)
 
 	addr := fmt.Sprintf("0.0.0.0:%d", *&appConfig.Port)
-	if err := http.ListenAndServe(addr, handler); err != nil {
+	if err := http.ListenAndServe(addr, router); err != nil {
 		log.Fatalf("error while listen and serve: %s", err.Error())
 	}
 }
