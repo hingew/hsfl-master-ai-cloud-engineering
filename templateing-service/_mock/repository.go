@@ -2,7 +2,7 @@
 // Source: github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/api/repository (interfaces: IRepository)
 
 // Package mock_repository is a generated GoMock package.
-package mock_repository
+package mock_
 
 import (
         reflect "reflect"
@@ -35,7 +35,7 @@ func (m *MockIRepository) EXPECT() *MockIRepositoryMockRecorder {
 }
 
 // CreateTemplate mocks base method.
-func (m *MockIRepository) CreateTemplate(arg0 *model.PdfTemplateCreationRequest) error {
+func (m *MockIRepository) CreateTemplate(arg0 *model.PdfTemplate) error {
         m.ctrl.T.Helper()
         ret := m.ctrl.Call(m, "CreateTemplate", arg0)
         ret0, _ := ret[0].(error)
@@ -93,7 +93,7 @@ func (mr *MockIRepositoryMockRecorder) GetTemplate(arg0 interface{}) *gomock.Cal
 }
 
 // UpdateTemplate mocks base method.
-func (m *MockIRepository) UpdateTemplate(arg0 int64, arg1 *model.PdfTemplateCreationRequest) error {
+func (m *MockIRepository) UpdateTemplate(arg0 int64, arg1 *model.PdfTemplate) error {
         m.ctrl.T.Helper()
         ret := m.ctrl.Call(m, "UpdateTemplate", arg0, arg1)
         ret0, _ := ret[0].(error)

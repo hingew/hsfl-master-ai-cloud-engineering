@@ -4,14 +4,14 @@ import (
 	"net/http"
 
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/router"
-	"github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/api/controller"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/templates/controller"
 )
 
 type TemplateRouter struct {
 	router http.Handler
 }
 
-func New(
+func NewTemplateRouter(
 	myController controller.IController,
 ) *TemplateRouter {
 	myRouter := router.New()

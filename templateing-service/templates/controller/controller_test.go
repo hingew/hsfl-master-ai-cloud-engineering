@@ -252,7 +252,7 @@ func TestController(t *testing.T) {
 					]
 				}`))
 
-			template := model.PdfTemplateCreationRequest{
+			template := model.PdfTemplate{
 				PdfName: "My table template",
 				Elements: []model.Element{
 					{
@@ -312,7 +312,7 @@ func TestController(t *testing.T) {
 					]
 				}`))
 
-			template := model.PdfTemplateCreationRequest{
+			template := model.PdfTemplate{
 				PdfName: "My table template",
 				Elements: []model.Element{
 					{
@@ -392,7 +392,7 @@ func TestController(t *testing.T) {
 				strings.NewReader(`{"name": "New Name"}`))
 			r = r.WithContext(context.WithValue(r.Context(), "id", "1"))
 
-			request := model.PdfTemplateCreationRequest{
+			request := model.PdfTemplate{
 				PdfName: "New Name",
 			}
 
@@ -415,7 +415,7 @@ func TestController(t *testing.T) {
 				strings.NewReader(`{"name": "New Name"}`))
 			r = r.WithContext(context.WithValue(r.Context(), "id", "1"))
 
-			request := model.PdfTemplateCreationRequest{
+			request := model.PdfTemplate{
 				PdfName: "New Name",
 			}
 

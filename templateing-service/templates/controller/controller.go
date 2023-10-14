@@ -5,12 +5,18 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/api/repository"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/templates/model"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/templates/repository"
 )
 
 type Controller struct {
 	repo repository.IRepository
+}
+
+func NewController(
+	repo repository.IRepository,
+) *Controller {
+	return &Controller{repo}
 }
 
 func (c *Controller) GetAllTemplates(w http.ResponseWriter, r *http.Request) {
@@ -44,13 +50,13 @@ func (c *Controller) GetTemplate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Controller) CreateTemplate(w http.ResponseWriter, r *http.Request) {
-	var request *model.PdfTemplateCreationRequest
+	var request *model.PdfTemplate
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	if !request.IsValid() {
+	if !request.IsValidForCreation() {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -72,7 +78,7 @@ func (c *Controller) UpdateTemplate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var request *model.PdfTemplateCreationRequest
+	var request *model.PdfTemplate
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return

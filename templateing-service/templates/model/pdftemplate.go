@@ -12,11 +12,6 @@ type PdfTemplate struct {
 	Elements  []Element `json:"elements"`
 }
 
-type PdfTemplateCreationRequest struct {
-	PdfName  string    `json:"name"`
-	Elements []Element `json:"elements"`
-}
-
-func (r *PdfTemplateCreationRequest) IsValid() bool {
+func (r *PdfTemplate) IsValidForCreation() bool {
 	return r.PdfName != "" && r.Elements != nil
 }
