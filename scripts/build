@@ -9,7 +9,7 @@ for goModFile in $(find . -name '*.mod'); do
     echo "### Building $currentRoot ###"
     echo ""
 
-    cd "$currentGoRootDirectory" || exit 1
+    cd "$currentRoot" || exit 1
 
     go mod tidy
 
