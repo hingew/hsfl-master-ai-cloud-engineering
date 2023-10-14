@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/database"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/api/handler"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/api/router"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/auth"

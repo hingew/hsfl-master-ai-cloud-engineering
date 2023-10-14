@@ -3,6 +3,10 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/crypto"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/user"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/user/model"
 )
 
 type registerRequest struct {
