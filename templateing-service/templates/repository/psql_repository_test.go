@@ -23,10 +23,7 @@ func TestPsqlRepository(t *testing.T) {
 		t.Run("should insert a template in the db", func(t *testing.T) {
 			// given
 			template := model.PdfTemplate{
-				ID:        7,
-				PdfName:   "Test",
-				CreatedAt: time.Date(2023, 10, 9, 1, 1, 1, 1, time.UTC),
-				UpdatedAt: time.Date(2023, 10, 9, 3, 1, 1, 1, time.UTC),
+				PdfName: "Test",
 				Elements: []model.Element{
 					{
 						Type:   "rect",
@@ -41,7 +38,7 @@ func TestPsqlRepository(t *testing.T) {
 			elementJson, _ := json.Marshal(template.Elements)
 
 			dbmock.ExpectExec(`INSERT INTO templates (name, created_at, updated_at, elements) VALUES ($1, $2, $3, $4)`).
-				WithArgs("Test", time.Date(2023, 10, 9, 1, 1, 1, 1, time.UTC), time.Date(2023, 10, 9, 3, 1, 1, 1, time.UTC), elementJson).
+				WithArgs("Test", sqlmock.AnyArg(), sqlmock.AnyArg(), elementJson).
 				WillReturnResult(nil)
 
 			// when
@@ -138,38 +135,12 @@ func TestPsqlRepository(t *testing.T) {
 	t.Run("DeleteTemplate", func(t *testing.T) {
 		t.Run("should delete template in batch", func(t *testing.T) {
 			// given
-			templates := []*model.PdfTemplate{
-				{
-					ID:        1,
-					PdfName:   "test product 1",
-					CreatedAt: time.Date(2023, 10, 13, 10, 27, 10, 297310, time.Local),
-					UpdatedAt: time.Date(2023, 10, 13, 10, 27, 10, 297310, time.Local),
-					Elements: []model.Element{{
-						Type:      "text",
-						X:         0,
-						Y:         0,
-						Width:     0,
-						Height:    0,
-						ValueFrom: "title",
-						Font:      "JetBrainsMono",
-						Size:      18,
-					}},
-				},
-				{
-					ID:        2,
-					PdfName:   "Test2",
-					CreatedAt: time.Date(2023, 10, 13, 10, 27, 10, 297310, time.Local),
-					UpdatedAt: time.Date(2023, 10, 13, 10, 27, 10, 297310, time.Local),
-					Elements:  []model.Element{},
-				},
-			}
-
 			dbmock.ExpectExec(`DELETE FROM templates WHERE id = $1`).
-				WithArgs(1, 2).
-				WillReturnResult(sqlmock.NewResult(0, 2))
+				WithArgs(1).
+				WillReturnResult(sqlmock.NewResult(0, 1))
 
 			// when
-			err := repository.DeleteTemplate(templates[0].ID)
+			err := repository.DeleteTemplate(1)
 
 			// then
 			assert.NoError(t, err)
