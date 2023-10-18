@@ -22,7 +22,8 @@ func New() *Router {
 	return &Router{}
 }
 
-func (router *Router) ServeHttp(w http.ResponseWriter, r *http.Request) {
+// ServeHTTP implements the Http.Handler interface
+func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	for _, route := range router.routes {
 		if r.Method != route.method {
 			continue

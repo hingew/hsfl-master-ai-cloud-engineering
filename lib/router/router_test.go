@@ -19,7 +19,7 @@ func TestRouter(t *testing.T) {
 		r := httptest.NewRequest(http.MethodGet, "/foobar", nil)
 
 		//when
-		router.ServeHttp(w, r)
+		router.ServeHTTP(w, r)
 
 		//then
 		assert.Equal(t, http.StatusNotFound, w.Code)
@@ -34,7 +34,7 @@ func TestRouter(t *testing.T) {
 		r := httptest.NewRequest(http.MethodGet, "/foobar", nil)
 
 		//when
-		router.ServeHttp(w, r)
+		router.ServeHTTP(w, r)
 
 		//then
 		assert.Equal(t, http.StatusOK, w.Code)
@@ -52,7 +52,7 @@ func TestRouter(t *testing.T) {
 		r := httptest.NewRequest(http.MethodGet, "/foobar/7/has/params", nil)
 
 		//when
-		router.ServeHttp(w, r)
+		router.ServeHTTP(w, r)
 
 		//then
 		assert.Equal(t, http.StatusOK, w.Code)
@@ -75,7 +75,7 @@ func TestRouter(t *testing.T) {
 			r := httptest.NewRequest(method, "/get", nil)
 
 			//when
-			router.ServeHttp(w, r)
+			router.ServeHTTP(w, r)
 
 			//then
 			assert.Equal(t, http.StatusNotFound, w.Code)
@@ -87,7 +87,7 @@ func TestRouter(t *testing.T) {
 			r := httptest.NewRequest(method, "/post", nil)
 
 			//when
-			router.ServeHttp(w, r)
+			router.ServeHTTP(w, r)
 
 			//then
 			assert.Equal(t, http.StatusNotFound, w.Code)
@@ -99,7 +99,7 @@ func TestRouter(t *testing.T) {
 			r := httptest.NewRequest(method, "/put", nil)
 
 			//when
-			router.ServeHttp(w, r)
+			router.ServeHTTP(w, r)
 
 			//then
 			assert.Equal(t, http.StatusNotFound, w.Code)
@@ -111,7 +111,7 @@ func TestRouter(t *testing.T) {
 			r := httptest.NewRequest(method, "/delete", nil)
 
 			//when
-			router.ServeHttp(w, r)
+			router.ServeHTTP(w, r)
 
 			//then
 			assert.Equal(t, http.StatusNotFound, w.Code)
