@@ -7,8 +7,8 @@ import (
 
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/config"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/database"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/router"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/api/handler"
-	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/api/router"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/auth"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/crypto"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/user"
@@ -43,10 +43,9 @@ func main() {
 
 	hasher := crypto.NewBcryptHasher()
 
-	router := router.New(
-		handler.NewRegisterHandler(userRepository, hasher),
-		handler.NewLoginHandler(userRepository, hasher, tokenGenerator),
-	)
+	router := router.New()
+	router.POST("/auth/register", handler.Register(userRepository, hasher))
+	router.POST("/auth/login", handler.Login(userRepository, hasher, tokenGenerator))
 
 	addr := fmt.Sprintf("0.0.0.0:%d", *&appConfig.Port)
 	if err := http.ListenAndServe(addr, router); err != nil {
