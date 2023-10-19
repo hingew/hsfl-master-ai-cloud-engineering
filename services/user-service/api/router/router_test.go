@@ -20,7 +20,7 @@ func TestRouter(t *testing.T) {
 	t.Run("should run register handler", func(t *testing.T) {
 		// given
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/v1/auth/register", nil)
+		r := httptest.NewRequest("POST", "/api/auth/register", nil)
 
 		registerHandler.
 			EXPECT().
@@ -38,7 +38,7 @@ func TestRouter(t *testing.T) {
 	t.Run("should run login handler", func(t *testing.T) {
 		// given
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/v1/auth/login", nil)
+		r := httptest.NewRequest("POST", "/api/auth/login", nil)
 
 		loginHandler.
 			EXPECT().
@@ -56,7 +56,7 @@ func TestRouter(t *testing.T) {
 	t.Run("should return 404 NOT FOUND if target is unknown", func(t *testing.T) {
 		// given
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/v1/auth/unknown", nil)
+		r := httptest.NewRequest("POST", "/api/auth/unknown", nil)
 
 		// when
 		router.ServeHTTP(w, r)

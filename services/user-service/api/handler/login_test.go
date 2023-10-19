@@ -27,7 +27,7 @@ func TestLoginHandler(t *testing.T) {
 	t.Run("should return 405 METHOD NOT ALLOWED if method is not POST", func(t *testing.T) {
 		// given
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("GET", "/api/v1/auth/login", nil)
+		r := httptest.NewRequest("GET", "/api/auth/login", nil)
 
 		// when
 		handler.ServeHTTP(w, r)
@@ -45,7 +45,7 @@ func TestLoginHandler(t *testing.T) {
 		for _, test := range tests {
 			// given
 			w := httptest.NewRecorder()
-			r := httptest.NewRequest("POST", "/api/v1/auth/login", test)
+			r := httptest.NewRequest("POST", "/api/auth/login", test)
 
 			// when
 			handler.ServeHTTP(w, r)
@@ -64,7 +64,7 @@ func TestLoginHandler(t *testing.T) {
 		for _, test := range tests {
 			// given
 			w := httptest.NewRecorder()
-			r := httptest.NewRequest("POST", "/api/v1/auth/login", test)
+			r := httptest.NewRequest("POST", "/api/auth/login", test)
 
 			// when
 			handler.ServeHTTP(w, r)
@@ -77,7 +77,7 @@ func TestLoginHandler(t *testing.T) {
 	t.Run("should return 500 INTERNAL SERVER ERROR if search for user failed", func(t *testing.T) {
 		// given
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/v1/auth/login", strings.NewReader(`{"email":"test@test.com","password":"test"}`))
+		r := httptest.NewRequest("POST", "/api/auth/login", strings.NewReader(`{"email":"test@test.com","password":"test"}`))
 
 		userRepository.
 			EXPECT().
@@ -94,7 +94,7 @@ func TestLoginHandler(t *testing.T) {
 	t.Run("should return 401 UNAUTHORIZED if user not found", func(t *testing.T) {
 		// given
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/v1/auth/login", strings.NewReader(`{"email":"test@test.com","password":"test"}`))
+		r := httptest.NewRequest("POST", "/api/auth/login", strings.NewReader(`{"email":"test@test.com","password":"test"}`))
 
 		userRepository.
 			EXPECT().
@@ -112,7 +112,7 @@ func TestLoginHandler(t *testing.T) {
 	t.Run("should return 401 UNAUTHORIZED if password is not correct", func(t *testing.T) {
 		// given
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/v1/auth/login", strings.NewReader(`{"email":"test@test.com","password":"wrong password"}`))
+		r := httptest.NewRequest("POST", "/api/auth/login", strings.NewReader(`{"email":"test@test.com","password":"wrong password"}`))
 
 		userRepository.
 			EXPECT().
@@ -138,7 +138,7 @@ func TestLoginHandler(t *testing.T) {
 	t.Run("should return 200 OK", func(t *testing.T) {
 		// given
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest("POST", "/api/v1/auth/login", strings.NewReader(`{"email":"test@test.com","password":"test"}`))
+		r := httptest.NewRequest("POST", "/api/auth/login", strings.NewReader(`{"email":"test@test.com","password":"test"}`))
 
 		userRepository.
 			EXPECT().

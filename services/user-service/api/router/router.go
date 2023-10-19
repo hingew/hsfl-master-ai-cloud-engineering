@@ -11,8 +11,8 @@ func New(
 	loginHandler http.Handler,
 ) *Router {
 	mux := http.NewServeMux()
-	mux.Handle("/api/v1/auth/register", registerHandler)
-	mux.Handle("/api/v1/auth/login", loginHandler)
+	mux.Handle("/api/auth/register", registerHandler)
+	mux.Handle("/api/auth/login", loginHandler)
 
 	return &Router{mux}
 }
