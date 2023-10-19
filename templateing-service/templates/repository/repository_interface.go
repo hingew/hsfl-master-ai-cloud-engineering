@@ -5,9 +5,9 @@ import (
 )
 
 type IRepository interface {
-	GetAllTemplates() ([]*model.PdfTemplate, error)
-	GetTemplate(id int64) (*model.PdfTemplate, error)
-	CreateTemplate(template *model.PdfTemplate) error
-	UpdateTemplate(id int64, template *model.PdfTemplate) error
-	DeleteTemplate(id int64) error
+	CreateTemplate(data model.PdfTemplate) (*uint, error)
+	GetAllTemplates() (*[]model.PdfTemplate, error)
+	GetTemplateById(id uint) (*model.PdfTemplate, error)
+	UpdateTemplate(id uint, data model.PdfTemplate) error
+	DeleteTemplate(id uint) error
 }

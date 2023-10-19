@@ -40,7 +40,7 @@ func main() {
 		log.Fatalf("could not load application configuration: %s", err.Error())
 	}
 
-	repo, err := repository.NewPsqlRepository(config.Database)
+	repo, err := repository.NewGormPsqlRepository(config.Database)
 	if err != nil {
 		log.Fatalf("could not create repository: %s", err.Error())
 	}

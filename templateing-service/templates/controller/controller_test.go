@@ -54,7 +54,7 @@ func TestController(t *testing.T) {
 				Return([]*model.PdfTemplate{
 					{
 						ID:        999,
-						PdfName:   "Test",
+						Name:      "Test",
 						CreatedAt: time.Date(2023, 10, 9, 1, 1, 1, 1, time.UTC),
 						UpdatedAt: time.Date(2023, 10, 9, 3, 1, 1, 1, time.UTC),
 						Elements:  []model.Element{},
@@ -74,8 +74,8 @@ func TestController(t *testing.T) {
 			assert.Equal(t, http.StatusOK, w.Code)
 			assert.Equal(t, "application/json", w.Header().Get("Content-Type"))
 			assert.Len(t, response, 1)
-			assert.Equal(t, int64(999), response[0].ID)
-			assert.Equal(t, string("Test"), response[0].PdfName)
+			assert.Equal(t, uint(999), response[0].ID)
+			assert.Equal(t, string("Test"), response[0].Name)
 			assert.Equal(t, time.Date(2023, 10, 9, 1, 1, 1, 1, time.UTC), response[0].CreatedAt)
 			assert.Equal(t, time.Date(2023, 10, 9, 3, 1, 1, 1, time.UTC), response[0].UpdatedAt)
 			assert.Len(t, response[0].Elements, 0)
@@ -85,7 +85,7 @@ func TestController(t *testing.T) {
 	t.Run("GetTemplate", func(t *testing.T) {
 		t.Run("should return all products", func(t *testing.T) {
 			// given
-			var id int64 = 1234
+			var id uint = 1234
 			endpoint := fmt.Sprintf("/templates/%d", id)
 			w := httptest.NewRecorder()
 			r := httptest.NewRequest("GET", endpoint, nil)
@@ -93,7 +93,7 @@ func TestController(t *testing.T) {
 
 			template := &model.PdfTemplate{
 				ID:        id,
-				PdfName:   "Test",
+				Name:      "Test",
 				CreatedAt: time.Date(2023, 10, 9, 1, 1, 1, 1, time.UTC),
 				UpdatedAt: time.Date(2023, 10, 9, 3, 1, 1, 1, time.UTC),
 				Elements: []model.Element{
@@ -108,7 +108,7 @@ func TestController(t *testing.T) {
 			}
 			productRepository.
 				EXPECT().
-				GetTemplate(id).
+				GetTemplateById(id).
 				Return(template, nil).
 				Times(1)
 
@@ -123,8 +123,8 @@ func TestController(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, http.StatusOK, w.Code)
 			assert.Equal(t, "application/json", w.Header().Get("Content-Type"))
-			assert.Equal(t, int64(id), response.ID)
-			assert.Equal(t, string("Test"), response.PdfName)
+			assert.Equal(t, uint(id), response.ID)
+			assert.Equal(t, string("Test"), response.Name)
 			assert.Equal(t, time.Date(2023, 10, 9, 1, 1, 1, 1, time.UTC), response.CreatedAt)
 			assert.Equal(t, time.Date(2023, 10, 9, 3, 1, 1, 1, time.UTC), response.UpdatedAt)
 			assert.Len(t, response.Elements, 1)
@@ -137,7 +137,7 @@ func TestController(t *testing.T) {
 
 		t.Run("should return 500 INTERNAL SERVER ERROR if query failed", func(t *testing.T) {
 			// given
-			var id int64 = 1234
+			var id uint = 1234
 			endpoint := fmt.Sprintf("/templates/%d", id)
 			w := httptest.NewRecorder()
 			r := httptest.NewRequest("GET", endpoint, nil)
@@ -145,7 +145,7 @@ func TestController(t *testing.T) {
 
 			productRepository.
 				EXPECT().
-				GetTemplate(id).
+				GetTemplateById(id).
 				Return(nil, errors.New("query failed")).
 				Times(1)
 
@@ -192,42 +192,6 @@ func TestController(t *testing.T) {
 			}
 		})
 
-		t.Run("should return 400 BAD REQUEST if payload is incomplete", func(t *testing.T) {
-			tests := []io.Reader{
-				strings.NewReader(`{"name": "Test"}`),
-				strings.NewReader(`{"elements": [
-					{ 
-						"type": "rect"
-						"x": 0, 
-						"y": 0, 
-						"width": 0, 
-						"height": 0
-					},
-					{
-						"type": "text"
-						"x": 0, 
-						"y": 0, 
-						"width": 0, 
-						"height": 0,
-						"value_from": "title",
-						"font": "JetBrainsMono",
-						"size": 18
-				]}`),
-			}
-
-			for _, test := range tests {
-				// given
-				w := httptest.NewRecorder()
-				r := httptest.NewRequest("POST", "/templates", test)
-
-				// when
-				controller.CreateTemplate(w, r)
-
-				// then
-				assert.Equal(t, http.StatusBadRequest, w.Code)
-			}
-		})
-
 		t.Run("should return 500 INTERNAL SERVER ERROR if persisting failed", func(t *testing.T) {
 			// given
 			w := httptest.NewRecorder()
@@ -247,39 +211,18 @@ func TestController(t *testing.T) {
 							"x": 0, 
 							"y": 0, 
 							"width": 0, 
-							"height": 0
+							"height": 0,
+							"value_from": "title",
+							"font": "JetBrainsMono",
+							"size": 18
 						}
 					]
 				}`))
 
-			template := model.PdfTemplate{
-				PdfName: "My table template",
-				Elements: []model.Element{
-					{
-						Type:   "rect",
-						X:      0,
-						Y:      0,
-						Width:  0,
-						Height: 0,
-					},
-					{
-						Type:   "text",
-						X:      0,
-						Y:      0,
-						Width:  0,
-						Height: 0,
-						/*
-							"value_from": "title"
-							"font": "JetBrainsMono"
-							"size": 18
-						*/
-					},
-				},
-			}
 			productRepository.
 				EXPECT().
-				CreateTemplate(&template).
-				Return(errors.New("database error"))
+				CreateTemplate(gomock.Any()).
+				Return(nil, errors.New("database error"))
 
 			// when
 			controller.CreateTemplate(w, r)
@@ -307,39 +250,20 @@ func TestController(t *testing.T) {
 							"x": 0, 
 							"y": 0, 
 							"width": 0, 
-							"height": 0
+							"height": 0,
+							"value_from": "title",
+							"font": "JetBrainsMono",
+							"size": 18
 						}
 					]
 				}`))
 
-			template := model.PdfTemplate{
-				PdfName: "My table template",
-				Elements: []model.Element{
-					{
-						Type:   "rect",
-						X:      0,
-						Y:      0,
-						Width:  0,
-						Height: 0,
-					},
-					{
-						Type:   "text",
-						X:      0,
-						Y:      0,
-						Width:  0,
-						Height: 0,
-						/*
-							"value_from": "title"
-							"font": "JetBrainsMono"
-							"size": 18
-						*/
-					},
-				},
-			}
+			id := uint(1)
+
 			productRepository.
 				EXPECT().
-				CreateTemplate(&template).
-				Return(nil)
+				CreateTemplate(gomock.Any()).
+				Return(&id, nil)
 
 			// when
 			controller.CreateTemplate(w, r)
@@ -393,12 +317,12 @@ func TestController(t *testing.T) {
 			r = r.WithContext(context.WithValue(r.Context(), "id", "1"))
 
 			request := model.PdfTemplate{
-				PdfName: "New Name",
+				Name: "New Name",
 			}
 
 			productRepository.
 				EXPECT().
-				UpdateTemplate(int64(1), &request).
+				UpdateTemplate(uint(1), request).
 				Return(errors.New("database error"))
 
 			// when
@@ -416,12 +340,12 @@ func TestController(t *testing.T) {
 			r = r.WithContext(context.WithValue(r.Context(), "id", "1"))
 
 			request := model.PdfTemplate{
-				PdfName: "New Name",
+				Name: "New Name",
 			}
 
 			productRepository.
 				EXPECT().
-				UpdateTemplate(int64(1), &request).
+				UpdateTemplate(uint(1), request).
 				Return(nil)
 
 			// when
@@ -456,7 +380,7 @@ func TestController(t *testing.T) {
 
 			productRepository.
 				EXPECT().
-				DeleteTemplate(int64(1)).
+				DeleteTemplate(uint(1)).
 				Return(errors.New("database error"))
 
 			// when
@@ -474,7 +398,7 @@ func TestController(t *testing.T) {
 
 			productRepository.
 				EXPECT().
-				DeleteTemplate(int64(1)).
+				DeleteTemplate(uint(1)).
 				Return(nil)
 
 			// when

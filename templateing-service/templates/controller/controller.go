@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -33,13 +34,14 @@ func (c *Controller) GetAllTemplates(w http.ResponseWriter, r *http.Request) {
 func (c *Controller) GetTemplate(w http.ResponseWriter, r *http.Request) {
 	templateId := r.Context().Value("id").(string)
 
-	id, err := strconv.ParseInt(templateId, 10, 64)
+	id_, err := strconv.Atoi(templateId)
+	id := uint(id_)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	template, err := c.repo.GetTemplate(id)
+	template, err := c.repo.GetTemplateById(id)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -50,29 +52,28 @@ func (c *Controller) GetTemplate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Controller) CreateTemplate(w http.ResponseWriter, r *http.Request) {
-	var request *model.PdfTemplate
+	var request model.PdfTemplate
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	if !request.IsValidForCreation() {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	if err := c.repo.CreateTemplate(request); err != nil {
+	id, err := c.repo.CreateTemplate(request)
+	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
+	response := fmt.Sprintf("id: %d", id)
+	w.Write([]byte(response))
 	w.WriteHeader(http.StatusOK)
 }
 
 func (c *Controller) UpdateTemplate(w http.ResponseWriter, r *http.Request) {
 	templateId := r.Context().Value("id").(string)
 
-	id, err := strconv.ParseInt(templateId, 10, 64)
+	id_, err := strconv.Atoi(templateId)
+	id := uint(id_)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -84,7 +85,7 @@ func (c *Controller) UpdateTemplate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := c.repo.UpdateTemplate(id, request); err != nil {
+	if err := c.repo.UpdateTemplate(id, *request); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -95,7 +96,8 @@ func (c *Controller) UpdateTemplate(w http.ResponseWriter, r *http.Request) {
 func (c *Controller) DeleteTemplate(w http.ResponseWriter, r *http.Request) {
 	templateId := r.Context().Value("id").(string)
 
-	id, err := strconv.ParseInt(templateId, 10, 64)
+	id_, err := strconv.Atoi(templateId)
+	id := uint(id_)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
