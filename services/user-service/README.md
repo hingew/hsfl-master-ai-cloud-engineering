@@ -1,9 +1,34 @@
-# PDF-Creation Service
+# User Service
 
 ## Beschreibung
 
-Der PDF-Creation Service fragt das Template bei dem PDF-Template Service an und nimmt zusätzlich noch die dynamischen
-Felder von dem Client entgegen, damit diese in dem PDF dargestellt werden können.
-Der PDF-Creation Service hat hierbei den Vorteil, dass dieser ohne zusätzliche Datenhaltung auskommt.
-Damit kann dieser sehr leicht skaliert werden.
+Authentifizierung des Benutzers
 
+## Configuration
+
+Create a private key for signing JWT tokens:
+
+``` 
+ssh-keygen -t ecdsa -f user-service.pem -m pem
+```
+
+To configure the user service, create a `config.yml` with the following content:
+
+```yml
+database:
+    host: localhost
+    port: 5432
+    username: postgres
+    password: password
+    dbname: postgres
+jwt:
+    signKey: /path/to/user-service.pem
+```
+
+
+## Up and running
+
+```sh
+go build
+./user-service --config=config.yml
+```

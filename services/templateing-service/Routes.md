@@ -45,6 +45,7 @@ Detail JSON
             "font": "JetBrainsMono",
             "size": 18
         }
+
     ]
 }
 ```

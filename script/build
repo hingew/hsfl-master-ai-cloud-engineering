@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+ROOT_DIR="$(pwd)"
+
+for goModFile in $(find . -name '*.mod'); do
+    currentRoot="$(dirname "$goModFile")"
+
+    echo ""
+    echo "### Building $currentRoot ###"
+    echo ""
+
+    cd "$currentRoot" || exit 1
+
+    go mod tidy
+
+    go build
+done
