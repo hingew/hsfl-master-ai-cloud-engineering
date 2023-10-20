@@ -32,9 +32,10 @@ func LoadConfigFromFile(path string) (*ApplicationConfig, error) {
 }
 
 func main() {
-	configPath := flag.String("config", "config.yml", "The path to the configuration file")
+	configPath := flag.String("config", "config.example.yml", "The path to the configuration file")
 	flag.Parse()
 
+	// TODO: Haukes lib Funktion hier nutzen
 	config, err := LoadConfigFromFile(*configPath)
 	if err != nil {
 		log.Fatalf("could not load application configuration: %s", err.Error())

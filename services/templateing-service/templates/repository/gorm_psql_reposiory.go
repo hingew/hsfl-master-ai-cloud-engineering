@@ -68,6 +68,11 @@ func (repo *GormPsqlRepository) UpdateTemplate(id uint, updatedTemplate model.Pd
 		return err
 	}
 
+	err = repo.deleteUnassignedElements()
+	if err != nil {
+		return err
+	}
+
 	for _, element := range updatedTemplate.Elements {
 		if err := repo.db.Model(&existingTemplate).Association("Elements").Append(&element); err != nil {
 			return err
@@ -77,6 +82,19 @@ func (repo *GormPsqlRepository) UpdateTemplate(id uint, updatedTemplate model.Pd
 	existingTemplate.Name = updatedTemplate.Name
 
 	if result := repo.db.Save(&existingTemplate); result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (repo *GormPsqlRepository) deleteUnassignedElements() error {
+	var unassignedElements []model.Element
+	if result := repo.db.Where("pdf_template_id IS NULL").Find(&unassignedElements); result.Error != nil {
+		return result.Error
+	}
+
+	if result := repo.db.Delete(&unassignedElements); result.Error != nil {
 		return result.Error
 	}
 
