@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/creation-service/pdf"
 )
@@ -26,6 +27,15 @@ func (r *creationRequest) isValid() bool {
 }
 
 func (c *Controller) CreatePdf(w http.ResponseWriter, r *http.Request) {
+	templateId := r.Context().Value("id").(string)
+
+	id_, err := strconv.Atoi(templateId)
+	id := uint(id_)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	var request creationRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)

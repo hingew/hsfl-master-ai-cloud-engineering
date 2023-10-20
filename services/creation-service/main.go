@@ -26,7 +26,7 @@ func main() {
 	controller := controller.NewController(pdf)
 
 	router := router.New()
-	router.POST("/create", controller.CreatePdf)
+    router.POST("/render/:id", controller.CreatePdf)
 
 	addr := fmt.Sprintf("0.0.0.0:%d", *&appConfig.Port)
 	if err := http.ListenAndServe(addr, router); err != nil {
