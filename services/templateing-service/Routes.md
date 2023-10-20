@@ -29,21 +29,23 @@ Detail JSON
     "updated_at": "2023-10-08 00:00Z",
     "elements": [
         { 
-            "type": "rect"
+            "type": "rect",
             "x": 0, 
             "y": 0, 
             "width": 0, 
             "height": 0
         },
         {
-            "type": "text"
+            "type": "text",
             "x": 0, 
             "y": 0, 
             "width": 0, 
-            "height": 0
-            "value_from": "title"
-            "font": "JetBrainsMono"
+            "height": 0,
+            "value_from": "title",
+            "font": "JetBrainsMono",
             "size": 18
+        }
+
     ]
 }
 ```
