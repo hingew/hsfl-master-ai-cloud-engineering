@@ -51,7 +51,7 @@ func TestController(t *testing.T) {
 			productRepository.
 				EXPECT().
 				GetAllTemplates().
-				Return([]*model.PdfTemplate{
+				Return(&[]model.PdfTemplate{
 					{
 						ID:        999,
 						Name:      "Test",
