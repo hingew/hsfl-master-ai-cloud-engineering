@@ -2,7 +2,6 @@ package pdf
 
 import (
 	"bytes"
-
 	"github.com/jung-kurt/gofpdf"
 )
 
