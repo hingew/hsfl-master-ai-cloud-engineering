@@ -18,21 +18,11 @@ func (r *registerRequest) isValid() bool {
 	return r.Email != "" && r.Password != ""
 }
 
-type RegisterHandler struct {
-	userRepository user.Repository
-	hasher         crypto.Hasher
-}
-
-func NewRegisterHandler(
+func Register(
 	userRepository user.Repository,
 	hasher crypto.Hasher,
-) *RegisterHandler {
-	return &RegisterHandler{userRepository, hasher}
-}
-
-func (handler *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodPost:
+) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		var request registerRequest
 		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -44,7 +34,7 @@ func (handler *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 			return
 		}
 
-		products, err := handler.userRepository.FindByEmail(request.Email)
+		products, err := userRepository.FindByEmail(request.Email)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -55,20 +45,18 @@ func (handler *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 			return
 		}
 
-		hashedPassword, err := handler.hasher.Hash([]byte(request.Password))
+		hashedPassword, err := hasher.Hash([]byte(request.Password))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		if err := handler.userRepository.Create([]*model.DbUser{{
+		if err := userRepository.Create([]*model.DbUser{{
 			Email:    request.Email,
 			Password: hashedPassword,
 		}}); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-	default:
-		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }

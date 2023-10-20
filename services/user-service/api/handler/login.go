@@ -26,23 +26,12 @@ func (r *loginRequest) isValid() bool {
 	return r.Email != "" && r.Password != ""
 }
 
-type LoginHandler struct {
-	userRepository user.Repository
-	hasher         crypto.Hasher
-	tokenGenerator auth.TokenGenerator
-}
-
-func NewLoginHandler(
+func Login(
 	userRepository user.Repository,
 	hasher crypto.Hasher,
 	tokenGenerator auth.TokenGenerator,
-) *LoginHandler {
-	return &LoginHandler{userRepository, hasher, tokenGenerator}
-}
-
-func (handler *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodPost:
+) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		var request loginRequest
 		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -54,7 +43,7 @@ func (handler *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		users, err := handler.userRepository.FindByEmail(request.Email)
+		users, err := userRepository.FindByEmail(request.Email)
 		if err != nil {
 			log.Printf("could not find user by email: %s", err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
@@ -67,14 +56,14 @@ func (handler *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if ok := handler.hasher.Validate([]byte(request.Password), users[0].Password); !ok {
+		if ok := hasher.Validate([]byte(request.Password), users[0].Password); !ok {
 			w.Header().Add("WWW-Authenticate", "Basic realm=Restricted")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 
 		expiration := 1 * time.Hour
-		accessToken, err := handler.tokenGenerator.CreateToken(map[string]interface{}{
+		accessToken, err := tokenGenerator.CreateToken(map[string]interface{}{
 			"email": request.Email,
 			"exp":   time.Now().Add(expiration).Unix(),
 		})
@@ -84,7 +73,6 @@ func (handler *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			TokenType:   "Bearer",
 			ExpiresIn:   int(expiration.Seconds()),
 		})
-	default:
-		w.WriteHeader(http.StatusMethodNotAllowed)
+
 	}
 }

@@ -1,22 +1,14 @@
 package router
 
-import "net/http"
+import (
+	"net/http"
 
-type Router struct {
-	mux *http.ServeMux
-}
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/router"
+)
 
 func New(
-	registerHandler http.Handler,
-	loginHandler http.Handler,
-) *Router {
-	mux := http.NewServeMux()
-	mux.Handle("/api/auth/register", registerHandler)
-	mux.Handle("/api/auth/login", loginHandler)
-
-	return &Router{mux}
-}
-
-func (handler *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	handler.mux.ServeHTTP(w, r)
+	registerHandler http.HandlerFunc,
+	loginHandler http.HandlerFunc,
+) *router.Router {
+	return router
 }
