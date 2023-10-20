@@ -14,7 +14,7 @@ func StartPostgres() (testcontainers.Container, error) {
 		Env: map[string]string{
 			"POSTGRES_USER":     "postgres",
 			"POSTGRES_PASSWORD": "postgres",
-			"POSTGRES_DB":       "database-name",
+			"POSTGRES_DB":       "postgres",
 		},
 		WaitingFor: wait.ForListeningPort("5432/tcp"),
 	}
