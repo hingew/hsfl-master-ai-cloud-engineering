@@ -43,6 +43,7 @@ func (c *Controller) GetTemplate(w http.ResponseWriter, r *http.Request) {
 
 	template, err := c.repo.GetTemplateById(id)
 	if err != nil {
+		// TODO wenn element nicht vorhanden, http.StatusNotFound
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -60,6 +61,7 @@ func (c *Controller) CreateTemplate(w http.ResponseWriter, r *http.Request) {
 
 	id, err := c.repo.CreateTemplate(request)
 	if err != nil {
+		// TODO könnte man sich mit etwas mehr aufwand ran setzen --> https://gorm.io/docs/error_handling.html
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -86,6 +88,8 @@ func (c *Controller) UpdateTemplate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := c.repo.UpdateTemplate(id, *request); err != nil {
+		// TODO könnte man sich mit etwas mehr aufwand ran setzen --> https://gorm.io/docs/error_handling.html
+		// https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -104,6 +108,7 @@ func (c *Controller) DeleteTemplate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := c.repo.DeleteTemplate(id); err != nil {
+		// TODO könnte man sich mit etwas mehr aufwand ran setzen --> https://gorm.io/docs/error_handling.html
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
