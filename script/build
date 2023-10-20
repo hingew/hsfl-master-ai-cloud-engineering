@@ -3,6 +3,7 @@
 ROOT_DIR="$(pwd)"
 
 for goModFile in $(find . -name '*.mod'); do
+    cd $ROOT_DIR
     currentRoot="$(dirname "$goModFile")"
 
     echo ""
