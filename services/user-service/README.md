@@ -1,8 +1,8 @@
 # User Service
 
-## Beschreibung
+## Description
 
-Authentifizierung des Benutzers
+Authentication of the user
 
 ## Configuration
 
