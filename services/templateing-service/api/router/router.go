@@ -16,11 +16,11 @@ func NewTemplateRouter(
 ) *TemplateRouter {
 	myRouter := router.New()
 
-	myRouter.GET("/templates", myController.GetAllTemplates)
-	myRouter.GET("/templates/:id", myController.GetTemplate)
-	myRouter.POST("/templates", myController.CreateTemplate)
-	myRouter.PUT("/templates/:id", myController.UpdateTemplate)
-	myRouter.DELETE("/templates/:id", myController.DeleteTemplate)
+	myRouter.GET("/api/templates", myController.GetAllTemplates)
+	myRouter.GET("/api/templates/:id", myController.GetTemplate)
+	myRouter.POST("/api/templates", myController.CreateTemplate)
+	myRouter.PUT("/api/templates/:id", myController.UpdateTemplate)
+	myRouter.DELETE("/api/templates/:id", myController.DeleteTemplate)
 
 	return &TemplateRouter{myRouter}
 }

@@ -2,27 +2,31 @@ package controller
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 	"strconv"
 
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/creation-service/client"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/creation-service/pdf"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/model"
 )
 
 type Controller struct {
-	pdf pdf.Pdf
+	pdf              pdf.Pdf
+	templatingClient client.TemplatingServiceClient
 }
 
-func NewController(pdf pdf.Pdf) *Controller {
-	return &Controller{pdf}
+func NewController(pdf pdf.Pdf, templatingClient client.TemplatingServiceClient) *Controller {
+	return &Controller{pdf, templatingClient}
 }
 
-type creationRequest struct {
-	TemplateId uint
-}
-
-func (r *creationRequest) isValid() bool {
-	//TODO: add request validation
+func isValid(template *model.PdfTemplate, params map[string]interface{}) bool {
+	for _, element := range template.Elements {
+		if element.ValueFrom != "" {
+			if _, ok := params[element.ValueFrom]; !ok {
+				return false
+			}
+		}
+	}
 	return true
 }
 
@@ -36,21 +40,27 @@ func (c *Controller) CreatePdf(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var request creationRequest
+	// GET the template from the templating service
+	template, err := c.templatingClient.GetTemplate(id)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var request map[string]interface{}
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	if !request.isValid() {
+	if !isValid(template, request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	report := pdf.New()
-
-	// TODO: render elements
-
+	report.Render(template, request)
 	buf, err := report.Out()
 
 	if err != nil {
@@ -58,11 +68,8 @@ func (c *Controller) CreatePdf(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-type", "application/pdf")
-
-	//Stream to response
-	if _, err := io.Copy(w, buf); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-	}
+	w.Write(buf.Bytes())
 
 }

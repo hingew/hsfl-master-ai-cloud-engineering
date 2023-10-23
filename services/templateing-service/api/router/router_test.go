@@ -6,9 +6,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/golang/mock/gomock"
-	mock_controller "github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/_mock"
+	mock_controller "github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/_mocks"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 )
 
 func TestRouter(t *testing.T) {
@@ -24,7 +24,7 @@ func TestRouter(t *testing.T) {
 			for _, test := range tests {
 				// given
 				w := httptest.NewRecorder()
-				r := httptest.NewRequest(test, "/templates", nil)
+				r := httptest.NewRequest(test, "/api/templates", nil)
 
 				// when
 				router.ServeHTTP(w, r)
@@ -37,7 +37,7 @@ func TestRouter(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			// given
 			w := httptest.NewRecorder()
-			r := httptest.NewRequest("GET", "/templates", nil)
+			r := httptest.NewRequest("GET", "/api/templates", nil)
 
 			productsController.
 				EXPECT().
@@ -54,7 +54,7 @@ func TestRouter(t *testing.T) {
 		t.Run("should call POST handler", func(t *testing.T) {
 			// given
 			w := httptest.NewRecorder()
-			r := httptest.NewRequest("POST", "/templates", nil)
+			r := httptest.NewRequest("POST", "/api/templates", nil)
 
 			productsController.
 				EXPECT().
@@ -76,7 +76,7 @@ func TestRouter(t *testing.T) {
 			for _, test := range tests {
 				// given
 				w := httptest.NewRecorder()
-				r := httptest.NewRequest(test, "/templates/1", nil)
+				r := httptest.NewRequest(test, "/api/templates/1", nil)
 
 				// when
 				router.ServeHTTP(w, r)
@@ -89,7 +89,7 @@ func TestRouter(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			// given
 			w := httptest.NewRecorder()
-			r := httptest.NewRequest("GET", "/templates/1", nil)
+			r := httptest.NewRequest("GET", "/api/templates/1", nil)
 
 			productsController.
 				EXPECT().
@@ -106,7 +106,7 @@ func TestRouter(t *testing.T) {
 		t.Run("should call PUT handler", func(t *testing.T) {
 			// given
 			w := httptest.NewRecorder()
-			r := httptest.NewRequest("PUT", "/templates/1", nil)
+			r := httptest.NewRequest("PUT", "/api/templates/1", nil)
 
 			productsController.
 				EXPECT().
@@ -123,7 +123,7 @@ func TestRouter(t *testing.T) {
 		t.Run("should call DELETE handler", func(t *testing.T) {
 			// given
 			w := httptest.NewRecorder()
-			r := httptest.NewRequest("DELETE", "/templates/1", nil)
+			r := httptest.NewRequest("DELETE", "/api/templates/1", nil)
 
 			productsController.
 				EXPECT().

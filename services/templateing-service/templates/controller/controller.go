@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/model"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/model"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/repository"
 )
 
