@@ -1,5 +1,7 @@
 # User Service
 
+**Badge goes here**
+
 ## Description
 
 Authentication of the user
