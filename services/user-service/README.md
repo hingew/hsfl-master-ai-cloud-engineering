@@ -1,6 +1,6 @@
 # User Service
 
-**Badge goes here**
+[![User-service](https://github.com/hingew/hsfl-master-ai-cloud-engineering/actions/workflows/user-service.yml/badge.svg?branch=develop)](https://github.com/hingew/hsfl-master-ai-cloud-engineering/actions/workflows/user-service.yml)
 
 ## Description
 
