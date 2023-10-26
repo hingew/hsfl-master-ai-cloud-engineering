@@ -22,7 +22,7 @@ func TestController(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	productRepository := mock_repository.NewMockIRepository(ctrl)
-	controller := Controller{productRepository}
+	controller := ControllerImp{productRepository}
 
 	t.Run("GetAllTemplates", func(t *testing.T) {
 		t.Run("should return 500 INTERNAL SERVER ERROR if query failed", func(t *testing.T) {

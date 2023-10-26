@@ -10,17 +10,17 @@ import (
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/templates/repository"
 )
 
-type Controller struct {
-	repo repository.IRepository
+type ControllerImp struct {
+	repo repository.Repository
 }
 
 func NewController(
-	repo repository.IRepository,
-) *Controller {
-	return &Controller{repo}
+	repo repository.Repository,
+) *ControllerImp {
+	return &ControllerImp{repo}
 }
 
-func (c *Controller) GetAllTemplates(w http.ResponseWriter, r *http.Request) {
+func (c *ControllerImp) GetAllTemplates(w http.ResponseWriter, r *http.Request) {
 	templates, err := c.repo.GetAllTemplates()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -31,7 +31,7 @@ func (c *Controller) GetAllTemplates(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(templates)
 }
 
-func (c *Controller) GetTemplate(w http.ResponseWriter, r *http.Request) {
+func (c *ControllerImp) GetTemplate(w http.ResponseWriter, r *http.Request) {
 	templateId := r.Context().Value("id").(string)
 
 	id_, err := strconv.Atoi(templateId)
@@ -52,7 +52,7 @@ func (c *Controller) GetTemplate(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(template)
 }
 
-func (c *Controller) CreateTemplate(w http.ResponseWriter, r *http.Request) {
+func (c *ControllerImp) CreateTemplate(w http.ResponseWriter, r *http.Request) {
 	var request model.PdfTemplate
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -71,7 +71,7 @@ func (c *Controller) CreateTemplate(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (c *Controller) UpdateTemplate(w http.ResponseWriter, r *http.Request) {
+func (c *ControllerImp) UpdateTemplate(w http.ResponseWriter, r *http.Request) {
 	templateId := r.Context().Value("id").(string)
 
 	id_, err := strconv.Atoi(templateId)
@@ -97,7 +97,7 @@ func (c *Controller) UpdateTemplate(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (c *Controller) DeleteTemplate(w http.ResponseWriter, r *http.Request) {
+func (c *ControllerImp) DeleteTemplate(w http.ResponseWriter, r *http.Request) {
 	templateId := r.Context().Value("id").(string)
 
 	id_, err := strconv.Atoi(templateId)

@@ -4,7 +4,7 @@ import (
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/templates/model"
 )
 
-type IRepository interface {
+type Repository interface {
 	CreateTemplate(data model.PdfTemplate) (*uint, error)
 	GetAllTemplates() (*[]model.PdfTemplate, error)
 	GetTemplateById(id uint) (*model.PdfTemplate, error)

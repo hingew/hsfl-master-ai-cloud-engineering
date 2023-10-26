@@ -12,7 +12,7 @@ type TemplateRouter struct {
 }
 
 func NewTemplateRouter(
-	myController controller.IController,
+	myController controller.Controller,
 ) *TemplateRouter {
 	myRouter := router.New()
 
