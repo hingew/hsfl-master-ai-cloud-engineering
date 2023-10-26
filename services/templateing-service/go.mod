@@ -4,7 +4,7 @@ go 1.21.1
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
-  github.com/hingew/hsfl-master-ai-cloud-engineering/lib v0.0.0
+	github.com/hingew/hsfl-master-ai-cloud-engineering/lib v0.0.0
 	github.com/lib/pq v1.10.9
 	go.uber.org/mock v0.3.0
 )
@@ -31,7 +31,5 @@ require (
 	gorm.io/driver/postgres v1.5.3
 	gorm.io/driver/sqlite v1.5.4
 )
-
-
 
 replace github.com/hingew/hsfl-master-ai-cloud-engineering/lib v0.0.0 => ../../lib/
