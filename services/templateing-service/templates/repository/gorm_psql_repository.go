@@ -2,7 +2,7 @@ package repository
 
 import (
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/database"
-	"github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/templates/model"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -36,8 +36,8 @@ func (repo *GormPsqlRepository) CreateTemplate(data model.PdfTemplate) (*uint, e
 	return &data.ID, nil
 }
 
-func (repo *GormPsqlRepository) GetAllTemplates() ([]*model.PdfTemplate, error) {
-	var templates []*model.PdfTemplate
+func (repo *GormPsqlRepository) GetAllTemplates() (*[]model.PdfTemplate, error) {
+	var templates *[]model.PdfTemplate
 
 	result := repo.db.Preload("Elements").Find(&templates)
 	if result.Error != nil {

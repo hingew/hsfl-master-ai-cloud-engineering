@@ -6,15 +6,15 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	mock_controller "github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/_mocks"
+	"github.com/golang/mock/gomock"
+	mock_controller "github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/_mock"
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/mock/gomock"
 )
 
 func TestRouter(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
-	productsController := mock_controller.NewMockIController(ctrl)
+	productsController := mock_controller.NewMockController(ctrl)
 	router := NewTemplateRouter(productsController)
 
 	t.Run("/templates", func(t *testing.T) {

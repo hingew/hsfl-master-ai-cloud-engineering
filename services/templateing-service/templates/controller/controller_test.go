@@ -12,17 +12,17 @@ import (
 	"testing"
 	"time"
 
-	mock_repository "github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/_mocks"
-	"github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/templates/model"
+	"github.com/golang/mock/gomock"
+	mock_repository "github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/_mock"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/model"
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/mock/gomock"
 )
 
 func TestController(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
-	productRepository := mock_repository.NewMockIRepository(ctrl)
-	controller := Controller{productRepository}
+	repo := mock_repository.NewMockRepository(ctrl)
+	controller := ControllerImp{repo}
 
 	t.Run("GetAllTemplates", func(t *testing.T) {
 		t.Run("should return 500 INTERNAL SERVER ERROR if query failed", func(t *testing.T) {
@@ -30,7 +30,7 @@ func TestController(t *testing.T) {
 			w := httptest.NewRecorder()
 			r := httptest.NewRequest("GET", "/templates", nil)
 
-			productRepository.
+			repo.
 				EXPECT().
 				GetAllTemplates().
 				Return(nil, errors.New("query failed")).
@@ -48,10 +48,10 @@ func TestController(t *testing.T) {
 			w := httptest.NewRecorder()
 			r := httptest.NewRequest("GET", "/templates", nil)
 
-			productRepository.
+			repo.
 				EXPECT().
 				GetAllTemplates().
-				Return([]*model.PdfTemplate{
+				Return(&[]model.PdfTemplate{
 					{
 						ID:        999,
 						Name:      "Test",
@@ -106,7 +106,7 @@ func TestController(t *testing.T) {
 					},
 				},
 			}
-			productRepository.
+			repo.
 				EXPECT().
 				GetTemplateById(id).
 				Return(template, nil).
@@ -143,7 +143,7 @@ func TestController(t *testing.T) {
 			r := httptest.NewRequest("GET", endpoint, nil)
 			r = r.WithContext(context.WithValue(r.Context(), "id", "1234"))
 
-			productRepository.
+			repo.
 				EXPECT().
 				GetTemplateById(id).
 				Return(nil, errors.New("query failed")).
@@ -219,7 +219,7 @@ func TestController(t *testing.T) {
 					]
 				}`))
 
-			productRepository.
+			repo.
 				EXPECT().
 				CreateTemplate(gomock.Any()).
 				Return(nil, errors.New("database error"))
@@ -260,7 +260,7 @@ func TestController(t *testing.T) {
 
 			id := uint(1)
 
-			productRepository.
+			repo.
 				EXPECT().
 				CreateTemplate(gomock.Any()).
 				Return(&id, nil)
@@ -320,7 +320,7 @@ func TestController(t *testing.T) {
 				Name: "New Name",
 			}
 
-			productRepository.
+			repo.
 				EXPECT().
 				UpdateTemplate(uint(1), request).
 				Return(errors.New("database error"))
@@ -343,7 +343,7 @@ func TestController(t *testing.T) {
 				Name: "New Name",
 			}
 
-			productRepository.
+			repo.
 				EXPECT().
 				UpdateTemplate(uint(1), request).
 				Return(nil)
@@ -378,7 +378,7 @@ func TestController(t *testing.T) {
 			r := httptest.NewRequest("DELETE", "/templates/1", nil)
 			r = r.WithContext(context.WithValue(r.Context(), "id", "1"))
 
-			productRepository.
+			repo.
 				EXPECT().
 				DeleteTemplate(uint(1)).
 				Return(errors.New("database error"))
@@ -396,7 +396,7 @@ func TestController(t *testing.T) {
 			r := httptest.NewRequest("DELETE", "/templates/1", nil)
 			r = r.WithContext(context.WithValue(r.Context(), "id", "1"))
 
-			productRepository.
+			repo.
 				EXPECT().
 				DeleteTemplate(uint(1)).
 				Return(nil)
