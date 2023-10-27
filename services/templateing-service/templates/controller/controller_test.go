@@ -12,10 +12,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
-	mock_repository "github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/_mock"
+	mock_repository "github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/_mocks"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/templates/model"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 )
 
 func TestController(t *testing.T) {

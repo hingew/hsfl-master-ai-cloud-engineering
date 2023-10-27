@@ -1,8 +1,10 @@
 # User Service
 
-## Beschreibung
+[![User-service](https://github.com/hingew/hsfl-master-ai-cloud-engineering/actions/workflows/user-service.yml/badge.svg?branch=develop)](https://github.com/hingew/hsfl-master-ai-cloud-engineering/actions/workflows/user-service.yml)
 
-Authentifizierung des Benutzers
+## Description
+
+Authentication of the user
 
 ## Configuration
 

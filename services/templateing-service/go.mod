@@ -3,8 +3,11 @@ module github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service
 go 1.21.1
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/hingew/hsfl-master-ai-cloud-engineering/lib v0.0.0
-	gorm.io/gorm v1.25.5
+	github.com/lib/pq v1.10.9
+	go.uber.org/mock v0.3.0
+  gorm.io/gorm v1.25.5
 )
 
 require (

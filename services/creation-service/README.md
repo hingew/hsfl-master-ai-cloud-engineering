@@ -1,5 +1,7 @@
 # PDF-Creation Service
 
+[![Creation-service](https://github.com/hingew/hsfl-master-ai-cloud-engineering/actions/workflows/creation-service.yml/badge.svg?branch=develop)](https://github.com/hingew/hsfl-master-ai-cloud-engineering/actions/workflows/creation-service.yml)
+
 ## Beschreibung
 
 Der PDF-Creation Service fragt das Template bei dem PDF-Template Service an und nimmt zusätzlich noch die dynamischen
