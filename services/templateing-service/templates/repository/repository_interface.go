@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/templates/model"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/model"
 )
 
 type Repository interface {

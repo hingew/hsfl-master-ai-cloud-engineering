@@ -7,14 +7,14 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	mock_controller "github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/_mock"
+	mock_controller "github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/_mock"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRouter(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
-	productsController := mock_controller.NewMockIController(ctrl)
+	productsController := mock_controller.NewMockController(ctrl)
 	router := NewTemplateRouter(productsController)
 
 	t.Run("/templates", func(t *testing.T) {

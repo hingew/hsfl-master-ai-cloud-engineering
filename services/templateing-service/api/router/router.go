@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/router"
-	"github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/templates/controller"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/controller"
 )
 
 type TemplateRouter struct {

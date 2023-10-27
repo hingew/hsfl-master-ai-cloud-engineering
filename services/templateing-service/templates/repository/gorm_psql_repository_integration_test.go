@@ -9,7 +9,7 @@ import (
 
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/containerhelpers"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/database"
-	"github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/templates/model"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/model"
 	"github.com/stretchr/testify/assert"
 )
 
