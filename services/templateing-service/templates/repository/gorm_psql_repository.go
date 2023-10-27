@@ -37,14 +37,14 @@ func (repo *GormPsqlRepository) CreateTemplate(data model.PdfTemplate) (*uint, e
 }
 
 func (repo *GormPsqlRepository) GetAllTemplates() (*[]model.PdfTemplate, error) {
-	var templates []model.PdfTemplate
+	var templates *[]model.PdfTemplate
 
 	result := repo.db.Preload("Elements").Find(&templates)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	return &templates, nil
+	return templates, nil
 }
 
 func (repo *GormPsqlRepository) GetTemplateById(id uint) (*model.PdfTemplate, error) {

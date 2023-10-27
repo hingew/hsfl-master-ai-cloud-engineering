@@ -1,1 +1,4 @@
+# This is the build binary for the service
 *.exe
+templating-service
+
