@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'services/templateing-service/**'
+      - '.github/workflows/templateing-service.yml'
 
 jobs:
   test:

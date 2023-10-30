@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'services/creation-service/**'
+      - '.github/workflows/creation-service.yml'
 
 jobs:
   test:

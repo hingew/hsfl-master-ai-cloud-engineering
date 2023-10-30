@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'services/user-service/**'
+      - '.github/workflows/user-service.yml'
 
 jobs:
   test:
