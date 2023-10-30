@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'services/creation-service/**'
+      - '.github/workflows/creation-service.yml'
 
 jobs:
   test:
@@ -28,5 +29,6 @@ jobs:
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        flags: creation-service

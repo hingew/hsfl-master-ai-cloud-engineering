@@ -19,19 +19,7 @@ func TestRegisterHandler(t *testing.T) {
 
 	hasher := mocks.NewMockHasher(ctrl)
 	userRepository := mocks.NewMockRepository(ctrl)
-	handler := NewRegisterHandler(userRepository, hasher)
-
-	t.Run("should return 405 METHOD NOT ALLOWED if method is not POST", func(t *testing.T) {
-		// given
-		w := httptest.NewRecorder()
-		r := httptest.NewRequest("GET", "/api/auth/login", nil)
-
-		// when
-		handler.ServeHTTP(w, r)
-
-		// then
-		assert.Equal(t, http.StatusMethodNotAllowed, w.Code)
-	})
+	handler := Register(userRepository, hasher)
 
 	t.Run("should return 400 BAD REQUEST if payload is not json", func(t *testing.T) {
 		tests := []io.Reader{

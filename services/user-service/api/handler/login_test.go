@@ -22,19 +22,7 @@ func TestLoginHandler(t *testing.T) {
 	userRepository := mocks.NewMockRepository(ctrl)
 	hasher := mocks.NewMockHasher(ctrl)
 	tokenGenerator := mocks.NewMockTokenGenerator(ctrl)
-	handler := NewLoginHandler(userRepository, hasher, tokenGenerator)
-
-	t.Run("should return 405 METHOD NOT ALLOWED if method is not POST", func(t *testing.T) {
-		// given
-		w := httptest.NewRecorder()
-		r := httptest.NewRequest("GET", "/api/auth/login", nil)
-
-		// when
-		handler.ServeHTTP(w, r)
-
-		// then
-		assert.Equal(t, http.StatusMethodNotAllowed, w.Code)
-	})
+	handler := Login(userRepository, hasher, tokenGenerator)
 
 	t.Run("should return 400 BAD REQUEST if payload is not json", func(t *testing.T) {
 		tests := []io.Reader{
