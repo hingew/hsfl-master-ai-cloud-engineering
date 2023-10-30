@@ -1,6 +1,7 @@
 # PDF-Creation Service
 
 [![Creation-service](https://github.com/hingew/hsfl-master-ai-cloud-engineering/actions/workflows/creation-service.yml/badge.svg?branch=develop)](https://github.com/hingew/hsfl-master-ai-cloud-engineering/actions/workflows/creation-service.yml)
+[![codecov](https://codecov.io/gh/hingew/hsfl-master-ai-cloud-engineering/graph/badge.svg?token=CDPMA4XLME)](https://codecov.io/gh/hingew/hsfl-master-ai-cloud-engineering?flag=creation-service)
 
 ## Beschreibung
 
