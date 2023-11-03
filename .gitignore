@@ -1,3 +1,4 @@
 .vscode/
 data/
 user-service/config.yml
+node_modules/
