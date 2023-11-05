@@ -8,7 +8,7 @@ services:
     ports:
       - 3000:3000
     environment:
-      - WEB_ENDPOINT=web:3000
+      - WEB_ENDPOINT=http://web:3000
       - TEMPLATE_ENDPOINT=templates:3000
       - CREATION_ENDPOINT=creation:3000
       - USER_ENDPOINT=user:3000
