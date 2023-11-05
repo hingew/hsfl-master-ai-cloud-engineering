@@ -11,35 +11,35 @@ package mocks
 import (
 	reflect "reflect"
 
-	model "github.com/hingew/hsfl-master-ai-cloud-engineering/templating-service/templates/model"
+	model "github.com/hingew/hsfl-master-ai-cloud-engineering/lib/model"
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockIRepository is a mock of IRepository interface.
-type MockIRepository struct {
+// MockRepository is a mock of Repository interface.
+type MockRepository struct {
 	ctrl     *gomock.Controller
-	recorder *MockIRepositoryMockRecorder
+	recorder *MockRepositoryMockRecorder
 }
 
-// MockIRepositoryMockRecorder is the mock recorder for MockIRepository.
-type MockIRepositoryMockRecorder struct {
-	mock *MockIRepository
+// MockRepositoryMockRecorder is the mock recorder for MockRepository.
+type MockRepositoryMockRecorder struct {
+	mock *MockRepository
 }
 
-// NewMockIRepository creates a new mock instance.
-func NewMockIRepository(ctrl *gomock.Controller) *MockIRepository {
-	mock := &MockIRepository{ctrl: ctrl}
-	mock.recorder = &MockIRepositoryMockRecorder{mock}
+// NewMockRepository creates a new mock instance.
+func NewMockRepository(ctrl *gomock.Controller) *MockRepository {
+	mock := &MockRepository{ctrl: ctrl}
+	mock.recorder = &MockRepositoryMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockIRepository) EXPECT() *MockIRepositoryMockRecorder {
+func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
 	return m.recorder
 }
 
 // CreateTemplate mocks base method.
-func (m *MockIRepository) CreateTemplate(data model.PdfTemplate) (*uint, error) {
+func (m *MockRepository) CreateTemplate(data model.PdfTemplate) (*uint, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateTemplate", data)
 	ret0, _ := ret[0].(*uint)
@@ -48,13 +48,13 @@ func (m *MockIRepository) CreateTemplate(data model.PdfTemplate) (*uint, error) 
 }
 
 // CreateTemplate indicates an expected call of CreateTemplate.
-func (mr *MockIRepositoryMockRecorder) CreateTemplate(data any) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) CreateTemplate(data any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTemplate", reflect.TypeOf((*MockIRepository)(nil).CreateTemplate), data)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTemplate", reflect.TypeOf((*MockRepository)(nil).CreateTemplate), data)
 }
 
 // DeleteTemplate mocks base method.
-func (m *MockIRepository) DeleteTemplate(id uint) error {
+func (m *MockRepository) DeleteTemplate(id uint) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteTemplate", id)
 	ret0, _ := ret[0].(error)
@@ -62,28 +62,28 @@ func (m *MockIRepository) DeleteTemplate(id uint) error {
 }
 
 // DeleteTemplate indicates an expected call of DeleteTemplate.
-func (mr *MockIRepositoryMockRecorder) DeleteTemplate(id any) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) DeleteTemplate(id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteTemplate", reflect.TypeOf((*MockIRepository)(nil).DeleteTemplate), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteTemplate", reflect.TypeOf((*MockRepository)(nil).DeleteTemplate), id)
 }
 
 // GetAllTemplates mocks base method.
-func (m *MockIRepository) GetAllTemplates() ([]*model.PdfTemplate, error) {
+func (m *MockRepository) GetAllTemplates() (*[]model.PdfTemplate, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAllTemplates")
-	ret0, _ := ret[0].([]*model.PdfTemplate)
+	ret0, _ := ret[0].(*[]model.PdfTemplate)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetAllTemplates indicates an expected call of GetAllTemplates.
-func (mr *MockIRepositoryMockRecorder) GetAllTemplates() *gomock.Call {
+func (mr *MockRepositoryMockRecorder) GetAllTemplates() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllTemplates", reflect.TypeOf((*MockIRepository)(nil).GetAllTemplates))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllTemplates", reflect.TypeOf((*MockRepository)(nil).GetAllTemplates))
 }
 
 // GetTemplateById mocks base method.
-func (m *MockIRepository) GetTemplateById(id uint) (*model.PdfTemplate, error) {
+func (m *MockRepository) GetTemplateById(id uint) (*model.PdfTemplate, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetTemplateById", id)
 	ret0, _ := ret[0].(*model.PdfTemplate)
@@ -92,13 +92,13 @@ func (m *MockIRepository) GetTemplateById(id uint) (*model.PdfTemplate, error) {
 }
 
 // GetTemplateById indicates an expected call of GetTemplateById.
-func (mr *MockIRepositoryMockRecorder) GetTemplateById(id any) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) GetTemplateById(id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTemplateById", reflect.TypeOf((*MockIRepository)(nil).GetTemplateById), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTemplateById", reflect.TypeOf((*MockRepository)(nil).GetTemplateById), id)
 }
 
 // UpdateTemplate mocks base method.
-func (m *MockIRepository) UpdateTemplate(id uint, data model.PdfTemplate) error {
+func (m *MockRepository) UpdateTemplate(id uint, data model.PdfTemplate) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateTemplate", id, data)
 	ret0, _ := ret[0].(error)
@@ -106,7 +106,7 @@ func (m *MockIRepository) UpdateTemplate(id uint, data model.PdfTemplate) error 
 }
 
 // UpdateTemplate indicates an expected call of UpdateTemplate.
-func (mr *MockIRepositoryMockRecorder) UpdateTemplate(id, data any) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) UpdateTemplate(id, data any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateTemplate", reflect.TypeOf((*MockIRepository)(nil).UpdateTemplate), id, data)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateTemplate", reflect.TypeOf((*MockRepository)(nil).UpdateTemplate), id, data)
 }

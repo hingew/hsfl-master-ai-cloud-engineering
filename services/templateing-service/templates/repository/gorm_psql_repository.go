@@ -2,7 +2,7 @@ package repository
 
 import (
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/database"
-	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/model"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
