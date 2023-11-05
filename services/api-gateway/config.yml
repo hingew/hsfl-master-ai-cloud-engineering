@@ -1,0 +1,2 @@
+templateing-service:
+  [["/templates", "/templates"], ["/templates/:id", "/templates/:id"]]
