@@ -1,0 +1,16 @@
+{
+    "name": "web-service",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "scripts": {
+      "build:js": "node build-tools/build-js.mjs",
+      "build:css": "node build-tools/build-css.mjs",
+      "build": "yarn build:js && yarn build:css"
+    },
+    "devDependencies": {
+      "esbuild": "^0.19.5",
+      "esbuild-sass-plugin": "^2.16.0",
+      "glob": "^10.3.10"
+    }
+  }
