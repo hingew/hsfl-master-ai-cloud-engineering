@@ -1,12 +1,16 @@
 FROM golang:1.21-alpine
 
-WORKDIR /app
-COPY ./src/api-gateway ./src/api-gateway
+ENV TEMPLATE_ENDPOINT=
+ENV WEB_ENDPOINT=
+ENV CREATION_ENDPOINT=
+ENV USER_ENDPOINT=
 
-WORKDIR /app/src/api-gateway
-RUN yarn
-RUN yarn build
+WORKDIR /app
+COPY ./services/api-gateway ./services/api-gateway
+
+WORKDIR /app/services/api-gateway
+RUN go mod tidy
 RUN go build -o ./main
 
 EXPOSE 3000
-CMD ["/app/src/api-gateway/main"]
+CMD ["/app/services/api-gateway/main"]
