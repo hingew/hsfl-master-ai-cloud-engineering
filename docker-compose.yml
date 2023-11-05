@@ -9,9 +9,9 @@ services:
       - 3000:3000
     environment:
       - WEB_ENDPOINT=http://web:3000
-      - TEMPLATE_ENDPOINT=templates:3000
-      - CREATION_ENDPOINT=creation:3000
-      - USER_ENDPOINT=user:3000
+      - TEMPLATE_ENDPOINT=http://templates:3000
+      - CREATION_ENDPOINT=http://creation:3000
+      - USER_ENDPOINT=http://user:3000
     depends_on:
       - web
       - templates
@@ -78,7 +78,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U test"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
