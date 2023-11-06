@@ -17,11 +17,6 @@ services:
       - templates
       - creation
       - user
-    links:
-      - web
-      - templates
-      - creation
-      - user
   
   web:
     build:
@@ -38,22 +33,18 @@ services:
       dockerfile: ./services/templateing-service/Dockerfile
     ports:
       - 3002:3000
+    volumes:
+      - ./services/templateing-service/config.yml:/app/config.yml
     depends_on:
       postgres:
         condition: service_healthy
-    links:
-      - postgres
-    environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASS: postgres
-      DB_NAME: postgres
   
   creation:
     build: 
       context: ./
       dockerfile: ./services/creation-service/Dockerfile
+    volumes:
+      - ./services/creation-service/config.yml:/app/config.yml
     ports:
       - 3003:3000
   
@@ -63,11 +54,12 @@ services:
       dockerfile: ./services/user-service/Dockerfile
     ports:
       - 3004:3000
+    volumes:
+      - ./services/user-service/config.yml:/app/config.yml
+      - ./services/user-service/cert.pem:/app/cert.pem 
     depends_on:
       postgres:
         condition: service_healthy
-    links:
-      - postgres
 
   postgres:
     image: postgres:15-alpine

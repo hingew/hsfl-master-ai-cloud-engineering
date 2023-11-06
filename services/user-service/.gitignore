@@ -1,2 +1,5 @@
 # This is the build binary for the service
 user-service
+
+# Certificate files
+*.pem

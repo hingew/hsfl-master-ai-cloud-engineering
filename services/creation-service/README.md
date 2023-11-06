@@ -12,9 +12,4 @@ Damit kann dieser sehr leicht skaliert werden.
 
 ## Configuration
 
-Create a private key for signing JWT tokens:
-
-```yml
-templating_service_url: "http://templates"
-port: 3000
-```
+To Configure the templateing service create your own config.yml file. Look [here](config.example.yml) for an template/example config
