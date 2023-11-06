@@ -33,7 +33,7 @@ func readRoutesConfig() RoutesConfig {
 	return routes
 }
 
-func addRoutes(proxy *my_proxy.ReverseProxy, endpoint string, routes []string) {
+func addRoutes(proxy my_proxy.ReverseProxy, endpoint string, routes []string) {
 	for _, source_route := range routes {
 		target_route := fmt.Sprintf("%s%s", endpoint, source_route)
 		proxy.Map(source_route, target_route)
@@ -41,12 +41,12 @@ func addRoutes(proxy *my_proxy.ReverseProxy, endpoint string, routes []string) {
 }
 
 func main() {
-	templateing_service_endpoint := "http://templates:3000" // os.Getenv("TEMPLATE_ENDPOINT")
-	web_service_endpoint := "http://web:3000"               // os.Getenv("WEB_ENDPOINT")
-	creation_service_endpoint := "http://creation:3000"     // os.Getenv("CREATION_ENDPOINT")
-	user_service_endpoint := "http://user:3000"             // os.Getenv("USER_ENDPOINT")
+	templateing_service_endpoint := os.Getenv("TEMPLATE_ENDPOINT")
+	web_service_endpoint := os.Getenv("WEB_ENDPOINT")
+	creation_service_endpoint := os.Getenv("CREATION_ENDPOINT")
+	user_service_endpoint := os.Getenv("USER_ENDPOINT")
 
-	proxy := my_proxy.NewReverseProxy(http.DefaultClient)
+	proxy := my_proxy.NewHttpReverseProxy(http.DefaultClient)
 
 	routes := readRoutesConfig()
 	addRoutes(proxy, templateing_service_endpoint, routes.TemplateingService)
