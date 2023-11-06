@@ -70,11 +70,9 @@ services:
       - postgres
 
   postgres:
-    image: postgres:14-alpine
+    image: postgres:15-alpine
     ports:
       - 5432:5432
-    volumes:
-      - ./data:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
@@ -84,3 +82,5 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    volumes:
+      - ./services/templateing-service/sql/testdata.sql:/docker-entrypoint-initdb.d/init.sql
