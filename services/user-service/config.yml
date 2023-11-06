@@ -1,6 +1,9 @@
 database:
-  host: localhost
+  host: postgres
   port: 5432
   username: postgres
   password: postgres
   dbname: postgres
+jwt:
+  signKey: /path/to/user-service.pem
+port: 3000

@@ -1,56 +1,94 @@
 package my_proxy
 
 import (
+	"fmt"
+	"io"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
+	"time"
 )
 
+type HttpClient interface {
+	Do(*http.Request) (*http.Response, error)
+}
+
 type ReverseProxy struct {
-	client ProxyClient
+	client HttpClient
 	routes map[string]string
 }
 
-func NewReverseProxy(targetHost string) (*ReverseProxy, error) {
-	url, err := url.Parse(targetHost)
-	if err != nil {
-		return nil, err
-	}
-
-	client := httputil.NewSingleHostReverseProxy(url)
-
-	proxy := ReverseProxy{client: client, routes: make(map[string]string)}
-
-	originalDirector := client.Director
-	client.Director = func(req *http.Request) {
-		originalDirector(req)
-		modifyRequest(req, proxy.routes)
-	}
-
-	client.ErrorHandler = errorHandler()
-
-	proxy.client = client
-
-	return &proxy, nil
+func NewReverseProxy(client HttpClient) *ReverseProxy {
+	return &ReverseProxy{client: client, routes: make(map[string]string)}
 }
 
 func (reverseProxy *ReverseProxy) Map(sourcePath string, destinationPath string) {
 	reverseProxy.routes[sourcePath] = destinationPath
 }
 
-func modifyRequest(req *http.Request, routes map[string]string) {
-	destinationPath, ok := routes[req.URL.Path]
-	if ok {
-		req.URL.Path = destinationPath
+func (reverseProxy *ReverseProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	endpointServerURL, err := reverseProxy.evaluateEndpointServer(req.URL.Path)
+	if err != nil {
+		rw.WriteHeader(http.StatusNotFound)
+		fmt.Fprintf(rw, "%s", err.Error())
+	}
+
+	reverseProxy.modifyRequest(req, endpointServerURL)
+
+	response, err := reverseProxy.client.Do(req)
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(rw, "%s", err)
+		return
+	}
+
+	reverseProxy.copyResponseHeader(response, rw)
+	reverseProxy.copyResponseStreamBody(response, rw)
+}
+
+func (reverseProxy *ReverseProxy) evaluateEndpointServer(sourceUrl string) (*url.URL, error) {
+	rawDestinationURL, ok := reverseProxy.routes[sourceUrl]
+	if ok != true {
+		errorMsg := fmt.Sprintf("Could not found: %s\n", sourceUrl)
+		errorMsg += "Supported URLs:\n"
+		for key, _ := range reverseProxy.routes {
+			errorMsg += fmt.Sprintf("\t%s\n", key)
+		}
+		return nil, fmt.Errorf(errorMsg)
+	}
+
+	return url.Parse(rawDestinationURL)
+}
+
+func (reverseProxy *ReverseProxy) modifyRequest(req *http.Request, endpoint *url.URL) {
+	req.Host = endpoint.Host
+	req.URL.Host = endpoint.Host
+	req.URL.Scheme = endpoint.Scheme
+	req.RequestURI = ""
+}
+
+func (reverseProxy *ReverseProxy) copyResponseHeader(response *http.Response, rw http.ResponseWriter) {
+	for key, values := range response.Header {
+		for _, value := range values {
+			rw.Header().Set(key, value)
+		}
 	}
 }
 
-func errorHandler() func(http.ResponseWriter, *http.Request, error) {
-	return func(w http.ResponseWriter, r *http.Request, err error) {
-		http.Error(w, "Error while computing request: "+err.Error(), http.StatusInternalServerError)
-	}
-}
+func (reverseProxy *ReverseProxy) copyResponseStreamBody(response *http.Response, rw http.ResponseWriter) {
+	done := make(chan bool)
+	go func() {
+		for {
+			select {
+			case <-time.Tick(10 * time.Millisecond):
+				rw.(http.Flusher).Flush()
+			case <-done:
+				return
+			}
+		}
+	}()
 
-func (reverseProxy *ReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	reverseProxy.client.ServeHTTP(w, r)
+	rw.WriteHeader(response.StatusCode)
+	io.Copy(rw, response.Body)
+
+	close(done)
 }

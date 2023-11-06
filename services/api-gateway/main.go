@@ -46,10 +46,7 @@ func main() {
 	creation_service_endpoint := "http://creation:3000"     // os.Getenv("CREATION_ENDPOINT")
 	user_service_endpoint := "http://user:3000"             // os.Getenv("USER_ENDPOINT")
 
-	proxy, err := my_proxy.NewReverseProxy("http://localhost:3000")
-	if err != nil {
-		log.Fatalf("could not create reverse proxy: %s", err.Error())
-	}
+	proxy := my_proxy.NewReverseProxy(http.DefaultClient)
 
 	routes := readRoutesConfig()
 	addRoutes(proxy, templateing_service_endpoint, routes.TemplateingService)

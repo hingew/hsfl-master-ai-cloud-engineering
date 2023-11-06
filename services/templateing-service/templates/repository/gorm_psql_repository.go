@@ -5,7 +5,6 @@ import (
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 type GormPsqlRepository struct {
@@ -13,7 +12,8 @@ type GormPsqlRepository struct {
 }
 
 func NewGormPsqlRepository(config database.Config) (*GormPsqlRepository, error) {
-	db, err := gorm.Open(postgres.Open(config.Dsn()), &gorm.Config{Logger: logger.Default.LogMode(logger.Info)})
+	// db, err := gorm.Open(postgres.Open(config.Dsn()), &gorm.Config{Logger: logger.Default.LogMode(logger.Info)})
+	db, err := gorm.Open(postgres.Open(config.Dsn()), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
