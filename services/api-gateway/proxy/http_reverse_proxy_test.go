@@ -66,37 +66,62 @@ func TestController(t *testing.T) {
 			proxy.ServeHTTP(w, r)
 
 			// assert
-			errorMsg := "Could not found: /test\nSupported URLs:\n\t/test2\n\t/test3\n"
+			errorMsg1 := "Could not found: /test\nSupported URLs:\n\t/test2\n\t/test3\n"
+			errorMsg2 := "Could not found: /test\nSupported URLs:\n\t/test3\n\t/test2\n"
 			assert.Equal(t, http.StatusNotFound, w.Code)
-			assert.Equal(t, errorMsg, w.Body.String())
+			assert.Assert(t, w.Body.String() == errorMsg1 || w.Body.String() == errorMsg2)
 		})
 	})
 
 	t.Run("Route supported", func(t *testing.T) {
 		proxy := NewHttpReverseProxy(client)
 		proxy.routes["/test2"] = "http://newEndpoint:3000/test2"
+		proxy.routes["/test2/:id"] = "http://newEndpoint:3000/test2/:id"
 		proxy.routes["/test3"] = "http://newEndpoint2:3000/test3"
+		proxy.routes["/test3/:id"] = "http://newEndpoint2:3000/test3/:id"
 
 		t.Run("Client answers with http.StatusAccepted", func(t *testing.T) {
-			// arrange
-			proxyReq := httptest.NewRequest(http.MethodGet, "/test3", nil)
-			serverReq := httptest.NewRequest(http.MethodGet, "http://newEndpoint2:3000/test3", nil)
-			serverReq.RequestURI = ""
-
-			w := httptest.NewRecorder()
-
 			response := &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(strings.NewReader("")),
 			}
-			client.EXPECT().Do(serverReq).Return(response, nil).Times(1)
 
-			// act
-			proxy.ServeHTTP(w, proxyReq)
+			t.Run("Route contains no id", func(t *testing.T) {
+				// arrange
+				proxyReq := httptest.NewRequest(http.MethodGet, "/test3", nil)
+				serverReq := httptest.NewRequest(http.MethodGet, "http://newEndpoint2:3000/test3", nil)
+				serverReq.RequestURI = ""
 
-			// assert
-			assert.Equal(t, http.StatusOK, w.Code)
-			assert.Equal(t, "", w.Body.String())
+				w := httptest.NewRecorder()
+
+				client.EXPECT().Do(serverReq).Return(response, nil).Times(1)
+
+				// act
+				proxy.ServeHTTP(w, proxyReq)
+
+				// assert
+				assert.Equal(t, http.StatusOK, w.Code)
+				assert.Equal(t, "", w.Body.String())
+			})
+
+			t.Run("Route contains an id", func(t *testing.T) {
+				// arrange
+				proxyReq := httptest.NewRequest(http.MethodGet, "/test3/691", nil)
+				serverReq := httptest.NewRequest(http.MethodGet, "http://newEndpoint2:3000/test3/691", nil)
+				serverReq.RequestURI = ""
+
+				w := httptest.NewRecorder()
+
+				client.EXPECT().Do(serverReq).Return(response, nil).Times(1)
+
+				// act
+				proxy.ServeHTTP(w, proxyReq)
+
+				// assert
+				assert.Equal(t, http.StatusOK, w.Code)
+				assert.Equal(t, "", w.Body.String())
+			})
+
 		})
 
 		t.Run("Client answers with http.StatusInternalServerError", func(t *testing.T) {

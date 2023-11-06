@@ -3,8 +3,11 @@ package my_proxy
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
+	"regexp"
+	"strings"
 	"time"
 )
 
@@ -47,7 +50,7 @@ func (reverseProxy *HttpReverseProxy) ServeHTTP(rw http.ResponseWriter, req *htt
 }
 
 func (reverseProxy *HttpReverseProxy) evaluateEndpointServer(sourceUrl string) (*url.URL, error) {
-	rawDestinationURL, ok := reverseProxy.routes[sourceUrl]
+	ok, rawDestinationURL := reverseProxy.matchSupportedRoute(sourceUrl)
 	if ok != true {
 		errorMsg := fmt.Sprintf("Could not found: %s\n", sourceUrl)
 		errorMsg += "Supported URLs:\n"
@@ -56,8 +59,37 @@ func (reverseProxy *HttpReverseProxy) evaluateEndpointServer(sourceUrl string) (
 		}
 		return nil, fmt.Errorf(errorMsg)
 	}
+	log.Println(rawDestinationURL)
 
-	return url.Parse(rawDestinationURL)
+	return url.Parse(*rawDestinationURL)
+}
+
+func (reverseProxy *HttpReverseProxy) matchSupportedRoute(source_route string) (bool, *string) {
+	if !containsId(source_route) {
+		destination_route, ok := reverseProxy.routes[source_route]
+		return ok, &destination_route
+	}
+
+	for key, value := range reverseProxy.routes {
+		if !strings.Contains(key, ":id") {
+			continue
+		}
+		expression := strings.Replace(key, ":id", `(\d+)`, 1)
+		reg := regexp.MustCompile(expression)
+		matches := reg.FindStringSubmatch(source_route)
+		if len(matches) == 2 {
+			id := matches[1]
+			destinationRoute := strings.Replace(value, ":id", id, 1)
+			return true, &destinationRoute
+		}
+	}
+
+	return false, nil
+}
+
+func containsId(str string) bool {
+	regex := regexp.MustCompile(`/\d+`)
+	return regex.MatchString(str)
 }
 
 func (reverseProxy *HttpReverseProxy) modifyRequest(req *http.Request, endpoint *url.URL) {

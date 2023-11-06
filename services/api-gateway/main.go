@@ -41,6 +41,13 @@ func addRoutes(proxy my_proxy.ReverseProxy, endpoint string, routes []string) {
 }
 
 func main() {
+	/*
+		templateing_service_endpoint := "http://templates:3000"
+		web_service_endpoint := "http://web:3000"
+		creation_service_endpoint := "http://creation:3000"
+		user_service_endpoint := "http://user:3000"
+	*/
+
 	templateing_service_endpoint := os.Getenv("TEMPLATE_ENDPOINT")
 	web_service_endpoint := os.Getenv("WEB_ENDPOINT")
 	creation_service_endpoint := os.Getenv("CREATION_ENDPOINT")
@@ -48,6 +55,14 @@ func main() {
 
 	proxy := my_proxy.NewHttpReverseProxy(http.DefaultClient)
 
+	/*
+		routes := RoutesConfig{
+			TemplateingService: []string{"/api/templates", "/api/templates/:id"},
+			UserService:        []string{"/auth/register", "/auth/login"},
+			WebService:         []string{"/", "/static/"},
+			CreationService:    []string{"/api/render/:id"},
+		}
+	*/
 	routes := readRoutesConfig()
 	addRoutes(proxy, templateing_service_endpoint, routes.TemplateingService)
 	addRoutes(proxy, web_service_endpoint, routes.WebService)
