@@ -30,6 +30,7 @@ func (reverseProxy *HttpReverseProxy) ServeHTTP(rw http.ResponseWriter, req *htt
 	if err != nil {
 		rw.WriteHeader(http.StatusNotFound)
 		fmt.Fprintf(rw, "%s", err.Error())
+		return
 	}
 
 	reverseProxy.modifyRequest(req, endpointServerURL)
