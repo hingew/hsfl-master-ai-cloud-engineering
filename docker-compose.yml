@@ -27,6 +27,8 @@ services:
       - 3001:3000
     environment:
       - TEMPLATE_ENDPOINT=templates:3000
+    depends_on:
+      - templates
 
   templates:
     build:
@@ -34,8 +36,11 @@ services:
       dockerfile: ./services/templateing-service/Dockerfile
     ports:
       - 3002:3000
+    environment:
+      - USE_TESTDATA=true
     volumes:
       - ./services/templateing-service/config.yml:/app/config.yml
+      - ./services/templateing-service/test_data.json:/app/test_data.json
     depends_on:
       postgres:
         condition: service_healthy
