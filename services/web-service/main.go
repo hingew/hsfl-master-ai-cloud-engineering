@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 type IndexPageViewModel struct {
@@ -14,8 +15,8 @@ type IndexPageViewModel struct {
 }
 
 type PdfTemplate struct {
-	UpdatedAt string
-	CreatedAt string
+	UpdatedAt time.Time
+	CreatedAt time.Time
 	Name      string
 }
 
