@@ -1,21 +1,22 @@
 {{ define "index" }}
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>PDF Templates </title>
-        <script src="static/js/bundle.js"></script>
-        <link href="static/css/bundle.css" rel="stylesheet">
-    </head>
-    <body>
-        <ul class="templates">
-            {{ range .PdfTemplate }}
-            <li class="templates__item">
-                <span>von {{ .UpdatedAt }}</span>
-                <span>für {{ .CreatedAt }}€</span>
-                <span>von {{ .Name }}</span>
-            </li>
-            {{ end }}
-        </ul>
-    </body>
+<head>
+    <title>PDF Templates</title>
+     <script src="static/js/bundle.js"></script>
+    <link href="static/css/bundle.css" rel="stylesheet">
+</head>
+<body>
+    <h1>PDF Templates</h1>
+    <ul class="templates">
+        {{ range .PdfTemplate }}
+        <li class="templates__item">
+            <span class="templates__updated">Geändert am: {{ .UpdatedAt }}</span>
+            <span class="templates__created">Erstellt am: {{ .CreatedAt }}</span>
+            <span class="templates__name">Von {{ .Name }}</span>
+        </li>
+        {{ end }}
+    </ul>
+</body>
 </html>
 {{ end }}

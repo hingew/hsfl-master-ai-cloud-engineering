@@ -70,4 +70,4 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - ./services/templateing-service/sql/testdata.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./services/templateing-service/sql:/docker-entrypoint-initdb.d

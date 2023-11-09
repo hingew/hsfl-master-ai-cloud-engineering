@@ -54,12 +54,12 @@ func (reverseProxy *HttpReverseProxy) evaluateEndpointServer(sourceUrl string) (
 	if ok != true {
 		errorMsg := fmt.Sprintf("Could not found: %s\n", sourceUrl)
 		errorMsg += "Supported URLs:\n"
-		for key, _ := range reverseProxy.routes {
+		for key := range reverseProxy.routes {
 			errorMsg += fmt.Sprintf("\t%s\n", key)
 		}
 		return nil, fmt.Errorf(errorMsg)
 	}
-	log.Println(rawDestinationURL)
+	log.Println(*rawDestinationURL)
 
 	return url.Parse(*rawDestinationURL)
 }
