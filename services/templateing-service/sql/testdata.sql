@@ -1,4 +1,4 @@
-CREATE TABLE templates (
+CREATE TABLE pdf_templates (
 	id          serial  primary key,
 	updatedAt   date    not null,
 	createdAt   date    not null,
@@ -6,6 +6,6 @@ CREATE TABLE templates (
 	
 );
 
-INSERT INTO templates (updatedAt, createdAt, name) VALUES 
+INSERT INTO pdf_templates (updatedAt, createdAt, name) VALUES 
 ('2023-11-03', '2023-11-03', 'Vorlage 1'),
 ('2023-11-02', '2023-11-02', 'Vorlage 2');
