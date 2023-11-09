@@ -12,11 +12,12 @@ services:
       - TEMPLATE_ENDPOINT=http://templates:3000
       - CREATION_ENDPOINT=http://creation:3000
       - USER_ENDPOINT=http://user:3000
+    volumes:
+      - ./services/api-gateway/config.yml:/app/config.yml
     depends_on:
       - web
       - templates
       - creation
-      - user
   
   web:
     build:
@@ -47,19 +48,8 @@ services:
       - ./services/creation-service/config.yml:/app/config.yml
     ports:
       - 3003:3000
-  
-  user:
-    build: 
-      context: ./
-      dockerfile: ./services/user-service/Dockerfile
-    ports:
-      - 3004:3000
-    volumes:
-      - ./services/user-service/config.yml:/app/config.yml
-      - ./services/user-service/cert.pem:/app/cert.pem 
     depends_on:
-      postgres:
-        condition: service_healthy
+      - templates
 
   postgres:
     image: postgres:15-alpine
