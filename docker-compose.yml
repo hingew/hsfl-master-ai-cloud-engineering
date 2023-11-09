@@ -27,7 +27,7 @@ services:
       - 3001:3000
     environment:
       - TEMPLATE_ENDPOINT=templates:3000
-    depends_on:
+    links:
       - templates
 
   templates:
@@ -37,7 +37,7 @@ services:
     ports:
       - 3002:3000
     environment:
-      - USE_TESTDATA=true
+      - USE_TESTDATA=false
     volumes:
       - ./services/templateing-service/config.yml:/app/config.yml
       - ./services/templateing-service/test_data.json:/app/test_data.json
@@ -53,7 +53,7 @@ services:
       - ./services/creation-service/config.yml:/app/config.yml
     ports:
       - 3003:3000
-    depends_on:
+    links:
       - templates
 
   postgres:

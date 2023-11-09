@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -42,6 +43,8 @@ func (c *Controller) CreatePdf(w http.ResponseWriter, r *http.Request) {
 
 	// GET the template from the templating service
 	template, err := c.templatingClient.GetTemplate(id)
+	log.Print(template)
+	log.Print(err)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

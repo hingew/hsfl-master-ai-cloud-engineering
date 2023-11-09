@@ -50,15 +50,18 @@ func LoadConfigFromFile(path string) (*ApplicationConfig, error) {
 func main() {
 	use_testdata := os.Getenv("USE_TESTDATA")
 
-	var testdata *[]model.PdfTemplate
+	var testdata []model.PdfTemplate
 	var err error
 
 	if use_testdata == "true" {
 		log.Print("Use testdata")
-		testdata, err = LoadTestData("test_data.json")
+		p, err := LoadTestData("test_data.json")
 		if err != nil {
 			log.Fatalf("could not load testdata: %s", err.Error())
+		} else {
+			testdata = *p
 		}
+
 	}
 
 	configPath := flag.String("config", "config.yml", "The path to the configuration file")
@@ -77,7 +80,7 @@ func main() {
 	ctr := controller.NewController(repo)
 	handler := router.NewTemplateRouter(ctr)
 
-	if err := repo.Setup(*testdata); err != nil {
+	if err := repo.Setup(testdata); err != nil {
 		log.Fatalf("could not setup database: %s", err.Error())
 	}
 

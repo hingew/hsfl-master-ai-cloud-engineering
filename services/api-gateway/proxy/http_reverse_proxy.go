@@ -3,7 +3,6 @@ package my_proxy
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -59,7 +58,6 @@ func (reverseProxy *HttpReverseProxy) evaluateEndpointServer(sourceUrl string) (
 		}
 		return nil, fmt.Errorf(errorMsg)
 	}
-	log.Println(*rawDestinationURL)
 
 	return url.Parse(*rawDestinationURL)
 }
