@@ -1,12 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/database"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/model"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/api/router"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/controller"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/repository"
@@ -15,6 +17,20 @@ import (
 
 type ApplicationConfig struct {
 	Database database.PsqlConfig `yaml:"database"`
+}
+
+func LoadTestData(path string) (*[]model.PdfTemplate, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+
+	var testdata []model.PdfTemplate
+	if err := json.NewDecoder(f).Decode(&testdata); err != nil {
+		return nil, err
+	}
+
+	return &testdata, nil
 }
 
 func LoadConfigFromFile(path string) (*ApplicationConfig, error) {
@@ -32,10 +48,25 @@ func LoadConfigFromFile(path string) (*ApplicationConfig, error) {
 }
 
 func main() {
-	configPath := flag.String("config", "config.example.yml", "The path to the configuration file")
+	use_testdata := os.Getenv("USE_TESTDATA")
+
+	var testdata []model.PdfTemplate
+	var err error
+
+	if use_testdata == "true" {
+		log.Print("Use testdata")
+		p, err := LoadTestData("test_data.json")
+		if err != nil {
+			log.Fatalf("could not load testdata: %s", err.Error())
+		} else {
+			testdata = *p
+		}
+
+	}
+
+	configPath := flag.String("config", "config.yml", "The path to the configuration file")
 	flag.Parse()
 
-	// TODO: Haukes lib Funktion hier nutzen
 	config, err := LoadConfigFromFile(*configPath)
 	if err != nil {
 		log.Fatalf("could not load application configuration: %s", err.Error())
@@ -49,7 +80,7 @@ func main() {
 	ctr := controller.NewController(repo)
 	handler := router.NewTemplateRouter(ctr)
 
-	if err := repo.Setup(); err != nil {
+	if err := repo.Setup(testdata); err != nil {
 		log.Fatalf("could not setup database: %s", err.Error())
 	}
 

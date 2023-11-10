@@ -1,0 +1,70 @@
+[
+    {
+        "name": "Template1",
+        "elements": [
+            { 
+                "type": "rect",
+                "x": 0, 
+                "y": 10, 
+                "width": 30, 
+                "height": 5
+            },
+            {
+                "type": "text",
+                "x": 30, 
+                "y": 30, 
+                "width": 60, 
+                "height": 0,
+                "value_from": "title",
+                "font": "JetBrainsMono",
+                "size": 18
+            }
+        ]
+    },
+    {
+        "name": "Template2",
+        "elements": []
+    },
+    {
+        "name": "Template3",
+        "elements": [
+            { 
+                "type": "rect",
+                "x": 0, 
+                "y": 10, 
+                "width": 30, 
+                "height": 5
+            },
+            {
+                "type": "text",
+                "x": 30, 
+                "y": 30, 
+                "width": 60, 
+                "height": 0,
+                "value_from": "title",
+                "font": "JetBrainsMono",
+                "size": 18
+            },
+            {
+                "type": "text",
+                "x": 60, 
+                "y": 120, 
+                "width": 60, 
+                "height": 30,
+                "value_from": "date",
+                "font": "JetBrainsMono",
+                "size": 12
+            },
+            {
+                "type": "text",
+                "x": 20, 
+                "y": 40, 
+                "width": 40, 
+                "height": 20,
+                "value_from": "name",
+                "font": "JetBrainsMono",
+                "size": 12
+            }
+        ]
+    }
+]

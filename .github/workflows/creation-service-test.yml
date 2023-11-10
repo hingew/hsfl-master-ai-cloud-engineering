@@ -1,4 +1,4 @@
-name: Creation Tests
+name: Creation-Service Tests
 
 on:
   push:
@@ -32,3 +32,4 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         flags: creation-service
+

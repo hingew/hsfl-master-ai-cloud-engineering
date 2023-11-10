@@ -1,11 +1,12 @@
 package repository
 
 import (
+	"log"
+
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/database"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 type GormPsqlRepository struct {
@@ -13,7 +14,8 @@ type GormPsqlRepository struct {
 }
 
 func NewGormPsqlRepository(config database.Config) (*GormPsqlRepository, error) {
-	db, err := gorm.Open(postgres.Open(config.Dsn()), &gorm.Config{Logger: logger.Default.LogMode(logger.Info)})
+	// db, err := gorm.Open(postgres.Open(config.Dsn()), &gorm.Config{Logger: logger.Default.LogMode(logger.Info)})
+	db, err := gorm.Open(postgres.Open(config.Dsn()), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
@@ -21,8 +23,16 @@ func NewGormPsqlRepository(config database.Config) (*GormPsqlRepository, error) 
 	return &GormPsqlRepository{db}, nil
 }
 
-func (repo *GormPsqlRepository) Setup() error {
+func (repo *GormPsqlRepository) Setup(testdata []model.PdfTemplate) error {
 	err := repo.db.AutoMigrate(&model.PdfTemplate{}, &model.Element{})
+
+	for _, data := range testdata {
+		_, err2 := repo.CreateTemplate(data)
+		if err2 != nil {
+			log.Fatalf("Could not create DB entry for testdata!\n%s", err2.Error())
+		}
+	}
+
 	return err
 }
 

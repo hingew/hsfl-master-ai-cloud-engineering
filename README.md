@@ -20,3 +20,8 @@ jannes.nebendahl@stud.hs-flensburg.de\
 Hochschule Flensburg
 
 ## TODO
+
+
+# Aktuelles Architekturbild
+![currentArchitecture](currentArchitecture.png)
+

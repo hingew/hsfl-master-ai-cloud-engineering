@@ -4,3 +4,6 @@ database:
   username: postgres
   password: postgres
   dbname: postgres
+jwt:
+  signKey: /app/cert.pem
+port: 3000

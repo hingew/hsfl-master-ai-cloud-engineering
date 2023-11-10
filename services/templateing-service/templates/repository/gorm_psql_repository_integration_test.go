@@ -52,7 +52,7 @@ func TestIntegrationGormPsqlRepository(t *testing.T) {
 			t.Cleanup(clearTables(t, sqlDb, []string{"elements", "pdf_templates"}))
 
 			// act
-			err := repository.Setup()
+			err := repository.Setup([]model.PdfTemplate{})
 
 			// assert
 			assert.NoError(t, err)

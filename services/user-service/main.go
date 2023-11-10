@@ -1,17 +1,19 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
-	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/config"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/database"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/router"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/api/handler"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/auth"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/crypto"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/user"
+	"gopkg.in/yaml.v3"
 )
 
 type ApplicationConfig struct {
@@ -20,10 +22,26 @@ type ApplicationConfig struct {
 	Port     int                 `yaml:"port"`
 }
 
-func main() {
-	var appConfig *ApplicationConfig
+func LoadConfigFromFile(path string) (*ApplicationConfig, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
 
-	if err := config.Load(appConfig); err != nil {
+	var config ApplicationConfig
+	if err := yaml.NewDecoder(f).Decode(&config); err != nil {
+		return nil, err
+	}
+
+	return &config, nil
+}
+
+func main() {
+	configPath := flag.String("config", "config.yml", "The path to the configuration file")
+	flag.Parse()
+
+	appConfig, err := LoadConfigFromFile(*configPath)
+	if err != nil {
 		log.Fatalf("could not load application configuration: %s", err.Error())
 	}
 

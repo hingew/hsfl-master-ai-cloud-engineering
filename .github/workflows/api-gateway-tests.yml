@@ -1,10 +1,10 @@
-name: Templateing Tests
+name: Api-Gateway tests
 
 on:
   push:
     paths:
-      - 'services/templateing-service/**'
-      - '.github/workflows/templateing-service.yml'
+      - 'services/api-gateway/**'
+      - '.github/workflows/api-gateway.yml'
 
 jobs:
   test:
@@ -19,15 +19,17 @@ jobs:
         go-version: '1.21.x'
 
     - name: Install dependencies
-      working-directory: ./services/templateing-service
+      working-directory: ./services/api-gateway
       run: go get .
 
     - name: Go test
-      working-directory: ./services/templateing-service
+      working-directory: ./services/api-gateway
       run: go test ./... -race -coverprofile=coverage.txt -covermode=atomic
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        flags: templateing-service
+        flags: api-gateway
+
+

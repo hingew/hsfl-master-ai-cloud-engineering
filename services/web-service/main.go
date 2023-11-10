@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 type IndexPageViewModel struct {
@@ -14,14 +15,14 @@ type IndexPageViewModel struct {
 }
 
 type PdfTemplate struct {
-	UpdatedAt string
-	CreatedAt string
+	UpdatedAt time.Time
+	CreatedAt time.Time
 	Name      string
 }
 
 func requestPdfTemplates() ([]PdfTemplate, error) {
-	// define TEMPLATES_ENDPOINT in docker-compose.yml
-	endpoint := fmt.Sprintf("http://%s/api/templates", os.Getenv("TEMPLATES_ENDPOINT"))
+	// define TEMPLATE_ENDPOINT in docker-compose.yml
+	endpoint := fmt.Sprintf("http://%s/api/templates", os.Getenv("TEMPLATE_ENDPOINT"))
 
 	req, _ := http.NewRequest("GET", endpoint, nil)
 	res, err := http.DefaultClient.Do(req)
