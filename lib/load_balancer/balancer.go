@@ -18,8 +18,8 @@ const (
 
 type Target struct {
 	Proxy   http.Handler
-	Weight  int // Kapazität des Servers
-	Current int // Aktuelle Anzahl der Verbindungen
+	Weight  int
+	Current int
 }
 
 type LoadBalancer struct {
@@ -67,7 +67,6 @@ func (balancer *LoadBalancer) balanceByWeightedRoundRobin(w http.ResponseWriter,
 	balancer.mutex.Lock()
 	defer balancer.mutex.Unlock()
 
-	// Wählen Sie den Server mit dem niedrigsten Verhältnis von aktiven Verbindungen zu Gewicht
 	var min float64 = -1
 	var target *Target
 	for _, t := range balancer.targets {
@@ -79,7 +78,6 @@ func (balancer *LoadBalancer) balanceByWeightedRoundRobin(w http.ResponseWriter,
 	}
 
 	if target != nil {
-		// Simulieren Sie den Beginn einer neuen Verbindung
 		target.Current++
 		defer func() { target.Current-- }()
 		target.Proxy.ServeHTTP(w, r)
