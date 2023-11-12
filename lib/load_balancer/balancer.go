@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"sync"
 )
 
 type BalancerAlgorithm int
@@ -15,16 +16,26 @@ const (
 	HaukesStuff // TODO ich erinnere mich leider nicht mehr welchen Algorithmus Hauke implementieren wollte
 )
 
-type LoadBalancer struct {
-	targets   []http.Handler
-	index     int
-	algorithm BalancerAlgorithm
+type Target struct {
+	Proxy   http.Handler
+	Weight  int // Kapazität des Servers
+	Current int // Aktuelle Anzahl der Verbindungen
 }
 
-func NewLoadBalancer(targetUrls []*url.URL, algorithm BalancerAlgorithm) *LoadBalancer {
-	targets := make([]http.Handler, len(targetUrls))
+type LoadBalancer struct {
+	targets   []*Target
+	index     int
+	algorithm BalancerAlgorithm
+	mutex     sync.Mutex
+}
+
+func NewLoadBalancer(targetUrls []*url.URL, weights []int, algorithm BalancerAlgorithm) *LoadBalancer {
+	targets := make([]*Target, len(targetUrls))
 	for i, targetUrl := range targetUrls {
-		targets[i] = httputil.NewSingleHostReverseProxy(targetUrl)
+		targets[i] = &Target{
+			Proxy:  httputil.NewSingleHostReverseProxy(targetUrl),
+			Weight: weights[i],
+		}
 	}
 
 	return &LoadBalancer{
@@ -48,12 +59,33 @@ func (balancer *LoadBalancer) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 
 func (balancer *LoadBalancer) balanceByRoundRobin(w http.ResponseWriter, r *http.Request) {
 	target := balancer.targets[balancer.index]
-	target.ServeHTTP(w, r)
+	target.Proxy.ServeHTTP(w, r)
 	balancer.index = (balancer.index + 1) % len(balancer.targets)
 }
 
 func (balancer *LoadBalancer) balanceByWeightedRoundRobin(w http.ResponseWriter, r *http.Request) {
-	// TODO Robert
+	balancer.mutex.Lock()
+	defer balancer.mutex.Unlock()
+
+	// Wählen Sie den Server mit dem niedrigsten Verhältnis von aktiven Verbindungen zu Gewicht
+	var min float64 = -1
+	var target *Target
+	for _, t := range balancer.targets {
+		ratio := float64(t.Current) / float64(t.Weight)
+		if ratio < min || min == -1 {
+			min = ratio
+			target = t
+		}
+	}
+
+	if target != nil {
+		// Simulieren Sie den Beginn einer neuen Verbindung
+		target.Current++
+		defer func() { target.Current-- }()
+		target.Proxy.ServeHTTP(w, r)
+	} else {
+		http.Error(w, "Service Unavailable", http.StatusServiceUnavailable)
+	}
 }
 
 func (balancer *LoadBalancer) balanceBy(w http.ResponseWriter, r *http.Request) {
