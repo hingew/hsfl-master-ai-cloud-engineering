@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,24 +14,26 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
+	loadbalancer "github.com/hingew/hsfl-master-ai-cloud-engineering/lib/load_balancer"
 )
 
 func main() {
 	image := flag.String("image", "", "")
 	replicas := flag.Int("replicas", 1, "")
+	network := flag.String("network", "bridge", "")
+	port := flag.Int("port", 3000, "")
 	flag.Parse()
 
 	containers := StartContainers(*image, *replicas)
+	endpoints := EvaluateContainerEndpoint(containers, *network, *port)
 	defer StopContainers(containers)
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hello"))
-	})
+	balancer := loadbalancer.NewLoadBalancer(endpoints, loadbalancer.RoundRobin)
 
+	addr := fmt.Sprintf(":%d", *port)
 	server := &http.Server{
-		Addr:    ":3000",
-		Handler: mux,
+		Addr:    addr,
+		Handler: balancer,
 	}
 
 	sigChan := make(chan os.Signal, 1)
@@ -41,6 +45,34 @@ func main() {
 	}()
 
 	server.ListenAndServe()
+}
+
+func EvaluateContainerEndpoint(containerIds []string, networkName string, port int) []*url.URL {
+	cli, err := client.NewClientWithOpts()
+	if err != nil {
+		panic(err)
+	}
+
+	endpoints := make([]*url.URL, len(containerIds))
+
+	for i, id := range containerIds {
+		container, err := cli.ContainerInspect(context.Background(), id)
+		if err != nil {
+			panic(err)
+		}
+
+		ip := container.NetworkSettings.Networks[networkName].IPAddress
+
+		rawUrl := fmt.Sprintf("http://%s:%d", ip, port)
+		endpoint, err := url.Parse(rawUrl)
+		if err != nil {
+			panic(err)
+		}
+
+		endpoints[i] = endpoint
+	}
+
+	return endpoints
 }
 
 func StopContainers(containers []string) {
