@@ -6,6 +6,8 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"sync"
+
+	"github.com/cespare/xxhash"
 )
 
 type BalancerAlgorithm int
@@ -13,7 +15,7 @@ type BalancerAlgorithm int
 const (
 	RoundRobin BalancerAlgorithm = iota
 	WeightedRoundRobin
-	HaukesStuff // TODO ich erinnere mich leider nicht mehr welchen Algorithmus Hauke implementieren wollte
+	IPHash // TODO ich erinnere mich leider nicht mehr welchen Algorithmus Hauke implementieren wollte
 )
 
 type Target struct {
@@ -52,8 +54,8 @@ func (balancer *LoadBalancer) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		balancer.balanceByRoundRobin(w, r)
 	case WeightedRoundRobin:
 		balancer.balanceByWeightedRoundRobin(w, r)
-	case HaukesStuff:
-		balancer.balanceBy(w, r)
+	case IPHash:
+		balancer.balanceByIPHash(w, r)
 	}
 }
 
@@ -86,6 +88,17 @@ func (balancer *LoadBalancer) balanceByWeightedRoundRobin(w http.ResponseWriter,
 	}
 }
 
-func (balancer *LoadBalancer) balanceBy(w http.ResponseWriter, r *http.Request) {
-	// TODO Hauke
+func (balancer *LoadBalancer) balanceByIPHash(w http.ResponseWriter, r *http.Request) {
+	ip := getClientIp(r)
+	next := xxhash.Sum64([]byte(ip)) % uint64(len(balancer.targets))
+	target := balancer.targets[next]
+	target.Proxy.ServeHTTP(w, r)
+}
+
+func getClientIp(r *http.Request) string {
+	ip := r.Header.Get("X-FORWARDED-FOR")
+	if ip != "" {
+		return ip
+	}
+	return r.RemoteAddr
 }
