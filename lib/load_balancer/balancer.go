@@ -15,8 +15,7 @@ type BalancerAlgorithm int
 const (
 	RoundRobin BalancerAlgorithm = iota
 	WeightedRoundRobin
-	IPHash // TODO ich erinnere mich leider nicht mehr welchen Algorithmus Hauke implementieren wollte
-)
+	IPHash 
 
 type Target struct {
 	Proxy   http.Handler
