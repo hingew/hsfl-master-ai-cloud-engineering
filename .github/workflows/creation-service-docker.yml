@@ -32,6 +32,6 @@ jobs:
           context: .
           file: ./services/creation-service/Dockerfile
           push: true
-          tags: ${{ github.ref_name }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
