@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	orchestrator, err := orchestrator.NewOrchestrator("hauing/templateing-service", 6, "bridge", 3000)
+	orchestrator, err := orchestrator.NewOrchestrator("hauing/templateing-service:develop", 6, "bridge", 3000)
 	if err != nil {
 		panic(err)
 	}
