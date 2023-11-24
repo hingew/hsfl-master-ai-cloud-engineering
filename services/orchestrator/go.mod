@@ -1,4 +1,4 @@
-module github.com/hingew/hsfl-master-ai-cloud-engineering/orchestrated-templateing-service
+module github.com/hingew/hsfl-master-ai-cloud-engineering/orchestrator
 
 go 1.21.1
 

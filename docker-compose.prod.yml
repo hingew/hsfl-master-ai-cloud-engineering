@@ -30,21 +30,16 @@ services:
     links:
       - templates
     
-  templates:
-    build:
+  orchestrated-templateing-service:
+    build: 
       context: ./
-      dockerfile: ./services/templateing-service/Dockerfile
+      dockerfile: ./services/orchestrator/Dockerfile
     ports:
-      - 3002:3000
+      - 3004:3000
     environment:
-      - USE_TESTDATA=false
-    volumes:
-      - ./services/templateing-service/config.yml:/app/config.yml
-      - ./services/templateing-service/test_data.json:/app/test_data.json
-    depends_on:
-      postgres:
-        condition: service_healthy
-  
+      - BALANCER_ALGORITHM=RoundRobin
+      - DOCKER_IMAGE=hauing/templateing-service:develop
+
   creation:
     build: 
       context: ./
