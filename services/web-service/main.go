@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/health"
 	"html/template"
 	"log"
 	"net/http"
@@ -55,12 +56,17 @@ func indexHandler(tmpl *template.Template) http.HandlerFunc {
 	}
 }
 
+func healthCheck() http.HandlerFunc {
+	return health.Check
+}
+
 func main() {
 	tmpl := template.Must(template.ParseGlob("templates/*.gohtml"))
 
 	router := http.NewServeMux()
 	router.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("public"))))
 	router.HandleFunc("/", indexHandler(tmpl))
+	router.HandleFunc("/api/health/web", healthCheck())
 
 	log.Fatal(http.ListenAndServe("0.0.0.0:3000", router))
 }

@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/database"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/health"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/router"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/api/handler"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/auth"
@@ -62,6 +63,8 @@ func main() {
 	hasher := crypto.NewBcryptHasher()
 
 	router := router.New()
+	router.GET("/api/health/user", health.Check)
+
 	router.POST("/auth/register", handler.Register(userRepository, hasher))
 	router.POST("/auth/login", handler.Login(userRepository, hasher, tokenGenerator))
 

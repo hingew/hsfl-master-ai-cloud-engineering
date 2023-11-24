@@ -10,6 +10,7 @@ import (
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/creation-service/client"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/creation-service/pdf"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/creation-service/pdf/controller"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/health"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/router"
 	"gopkg.in/yaml.v3"
 )
@@ -48,6 +49,7 @@ func main() {
 	controller := controller.NewController(pdf, &templatingServiceClient)
 
 	router := router.New()
+    router.GET("/api/health/creation", health.Check)
 	router.POST("/api/render/:id", controller.CreatePdf)
 
 	addr := fmt.Sprintf("0.0.0.0:%d", config.Port)
