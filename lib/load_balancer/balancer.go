@@ -15,7 +15,8 @@ type BalancerAlgorithm int
 const (
 	RoundRobin BalancerAlgorithm = iota
 	WeightedRoundRobin
-	IPHash 
+	IPHash
+)
 
 type Target struct {
 	Proxy   http.Handler

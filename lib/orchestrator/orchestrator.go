@@ -54,7 +54,12 @@ func (orc *Orchestrator) Start() {
 
 	defer orc.stopContainers(*containerIds)
 
-	balancer := loadbalancer.NewLoadBalancer(containerEndpoints, loadbalancer.RoundRobin)
+	weights := make([]int, orc.replicas)
+	for index, _ := range weights {
+		weights[index] = 0
+	}
+
+	balancer := loadbalancer.NewLoadBalancer(containerEndpoints, weights, loadbalancer.RoundRobin)
 
 	addr := fmt.Sprintf(":%d", orc.port)
 	server := &http.Server{
