@@ -16,7 +16,7 @@ services:
       - ./services/api-gateway/config.yml:/app/config.yml
     depends_on:
       - web
-      - templates
+      - orchestrated-templateing-service
       - creation
   
   web:
@@ -29,6 +29,16 @@ services:
       - TEMPLATE_ENDPOINT=templates:3000
     links:
       - templates
+    
+  orchestrated-templateing-service:
+    build: 
+      context: ./
+      dockerfile: ./services/orchestrated-templateing-service/Dockerfile
+    ports:
+      - 3004:3000
+    environment:
+      - BALANCER_ALGORITHM=RoundRobin
+
 
   templates:
     build:
@@ -54,7 +64,7 @@ services:
     ports:
       - 3003:3000
     links:
-      - templates
+      - orchestrated-templateing-service
 
   postgres:
     image: postgres:15-alpine
