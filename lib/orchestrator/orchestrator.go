@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
@@ -56,10 +58,26 @@ func (orc *Orchestrator) Start() {
 
 	weights := make([]int, orc.replicas)
 	for index, _ := range weights {
-		weights[index] = 0
+		weights[index] = rand.Intn(orc.replicas)
 	}
 
-	balancer := loadbalancer.NewLoadBalancer(containerEndpoints, weights, loadbalancer.RoundRobin)
+	balancer_algorithm_tag := os.Getenv("BALANCER_ALGORITHM")
+	balancer_algorithm := loadbalancer.RoundRobin
+	switch balancer_algorithm_tag {
+	case "RoundRobin":
+		balancer_algorithm = loadbalancer.RoundRobin
+		break
+	case "WeightedRoundRobin":
+		balancer_algorithm = loadbalancer.WeightedRoundRobin
+		break
+	case "IPHash":
+		balancer_algorithm = loadbalancer.IPHash
+		break
+	default:
+		log.Print("No balancing algorithm provided. Use RoundRobin as default")
+	}
+
+	balancer := loadbalancer.NewLoadBalancer(containerEndpoints, weights, balancer_algorithm)
 
 	addr := fmt.Sprintf(":%d", orc.port)
 	server := &http.Server{
