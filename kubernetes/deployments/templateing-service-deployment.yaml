@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: templateing-service-deployment
+  labels:
+    app: templateing-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: templateing-service
+  template:
+    metadata:
+      labels:
+        app: templateing-service
+    spec:
+      containers:
+      - name: templateing-service
+        image: hauing/templateing-service:develop
+        ports:
+        - containerPort: 3000
