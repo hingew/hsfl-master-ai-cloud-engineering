@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: creation-service-deployment
+  labels:
+    app: creation-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: creation-service
+  template:
+    metadata:
+      labels:
+        app: creation-service
+    spec:
+      containers:
+      - name: creation-service
+        image: hauing/creation-service:develop
+        ports:
+        - containerPort: 3000
