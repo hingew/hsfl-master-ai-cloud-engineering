@@ -19,8 +19,8 @@ spec:
         image: hauing/creation-service:develop
         ports:
         - containerPort: 3000
-      env:
-      - name: port
-        value: "3000"
-      - name: templating_service_url
-        value: "http://templates:3000"
+        env:
+        - name: port
+          value: "3000"
+        - name: templating_service_url
+          value: "http://templates:3000"
