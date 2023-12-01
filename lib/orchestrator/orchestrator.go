@@ -122,6 +122,7 @@ func (orc *Orchestrator) evaluateContainerEndpoints(containerIds []string) ([]*u
 func (orc *Orchestrator) startContainers() (*[]string, error) {
 	pullResponse, err := orc.client.ImagePull(context.Background(), orc.image, types.ImagePullOptions{})
 	if err != nil {
+		log.Print("Could not pull images")
 		return nil, err
 	}
 	defer pullResponse.Close()

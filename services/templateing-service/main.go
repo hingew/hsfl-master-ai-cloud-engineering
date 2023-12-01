@@ -2,17 +2,16 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/database"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/model"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/api/router"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/controller"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/repository"
-	"gopkg.in/yaml.v3"
 )
 
 type ApplicationConfig struct {
@@ -33,20 +32,6 @@ func LoadTestData(path string) (*[]model.PdfTemplate, error) {
 	return &testdata, nil
 }
 
-func LoadConfigFromFile(path string) (*ApplicationConfig, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-
-	var config ApplicationConfig
-	if err := yaml.NewDecoder(f).Decode(&config); err != nil {
-		return nil, err
-	}
-
-	return &config, nil
-}
-
 func main() {
 	use_testdata := os.Getenv("USE_TESTDATA")
 
@@ -61,16 +46,17 @@ func main() {
 		} else {
 			testdata = *p
 		}
-
 	}
 
-	configPath := flag.String("config", "config.yml", "The path to the configuration file")
-	flag.Parse()
-
-	config, err := LoadConfigFromFile(*configPath)
+	config := ApplicationConfig{}
+	config.Database.Host = os.Getenv("POSTGRES_HOST")
+	config.Database.Port, err = strconv.Atoi(os.Getenv("POSTGRES_PORT"))
 	if err != nil {
-		log.Fatalf("could not load application configuration: %s", err.Error())
+		log.Fatalf("could parse postgres port")
 	}
+	config.Database.Username = os.Getenv("POSTGRES_USERNAME")
+	config.Database.Password = os.Getenv("POSTGRES_PASSWORD")
+	config.Database.Database = os.Getenv("POSTGRES_DBNAME")
 
 	repo, err := repository.NewGormPsqlRepository(config.Database)
 	if err != nil {
