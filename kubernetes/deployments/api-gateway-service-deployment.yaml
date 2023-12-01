@@ -17,5 +17,6 @@ spec:
       containers:
       - name: api-gateway
         image: hauing/api-gateway:develop
+        imagePullPolicy: Always
         ports:
         - containerPort: 3000
