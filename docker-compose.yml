@@ -16,7 +16,7 @@ services:
       - ./services/api-gateway/config.yml:/app/config.yml
     depends_on:
       - web
-      - orchestrated-templateing-service
+      - templates
       - creation
   
   web:
@@ -38,6 +38,11 @@ services:
       - 3002:3000
     environment:
       - USE_TESTDATA=false
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DBNAME=postgres
     volumes:
       - ./services/templateing-service/config.yml:/app/config.yml
       - ./services/templateing-service/test_data.json:/app/test_data.json
@@ -54,7 +59,7 @@ services:
     ports:
       - 3003:3000
     links:
-      - orchestrated-templateing-service
+      - templates
 
   postgres:
     image: postgres:15-alpine

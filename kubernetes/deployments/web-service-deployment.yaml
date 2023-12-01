@@ -15,7 +15,7 @@ spec:
         app: web-service
     spec:
       containers:
-      - name: web-service
-        image: hauing/web-service:develop
-        ports:
-        - containerPort: 3000
+        - name: web-service
+          image: hauing/web-service:develop
+          ports:
+            - containerPort: 3000

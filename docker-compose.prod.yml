@@ -28,7 +28,7 @@ services:
     environment:
       - TEMPLATE_ENDPOINT=templates:3000
     links:
-      - templates
+      - orchestrated-templateing-service
     
   orchestrated-templateing-service:
     build: 
