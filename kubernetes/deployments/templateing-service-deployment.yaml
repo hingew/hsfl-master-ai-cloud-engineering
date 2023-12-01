@@ -21,12 +21,12 @@ spec:
             - containerPort: 3000
           env:
             - name: POSTGRES_HOST
-              value: postgres
+              value: "postgres"
             - name: POSTGRES_PORT
-              value: 5432
+              value: "5432"
             - name: POSTGRES_USERNAME
-              value: postgres
+              value: "postgres"
             - name: POSTGRES_PASSWORD
-              value: postgres
+              value: "postgres"
             - name: POSTGRES_DBNAME
-              value: postgres
+              value: "postgres"
