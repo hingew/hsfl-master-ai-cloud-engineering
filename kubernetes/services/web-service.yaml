@@ -7,6 +7,6 @@ spec:
     app: web
   ports:
     - protocol: TCP
-      port: 3001  
+      port: 3001
       targetPort: 3000
   type: NodePort

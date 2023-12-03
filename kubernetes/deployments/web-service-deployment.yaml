@@ -22,4 +22,4 @@ spec:
             - containerPort: 3000
           env:
             - name: TEMPLATE_ENDPOINT
-              value: "templateing-service:3000"
+              value: "http://templateing-service:3000"
