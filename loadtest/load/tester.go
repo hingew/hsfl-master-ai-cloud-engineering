@@ -58,7 +58,6 @@ func (tester *Tester) Run() error {
 }
 
 func (tester *Tester) startUser(wg *sync.WaitGroup, errors chan<- error) {
-	fmt.Printf("Starte neue Benutzer-Goroutine\n")
 	defer wg.Done()
 
 	for {
@@ -67,14 +66,12 @@ func (tester *Tester) startUser(wg *sync.WaitGroup, errors chan<- error) {
 			return
 		default:
 			target := tester.config.Targets[rand.Intn(len(tester.config.Targets))]
-			fmt.Printf("Sende Anfrage an %s\n", target)
-			if err := tester.client.Send(target, tester.config.Path); err != nil {
-				fmt.Printf("Fehler beim Senden der Anfrage: %v\n", err)
+			path := tester.config.Paths[rand.Intn(len(tester.config.Paths))]
+			fmt.Printf("Sende Anfrage an %s%s\n", target, path)
+			if err := tester.client.Send(target, path); err != nil {
 				errors <- err
 				return
 			}
-
-			// Pausieren zwischen den Anfragen
 			time.Sleep(1 * time.Second)
 		}
 	}

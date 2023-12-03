@@ -13,6 +13,7 @@ type TesterConfig struct {
 	Target      string   `json:"target"`
 	Path        string   `json:"path"`
 	Targets     []string `json:"targets"`
+	Paths       []string `json:"paths"`
 }
 
 func ReadConfig(filePath string) (*TesterConfig, error) {
