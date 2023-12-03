@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	my_proxy "github.com/hingew/hsfl-master-ai-cloud-engineering/api-gateway/proxy"
 	"gopkg.in/yaml.v2"
@@ -33,6 +34,23 @@ func readRoutesConfig() RoutesConfig {
 	log.Printf("Read config: %s", routes)
 
 	return routes
+}
+
+func readRoutesFromEnv() RoutesConfig {
+	var routes RoutesConfig
+
+	routes.CreationService = readRouteEnv("CREATION_ROUTES")
+	routes.WebService = readRouteEnv("WEB_ROUTES")
+	routes.TemplateingService = readRouteEnv("TEMPLATE_ROUTES")
+	routes.UserService = readRouteEnv("USER_ROUTES")
+
+	return routes
+}
+
+func readRouteEnv(env string) []string {
+	value := os.Getenv(env)
+	values := strings.Split(value, ";")
+	return values
 }
 
 func addRoutes(proxy my_proxy.ReverseProxy, endpoint string, routes []string) {
@@ -65,7 +83,8 @@ func main() {
 			CreationService:    []string{"/api/render/:id"},
 		}
 	*/
-	routes := readRoutesConfig()
+	// routes := readRoutesConfig()
+	routes := readRoutesFromEnv()
 	addRoutes(proxy, templateing_service_endpoint, routes.TemplateingService)
 	addRoutes(proxy, web_service_endpoint, routes.WebService)
 	addRoutes(proxy, creation_service_endpoint, routes.CreationService)

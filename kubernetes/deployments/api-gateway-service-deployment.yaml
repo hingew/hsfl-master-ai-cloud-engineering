@@ -15,18 +15,25 @@ spec:
         app: api-gateway
     spec:
       containers:
-      - name: api-gateway
-        image: hauing/api-gateway:develop
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 3000
-        env:
-        - name: WEB_ENDPOINT
-          value: "http://web-service:3000"
-        - name: TEMPLATE_ENDPOINT
-          value: "http://templateing-service:3000"
-        - name: CREATION_ENDPOINT
-          value: "http://creation-service:3000"
-        - name: USER_ENDPOINT
-          value: "http://user-service:3000"
-
+        - name: api-gateway
+          image: hauing/api-gateway:develop
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: WEB_ENDPOINT
+              value: "http://web-service:3000"
+            - name: TEMPLATE_ENDPOINT
+              value: "http://templateing-service:3000"
+            - name: CREATION_ENDPOINT
+              value: "http://creation-service:3000"
+            - name: USER_ENDPOINT
+              value: "http://user-service:3000"
+            - name: WEB_ROUTES
+              value: "/;/static/"
+            - name: TEMPLATE_ROUTES
+              value: "/api/templates;/api/templates/:id"
+            - name: CREATION_ROUTES
+              value: "/api/render/:id"
+            - name: USER_ROUTES
+              value: "/auth/register;/auth/login"
