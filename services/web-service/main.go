@@ -3,12 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/health"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/health"
 )
 
 type IndexPageViewModel struct {
@@ -23,7 +24,7 @@ type PdfTemplate struct {
 
 func requestPdfTemplates() ([]PdfTemplate, error) {
 	// define TEMPLATE_ENDPOINT in docker-compose.yml
-	endpoint := fmt.Sprintf("http://%s/api/templates", os.Getenv("TEMPLATE_ENDPOINT"))
+	endpoint := fmt.Sprintf("%s/api/templates", os.Getenv("TEMPLATE_ENDPOINT"))
 
 	req, _ := http.NewRequest("GET", endpoint, nil)
 	res, err := http.DefaultClient.Do(req)

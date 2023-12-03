@@ -22,13 +22,13 @@ spec:
             - containerPort: 3000
           env:
             - name: WEB_ENDPOINT
-              value: "http://web-service:3000"
+              value: "web-service:3000"
             - name: TEMPLATE_ENDPOINT
-              value: "http://templateing-service:3000"
+              value: "templateing-service:3000"
             - name: CREATION_ENDPOINT
-              value: "http://creation-service:3000"
+              value: "creation-service:3000"
             - name: USER_ENDPOINT
-              value: "http://user-service:3000"
+              value: "user-service:3000"
             - name: WEB_ROUTES
               value: "/;/static/"
             - name: TEMPLATE_ROUTES
