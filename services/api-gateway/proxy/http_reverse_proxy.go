@@ -3,6 +3,7 @@ package my_proxy
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -25,14 +26,19 @@ func NewHttpReverseProxy(client HttpClient) *HttpReverseProxy {
 
 func (reverseProxy *HttpReverseProxy) Map(sourcePath string, destinationPath string) {
 	reverseProxy.routes[sourcePath] = destinationPath
+	log.Printf("Added Router to Reverse Proxy: %s", destinationPath)
 }
 
 func (reverseProxy *HttpReverseProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	endpointServerURL, err := reverseProxy.evaluateEndpointServer(req.URL.Path)
+	inputURL := req.URL
+	endpointServerURL, err := reverseProxy.evaluateEndpointServer(inputURL.Path)
 	if err != nil {
 		rw.WriteHeader(http.StatusNotFound)
 		fmt.Fprintf(rw, "%s", err.Error())
+		log.Print(err.Error())
 		return
+	} else {
+		log.Printf("%s --> %s", inputURL, endpointServerURL)
 	}
 
 	reverseProxy.modifyRequest(req, endpointServerURL)
@@ -42,6 +48,8 @@ func (reverseProxy *HttpReverseProxy) ServeHTTP(rw http.ResponseWriter, req *htt
 		rw.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(rw, "%s", err)
 		return
+	} else {
+		log.Printf("%s <-- %s", inputURL, endpointServerURL)
 	}
 
 	reverseProxy.copyResponseHeader(response, rw)
