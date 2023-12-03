@@ -1,14 +1,14 @@
 {
-    "users": 5,
-    "rampup": 5,
-    "duration": 5,
-    "cooldown": 1,
-    "target": "localhost:8000",
-    "path": "/api/template",
+    "users": 100,
+    "rampup": 20,
+    "duration": 60,
+    "cooldown": 10,
+    "target": "192.168.2.134:32509",
+    "path": "/",
     "targets": [
-        "localhost:8000"
+        "192.168.2.134:32509"
     ],
     "paths": [
-        "/api/template"
+        "/"
     ]
 }

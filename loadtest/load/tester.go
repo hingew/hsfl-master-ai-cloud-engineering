@@ -2,10 +2,11 @@ package load
 
 import (
 	"fmt"
-	"loadtest/net"
 	"math/rand"
 	"sync"
 	"time"
+
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/loadtest/net"
 )
 
 type Tester struct {
