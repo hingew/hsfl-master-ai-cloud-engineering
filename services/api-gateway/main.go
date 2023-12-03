@@ -30,6 +30,8 @@ func readRoutesConfig() RoutesConfig {
 		log.Fatalf("Error during parsing yaml-file: %v", err)
 	}
 
+	log.Printf("Read config: %s", routes)
+
 	return routes
 }
 
