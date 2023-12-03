@@ -14,21 +14,21 @@ spec:
       labels:
         app: templateing-service
     spec:
+      terminationGracePeriodSeconds: 30
       containers:
-      - name: templateing-service
-        image: hauing/templateing-service:develop
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 3000
-        env:
-        - name: POSTGRES_HOST
-          value: postgres
-        - name: POSTGRES_PORT
-          value: "5432"
-        - name: POSTGRES_USERNAME
-          value: postgres
-        - name: POSTGRES_PASSWORD
-          value: postgres
-        - name: POSTGRES_DBNAME
-          value: postgres
-
+        - name: templateing-service
+          image: hauing/templateing-service:develop
+          imagePullPolicy: "Always"
+          ports:
+            - containerPort: 3000
+          env:
+            - name: POSTGRES_HOST
+              value: "postgres"
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USERNAME
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              value: "postgres"
+            - name: POSTGRES_DBNAME
+              value: "postgres"
