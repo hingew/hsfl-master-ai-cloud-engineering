@@ -1,0 +1,11 @@
+{
+    "users": 5,
+    "rampup": 5,
+    "duration": 5,
+    "cooldown": 1,
+    "target": "localhost:8000",
+    "path": "/admin/",
+    "targets": [
+        "localhost:8000"
+    ]
+}
