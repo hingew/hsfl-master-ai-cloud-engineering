@@ -30,7 +30,7 @@ services:
     ports:
       - 3001:3000
     environment:
-      - TEMPLATE_ENDPOINT=templates:3000
+      - TEMPLATE_ENDPOINT=http://templates:3000
     links:
       - templates
     
