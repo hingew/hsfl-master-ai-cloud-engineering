@@ -7,6 +7,6 @@ spec:
     app: templateing-service
   ports:
     - protocol: TCP
-      port: 3000
-      targetPort: 3002 
-  type: LoadBalancer
+      port: 3002 
+      targetPort: 3000 
+  type: NodePort
