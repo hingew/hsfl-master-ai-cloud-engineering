@@ -3,9 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"loadtest/load"
-	"loadtest/net"
 	"log"
+
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/loadtest/load"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/loadtest/net"
 )
 
 func main() {
