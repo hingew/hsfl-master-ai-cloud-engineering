@@ -1,21 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: web-service-deployment
+  name: web-deployment
   labels:
-    app: web-service
+    app: web
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: web-service
+      app: web
   template:
     metadata:
       labels:
-        app: web-service
+        app: web
     spec:
       containers:
-        - name: web-service
-          image: hauing/web-service:develop
-          ports:
-            - containerPort: 3000
+      - name: web
+        image: hauing/web-service:develop
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        env:
+        - name: TEMPLATE_ENDPOINT
+          value: "http://templateing-service:3000"
+

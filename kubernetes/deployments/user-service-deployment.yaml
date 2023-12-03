@@ -17,5 +17,6 @@ spec:
       containers:
       - name: user-service
         image: hauing/user-service:develop
+        imagePullPolicy: Always
         ports:
         - containerPort: 3000

@@ -17,6 +17,7 @@ spec:
       containers:
       - name: creation-service
         image: hauing/creation-service:develop
+        imagePullPolicy: Always
         ports:
         - containerPort: 3000
         env:

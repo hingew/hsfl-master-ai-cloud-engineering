@@ -4,9 +4,9 @@ metadata:
   name: web-service
 spec:
   selector:
-    app: web-service
+    app: web
   ports:
     - protocol: TCP
-      port: 3000
-      targetPort: 3001
-  type: LoadBalancer
+      port: 3001  
+      targetPort: 3000
+  type: NodePort
