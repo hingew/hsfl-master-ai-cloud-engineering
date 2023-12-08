@@ -1,12 +1,12 @@
 {
-    "users": 100,
-    "rampup": 20,
-    "duration": 60,
-    "cooldown": 10,
-    "target": "192.168.2.134:32509",
+    "users": 250,
+    "rampup": 40,
+    "duration": 120,
+    "cooldown": 20,
+    "target": "192.168.2.134:32674",
     "path": "/",
     "targets": [
-        "192.168.2.134:32509"
+        "192.168.2.134:32674"
     ],
     "paths": [
         "/"

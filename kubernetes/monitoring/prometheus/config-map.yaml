@@ -17,7 +17,6 @@ data:
           job: node-exporter
         annotations:
           summary: "High CPU load detected"
-          description: "The CPU usage is above 80% for 1 minute."
       - alert: HIGH Memory
         expr: (1 - (node_memory_MemAvailable_bytes{kubernetes_namespace=\"\"} / node_memory_MemTotal_bytes{kubernetes_namespace=\"\"})) * 100 > 95
         for: 1m
@@ -25,7 +24,6 @@ data:
           job: node-exporter
         annotations:
           summary: "High Memory load detected"
-          description: "The Memory usage is above 95% for 1 minute."
   prometheus.yml: |-
     global:
       scrape_interval: 5s
