@@ -1,18 +1,10 @@
 {
     "rampSpecifications": [
-        {"duration": 10, "targetRPS": 10},
-        {"duration": 10, "targetRPS": 10},
+        {"duration": 10, "targetRPS": 20},
+        {"duration": 10, "targetRPS": 30},
         {"duration": 10, "targetRPS": 10}
     ],
-    "users": 2,
-    "rampup": 40,
-    "duration": 5,
-    "cooldown": 20,
     "target": "localhost:8000",
-    "path": "/",
-    "targets": [
-        "localhost:8000"
-    ],
     "paths": [
         "/admin"
     ]

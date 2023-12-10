@@ -12,13 +12,7 @@ type RampSpecification struct {
 
 type TesterConfig struct {
 	RampSpecifications []RampSpecification `json:"rampSpecifications"`
-	NumberUsers        int                 `json:"users"`
-	Rampup             int                 `json:"rampup"`
-	Duration           int                 `json:"duration"`
-	Cooldown           int                 `json:"cooldown"`
 	Target             string              `json:"target"`
-	Path               string              `json:"path"`
-	Targets            []string            `json:"targets"`
 	Paths              []string            `json:"paths"`
 }
 

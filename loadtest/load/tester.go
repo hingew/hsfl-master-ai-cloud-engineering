@@ -70,7 +70,7 @@ func (tester *Tester) startUser(wg *sync.WaitGroup, errors chan<- error) {
 		case <-tester.done:
 			return
 		default:
-			target := tester.config.Targets[rand.Intn(len(tester.config.Targets))]
+			target := tester.config.Target
 			path := tester.config.Paths[rand.Intn(len(tester.config.Paths))]
 			fmt.Printf("Sende Anfrage an %s%s\n", target, path)
 			if err := tester.client.Send(target, path); err != nil {
