@@ -5,15 +5,21 @@ import (
 	"io/ioutil"
 )
 
+type RampSpecification struct {
+	Duration  int `json:"duration"`
+	TargetRPS int `json:"targetRPS"`
+}
+
 type TesterConfig struct {
-	NumberUsers int      `json:"users"`
-	Rampup      int      `json:"rampup"`
-	Duration    int      `json:"duration"`
-	Cooldown    int      `json:"cooldown"`
-	Target      string   `json:"target"`
-	Path        string   `json:"path"`
-	Targets     []string `json:"targets"`
-	Paths       []string `json:"paths"`
+	RampSpecifications []RampSpecification `json:"rampSpecifications"`
+	NumberUsers        int                 `json:"users"`
+	Rampup             int                 `json:"rampup"`
+	Duration           int                 `json:"duration"`
+	Cooldown           int                 `json:"cooldown"`
+	Target             string              `json:"target"`
+	Path               string              `json:"path"`
+	Targets            []string            `json:"targets"`
+	Paths              []string            `json:"paths"`
 }
 
 func ReadConfig(filePath string) (*TesterConfig, error) {
