@@ -20,33 +20,37 @@ func NewTester(config TesterConfig, client net.Client) *Tester {
 }
 
 func (tester *Tester) Run() error {
-	fmt.Println("Beginn der Ramp-Up-Phase")
-	rampupTime := time.Duration(tester.config.Rampup) * time.Second
-	totalTime := time.Duration(tester.config.Duration) * time.Second
-	cooldownTime := time.Duration(tester.config.Cooldown) * time.Second
-	tester.done = make(chan struct{})
-
 	var wg sync.WaitGroup
 	errors := make(chan error, 1)
+	tester.done = make(chan struct{})
 
-	// Ramp-Up-Phase
-	for i := 0; i < tester.config.NumberUsers; i++ {
-		wg.Add(1)
-		go tester.startUser(&wg, errors)
+	activeRoutines := 0
+	targetRoutines := 0
+	currentRPS := 0
+	for _, spec := range tester.config.RampSpecifications {
+		rpsChange := spec.TargetRPS - currentRPS
+		steps := spec.Duration
+		rpsIncrement := rpsChange / steps
 
-		// Ramp-Up-Verzögerung
-		time.Sleep(rampupTime / time.Duration(tester.config.NumberUsers))
+		for i := 0; i < steps; i++ {
+			currentRPS += rpsIncrement
+			targetRoutines = currentRPS * spec.Duration / 60
+
+			for activeRoutines < targetRoutines {
+				wg.Add(1)
+				go tester.startUser(&wg, errors)
+				activeRoutines++
+			}
+			for activeRoutines > targetRoutines {
+				activeRoutines--
+			}
+
+			time.Sleep(1 * time.Second)
+		}
+		currentRPS = spec.TargetRPS
 	}
-	fmt.Println("Ende der Ramp-Up-Phase, Beginn der Phase konstanter Last")
-
-	stableLoadTime := totalTime - rampupTime - cooldownTime
-	time.Sleep(stableLoadTime)
 
 	close(tester.done)
-
-	fmt.Println("Beginn der Absenkungsphase auf Null")
-	time.Sleep(cooldownTime)
-
 	wg.Wait()
 
 	select {
@@ -66,7 +70,7 @@ func (tester *Tester) startUser(wg *sync.WaitGroup, errors chan<- error) {
 		case <-tester.done:
 			return
 		default:
-			target := tester.config.Targets[rand.Intn(len(tester.config.Targets))]
+			target := tester.config.Target
 			path := tester.config.Paths[rand.Intn(len(tester.config.Paths))]
 			fmt.Printf("Sende Anfrage an %s%s\n", target, path)
 			if err := tester.client.Send(target, path); err != nil {
