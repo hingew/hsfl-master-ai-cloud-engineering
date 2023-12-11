@@ -8,11 +8,13 @@ services:
     ports:
       - 3000:3000
     environment:
-      - WEB_ENDPOINT=http://web:3000
+      - WEB_ENDPOINT=http://request:3000
       - TEMPLATE_ENDPOINT=http://templates:3000
       - CREATION_ENDPOINT=http://creation:3000
       - USER_ENDPOINT=http://user:3000
-      - WEB_ROUTES=/;/static/
+      - REQUEST_ENDPOINT=http://request:3000
+      - WEB_ROUTES=/noCoalecing/;/static/
+      - REQUEST_ROUTES=/
       - TEMPLATE_ROUTES=/api/templates;/api/templates/:id
       - CREATION_ROUTES=/api/render/:id
       - USER_ROUTES=/auth/register;/auth/login
@@ -22,6 +24,17 @@ services:
       - web
       - templates
       - creation
+  
+  request:
+    build:
+      context: ./ 
+      dockerfile: ./services/request-service/Dockerfile
+    ports:
+      - 3004:3000
+    environment:
+      - WEB_SERVICE_ENDPOINT=http://web:3000
+    links:
+      - web
   
   web:
     build:

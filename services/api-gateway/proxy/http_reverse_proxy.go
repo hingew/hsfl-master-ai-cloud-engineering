@@ -25,6 +25,9 @@ func NewHttpReverseProxy(client HttpClient) *HttpReverseProxy {
 }
 
 func (reverseProxy *HttpReverseProxy) Map(sourcePath string, destinationPath string) {
+	if strings.Contains(sourcePath, "noCoalecing/") {
+		destinationPath = strings.Replace(sourcePath, "noCoalecing/", "", 1)
+	}
 	reverseProxy.routes[sourcePath] = destinationPath
 	log.Printf("Added Router to Reverse Proxy: %s", destinationPath)
 }

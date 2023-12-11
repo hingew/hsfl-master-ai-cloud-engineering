@@ -16,6 +16,7 @@ type RoutesConfig struct {
 	UserService        []string `yaml:"user-service"`
 	WebService         []string `yaml:"web-service"`
 	CreationService    []string `yaml:"creation-service"`
+	RequestService     []string `yaml:"request-service"`
 }
 
 func readRoutesConfig() RoutesConfig {
@@ -43,6 +44,7 @@ func readRoutesFromEnv() RoutesConfig {
 	routes.WebService = readRouteEnv("WEB_ROUTES")
 	routes.TemplateingService = readRouteEnv("TEMPLATE_ROUTES")
 	routes.UserService = readRouteEnv("USER_ROUTES")
+	routes.RequestService = readRouteEnv("REQUEST_ROUTES")
 
 	return routes
 }
@@ -61,34 +63,21 @@ func addRoutes(proxy my_proxy.ReverseProxy, endpoint string, routes []string) {
 }
 
 func main() {
-	/*
-		templateing_service_endpoint := "http://templates:3000"
-		web_service_endpoint := "http://web:3000"
-		creation_service_endpoint := "http://creation:3000"
-		user_service_endpoint := "http://user:3000"
-	*/
 
 	templateing_service_endpoint := os.Getenv("TEMPLATE_ENDPOINT")
 	web_service_endpoint := os.Getenv("WEB_ENDPOINT")
 	creation_service_endpoint := os.Getenv("CREATION_ENDPOINT")
 	user_service_endpoint := os.Getenv("USER_ENDPOINT")
+	request_service_endpoint := os.Getenv("REQUEST_ENDPOINT")
 
 	proxy := my_proxy.NewHttpReverseProxy(http.DefaultClient)
 
-	/*
-		routes := RoutesConfig{
-			TemplateingService: []string{"/api/templates", "/api/templates/:id"},
-			UserService:        []string{"/auth/register", "/auth/login"},
-			WebService:         []string{"/", "/static/"},
-			CreationService:    []string{"/api/render/:id"},
-		}
-	*/
-	// routes := readRoutesConfig()
 	routes := readRoutesFromEnv()
 	addRoutes(proxy, templateing_service_endpoint, routes.TemplateingService)
 	addRoutes(proxy, web_service_endpoint, routes.WebService)
 	addRoutes(proxy, creation_service_endpoint, routes.CreationService)
 	addRoutes(proxy, user_service_endpoint, routes.UserService)
+	addRoutes(proxy, request_service_endpoint, routes.RequestService)
 
 	if err := http.ListenAndServe(":3000", proxy); err != nil {
 		log.Fatalf("error while listen and serve: %s", err.Error())
