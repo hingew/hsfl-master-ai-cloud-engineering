@@ -1,4 +1,0 @@
-templateing-service: ["/api/templates", "/api/templates/:id"]
-user-service: ["/auth/register", "/auth/login"]
-web-service: ["/", "/static/"]
-creation-service: ["/api/render/:id"]

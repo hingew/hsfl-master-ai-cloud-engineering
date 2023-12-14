@@ -16,8 +16,6 @@ services:
       - TEMPLATE_ROUTES=/api/templates;/api/templates/:id;/api/templates/:id/controller_coalecing;/api/templates/:id/gateway_coalecing
       - CREATION_ROUTES=/api/render/:id
       - USER_ROUTES=/auth/register;/auth/login
-    volumes:
-      - ./services/api-gateway/config.yml:/app/config.yml
     depends_on:
       - web
       - templates
@@ -33,6 +31,8 @@ services:
       - TEMPLATE_ENDPOINT=http://templates:3000
     links:
       - templates
+    volumes:
+      - ./services/web-service/public:/app/services/web-service/public
     
   templates:
     build:
