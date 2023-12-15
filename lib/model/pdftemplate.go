@@ -11,3 +11,4 @@ type PdfTemplate struct {
 	Name      string    `json:"name"`
 	Elements  []Element `json:"elements" gorm:"foreignKey:PdfTemplateID"`
 }
+

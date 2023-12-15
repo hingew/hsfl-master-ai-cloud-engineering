@@ -13,10 +13,10 @@ import (
 
 type Controller struct {
 	pdf              pdf.Pdf
-	templatingClient client.TemplatingServiceClient
+	templatingClient client.TemplatingGrpcClient
 }
 
-func NewController(pdf pdf.Pdf, templatingClient client.TemplatingServiceClient) *Controller {
+func NewController(pdf pdf.Pdf, templatingClient client.TemplatingGrpcClient) *Controller {
 	return &Controller{pdf, templatingClient}
 }
 
@@ -42,7 +42,7 @@ func (c *Controller) CreatePdf(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// GET the template from the templating service
-	template, err := c.templatingClient.GetTemplate(id)
+	template, err := c.templatingClient.FetchTemplate(id)
 	log.Print(template)
 	log.Print(err)
 
