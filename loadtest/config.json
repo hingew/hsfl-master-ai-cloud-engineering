@@ -1,11 +1,12 @@
 {
     "rampSpecifications": [
-        {"duration": 10, "targetRPS": 20},
-        {"duration": 10, "targetRPS": 30},
-        {"duration": 10, "targetRPS": 10}
+        {"duration": 5, "targetRPS": 10},
+        {"duration": 5, "targetRPS": 5},
+        {"duration": 5, "targetRPS": 5}
     ],
     "target": "localhost:8000",
     "paths": [
-        "/admin"
+        "/admin",
+        "/api"
     ]
 }
