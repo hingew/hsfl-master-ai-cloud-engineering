@@ -9,15 +9,15 @@ import (
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/model"
 )
 
-type TemplatingClient struct {
+type TemplatingHttpClient struct {
 	url string
 }
 
-func NewClient(url string) TemplatingClient {
-	return TemplatingClient{url}
+func NewHttpClient(url string) TemplatingHttpClient {
+	return TemplatingHttpClient{url}
 }
 
-func (t *TemplatingClient) GetTemplate(templateID uint) (*model.PdfTemplate, error) {
+func (t *TemplatingHttpClient) GetTemplate(templateID uint) (*model.PdfTemplate, error) {
 	requestURL := fmt.Sprintf("%s/api/templates/%d", t.url, templateID)
 
 	res, err := http.Get(requestURL)

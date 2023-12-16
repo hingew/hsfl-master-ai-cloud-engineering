@@ -12,6 +12,8 @@ import (
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/creation-service/pdf/controller"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/health"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/router"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type ApplicationConfig struct {
@@ -40,10 +42,16 @@ func main() {
 		log.Fatalf("could not load application configuration: %s", err.Error())
 	}
 
-	templatingServiceClient := client.NewClient(config.TemplatingServiceURL)
+	grpcConn, err := grpc.Dial(config.TemplatingServiceURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("GRPC could not connect: %v", err)
+	}
+	defer grpcConn.Close()
+
+	templatingServiceClient := client.NewGrpcClient(grpcConn)
 
 	pdf := pdf.New()
-	controller := controller.NewController(pdf, &templatingServiceClient)
+	controller := controller.NewController(pdf, templatingServiceClient)
 
 	router := router.New()
 	router.GET("/api/health/creation", health.Check)
