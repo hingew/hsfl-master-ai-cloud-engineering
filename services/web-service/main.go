@@ -23,7 +23,6 @@ type PdfTemplate struct {
 }
 
 func requestPdfTemplates() ([]PdfTemplate, error) {
-	// define TEMPLATE_ENDPOINT in docker-compose.yml
 	endpoint := fmt.Sprintf("%s/api/templates", os.Getenv("TEMPLATE_ENDPOINT"))
 
 	req, _ := http.NewRequest("GET", endpoint, nil)
