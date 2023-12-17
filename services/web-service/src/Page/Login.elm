@@ -1,9 +1,16 @@
 module Page.Login exposing (Model, Msg, init, update, view)
 
+import Auth
 import Components
-import Html.Styled exposing (Html, div, form, h2, text)
+import Css
+import Html.Styled exposing (Html, a, div, form, h2, p, text)
 import Html.Styled.Attributes as Attrs
+import Http
+import Http.Extra
+import Input
 import Platform.Cmd as Cmd
+import RemoteData exposing (WebData)
+import Svg.Styled.Events exposing (onClick)
 import Tailwind.Theme as Theme
 import Tailwind.Utilities as Tw
 
@@ -12,22 +19,16 @@ import Tailwind.Utilities as Tw
 -- https://tailwindui.com/components/application-ui/forms/sign-in-forms
 
 
-type Model
-    = Login LoginForm
-    | Register RegisterForm
-
-
-type alias LoginForm =
-    { name : String
-    , password : String
+type alias Model =
+    { form : Form
+    , error : Maybe Http.Error
+    , loading : Bool
     }
 
 
-type alias RegisterForm =
-    { name : String
-    , password : String
-    , passwordConfirmation : String
-    }
+type Form
+    = LoginForm Auth.Login
+    | RegisterForm Auth.Register
 
 
 type Msg
@@ -36,61 +37,82 @@ type Msg
     | PasswordConfirmationUpdate String
     | ToggleRegisterLogin
     | Submit
+    | GotLoginResult (WebData Auth.Token)
+    | GotRegisterResult (Result Http.Error ())
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Login { name = "", password = "" }, Cmd.none )
+    ( { form = LoginForm { email = "", password = "" }
+      , error = Nothing
+      , loading = False
+      }
+    , Cmd.none
+    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case model of
-        Login form ->
-            updateLoginForm msg form
-
-        Register form ->
-            updateRegisterForm msg form
-
-
-updateLoginForm : Msg -> LoginForm -> ( Model, Cmd Msg )
-updateLoginForm msg form =
     case msg of
         NameUpdate value ->
-            ( Login { form | name = value }, Cmd.none )
+            case model.form of
+                LoginForm form ->
+                    ( { model | form = LoginForm { form | email = value } }, Cmd.none )
+
+                RegisterForm form ->
+                    ( { model | form = RegisterForm { form | email = value } }, Cmd.none )
 
         PasswordUpdate value ->
-            ( Login { form | password = value }, Cmd.none )
+            case model.form of
+                LoginForm form ->
+                    ( { model | form = LoginForm { form | password = value } }, Cmd.none )
 
-        PasswordConfirmationUpdate _ ->
-            ( Login form, Cmd.none )
+                RegisterForm form ->
+                    ( { model | form = RegisterForm { form | password = value } }, Cmd.none )
 
-        ToggleRegisterLogin ->
-            ( Register { name = "", password = "", passwordConfirmation = "" }, Cmd.none )
+        PasswordConfirmationUpdate value ->
+            case model.form of
+                LoginForm _ ->
+                    ( model, Cmd.none )
 
-        Submit ->
-            -- TODO: Handle submit
-            ( Login form, Cmd.none )
-
-
-updateRegisterForm : Msg -> RegisterForm -> ( Model, Cmd Msg )
-updateRegisterForm msg form =
-    case msg of
-        NameUpdate value ->
-            ( Register { form | name = value }, Cmd.none )
-
-        PasswordUpdate value ->
-            ( Register { form | password = value }, Cmd.none )
-
-        PasswordConfirmationUpdate _ ->
-            ( Register form, Cmd.none )
+                RegisterForm form ->
+                    ( { model | form = RegisterForm { form | passwordConfirmation = value } }, Cmd.none )
 
         ToggleRegisterLogin ->
-            ( Login { name = "", password = "" }, Cmd.none )
+            case model.form of
+                LoginForm _ ->
+                    ( { model | form = RegisterForm { email = "", password = "", passwordConfirmation = "" } }, Cmd.none )
+
+                RegisterForm _ ->
+                    ( { model | form = LoginForm { email = "", password = "" } }, Cmd.none )
+
+        GotLoginResult response ->
+            case response of
+                RemoteData.Success token ->
+                    -- TODO: redirect after login
+                    ( model, Cmd.none )
+
+                RemoteData.Failure err ->
+                    ( { model | error = Just err }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        GotRegisterResult response ->
+            case response of
+                Ok _ ->
+                    ( { model | form = LoginForm { email = "", password = "" } }, Cmd.none )
+
+                Err err ->
+                    ( { model | error = Just err }, Cmd.none )
 
         Submit ->
-            -- TODO: Handle submit
-            ( Register form, Cmd.none )
+            case model.form of
+                LoginForm form ->
+                    ( model, Auth.login form GotLoginResult )
+
+                RegisterForm form ->
+                    ( model, Auth.register form GotRegisterResult )
 
 
 view : Model -> Html Msg
@@ -111,22 +133,13 @@ view model =
 
 
 viewForm : Model -> Html Msg
-viewForm model =
-    div
-        [ Attrs.css
-            [ Tw.mt_10
-            , Tw.mx_auto
-            , Tw.w_full
-            , Tw.max_w_sm
-            ]
-        ]
-        [ case model of
-            Login form ->
-                viewLoginForm form
+viewForm { form, error, loading } =
+    case form of
+        LoginForm loginForm ->
+            viewLoginForm loginForm error loading
 
-            Register form ->
-                viewRegisterform form
-        ]
+        RegisterForm registerForm ->
+            viewRegisterForm registerForm error loading
 
 
 viewHeader : Html Msg
@@ -144,23 +157,116 @@ viewHeader =
         ]
 
 
-viewLoginForm : LoginForm -> Html Msg
-viewLoginForm loginForm =
-    form
+viewLoginForm : Auth.Login -> Maybe Http.Error -> Bool -> Html Msg
+viewLoginForm loginForm error loading =
+    div
         [ Attrs.css
-            [ Tw.space_y_6 ]
+            [ Tw.mt_10
+            , Tw.mx_auto
+            , Tw.w_full
+            , Tw.max_w_sm
+            ]
         ]
-        [ Components.viewLabeldInput
-            { value = loginForm.name
-            , label = "Username"
-            , name = "username"
-            , msg = NameUpdate
-            , required = True
-            , type_ = Email
-            }
+        [ viewError error
+        , form
+            [ Attrs.css
+                [ Tw.space_y_6 ]
+            ]
+            [ Input.email
+                { value = loginForm.email
+                , label = "Email"
+                , name = "mail"
+                , msg = NameUpdate
+                , required = True
+                }
+            , Input.password
+                { value = loginForm.email
+                , label = "Password"
+                , name = "password"
+                , msg = PasswordUpdate
+                , required = True
+                }
+            , div [] [ Components.viewSubmitButton loading Submit ]
+            ]
+        , p [ Attrs.css [ Tw.mt_10, Tw.text_center, Tw.text_sm, Tw.text_color Theme.gray_600 ] ]
+            [ text "Not a member? "
+            , a
+                [ Attrs.css
+                    [ Tw.font_semibold
+                    , Tw.leading_6
+                    , Tw.text_color Theme.blue_600
+                    , Css.hover [ Tw.text_color Theme.blue_500, Tw.cursor_pointer ]
+                    ]
+                , onClick ToggleRegisterLogin
+                ]
+                [ text "Register now!" ]
+            ]
         ]
 
 
-viewRegisterform : RegisterForm -> Html Msg
-viewRegisterform form =
-    div [] []
+viewRegisterForm : Auth.Register -> Maybe Http.Error -> Bool -> Html Msg
+viewRegisterForm registerForm err loading =
+    div
+        [ Attrs.css
+            [ Tw.mt_10
+            , Tw.mx_auto
+            , Tw.w_full
+            , Tw.max_w_sm
+            ]
+        ]
+        [ viewError err
+        , form
+            [ Attrs.css
+                [ Tw.space_y_6 ]
+            ]
+            [ Input.email
+                { value = registerForm.email
+                , label = "Email"
+                , name = "mail"
+                , msg = NameUpdate
+                , required = True
+                }
+            , Input.password
+                { value = registerForm.password
+                , label = "Password"
+                , name = "password"
+                , msg = PasswordUpdate
+                , required = True
+                }
+            , Input.password
+                { value = registerForm.passwordConfirmation
+                , label = "Password confirmation"
+                , name = "password_confirmation"
+                , msg = PasswordConfirmationUpdate
+                , required = True
+                }
+            , div [] [ Components.viewSubmitButton loading Submit ]
+            ]
+        , p [ Attrs.css [ Tw.mt_10, Tw.text_center, Tw.text_sm, Tw.text_color Theme.gray_600 ] ]
+            [ text "Allready a member? "
+            , a
+                [ Attrs.css
+                    [ Tw.font_semibold
+                    , Tw.leading_6
+                    , Tw.text_color Theme.blue_600
+                    , Css.hover [ Tw.text_color Theme.blue_500, Tw.cursor_pointer ]
+                    ]
+                , onClick ToggleRegisterLogin
+                ]
+                [ text "Login!" ]
+            ]
+        ]
+
+
+viewError : Maybe Http.Error -> Html Msg
+viewError maybeError =
+    case maybeError of
+        Just err ->
+            p
+                [ Attrs.css
+                    [ Tw.text_color Theme.red_900 ]
+                ]
+                [ text (Http.Extra.errToString err) ]
+
+        Nothing ->
+            text ""

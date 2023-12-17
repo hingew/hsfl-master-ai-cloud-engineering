@@ -1,12 +1,12 @@
-module Input exposing (Input, InputType(..), view, viewLabeled)
+module Input exposing (Input, InputType(..), password, view, viewLabeled, email)
 
 import Css
-import Html.Styled exposing (Html, div, input)
+import Html.Styled exposing (Html, div, input, label, text)
 import Html.Styled.Attributes as Attrs
 import Html.Styled.Events exposing (onInput)
-import Tailwind.Breakpoints as Breakpoints
 import Tailwind.Theme as Theme
 import Tailwind.Utilities as Tw
+import Tailwind.Breakpoints as Breakpoints
 
 
 type InputType
@@ -15,32 +15,26 @@ type InputType
     | Password
 
 
-type alias Input a msg =
-    { value : a
+type alias Input msg =
+    { value : String
     , label : String
     , name : String
-    , msg : a -> msg
+    , msg : String -> msg
     , required : Bool
-    , type_ : InputType
     }
 
 
+email: Input msg -> Html msg
+email input =
+    viewLabeled input "email"
 
-inputTypeToString : InputType -> String
-inputTypeToString i =
-    case i of
-        Email ->
-            "email"
-
-        Text ->
-            "text"
-
-        Password ->
-            "password"
+password: Input  msg -> Html msg
+password input =
+    viewLabeled input "password"
 
 
-viewLabeled : Input a msg -> Html msg
-viewLabeled field =
+viewLabeled : Input msg -> String -> Html msg
+viewLabeled field type_ =
     div
         []
         [ viewLabel field.label field.name
@@ -48,7 +42,7 @@ viewLabeled field =
             [ Attrs.css
                 [ Tw.mt_2 ]
             ]
-            [ viewInput field ]
+            [ view field type_ ]
         ]
 
 
@@ -66,8 +60,8 @@ viewLabel value name =
         [ text value ]
 
 
-view : Input a msg -> Html msg
-view { value, name, msg, required, type_ } =
+view : Input msg -> String -> Html msg
+view { value, name, msg, required } type_ =
     input
         [ Attrs.css
             [ Tw.block
@@ -93,7 +87,7 @@ view { value, name, msg, required, type_ } =
                 ]
             ]
         , Attrs.id name
-        , Attrs.type_ (inputTypeToString type_)
+        , Attrs.type_ type_
         , Attrs.required required
         , Attrs.value value
         , onInput msg
