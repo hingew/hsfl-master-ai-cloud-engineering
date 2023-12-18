@@ -1,13 +1,9 @@
-module Auth exposing (Login, Register, Token, login, register)
+module Auth exposing (Login, Register, login, register)
 
 import Http
-import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
 import RemoteData exposing (WebData)
-
-
-type Token
-    = Token String
+import Session exposing (Token)
 
 
 type alias Login =
@@ -34,16 +30,11 @@ encodeRegister { email, password } =
         ]
 
 
-tokenDecoder : Decoder Token
-tokenDecoder =
-    Decode.map Token (Decode.field "access_token" Decode.string)
-
-
 login : Login -> (WebData Token -> msg) -> Cmd msg
 login data msg =
     Http.post
         { url = "/auth/login"
-        , expect = Http.expectJson (RemoteData.fromResult >> msg) tokenDecoder
+        , expect = Http.expectJson (RemoteData.fromResult >> msg) Session.decoder
         , body = Http.jsonBody (encodeLogin data)
         }
 

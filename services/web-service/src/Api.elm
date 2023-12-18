@@ -1,16 +1,10 @@
 module Api exposing
-    ( basePath
-    , get
+    ( get
     , post
     , put
     )
 
 import Http exposing (Body)
-
-
-basePath : String
-basePath =
-    "/media_mix_modeling/api"
 
 
 get : { url : String, expect : Http.Expect msg } -> Cmd msg

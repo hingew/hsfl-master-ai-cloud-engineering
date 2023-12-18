@@ -11,7 +11,8 @@ export default defineConfig({
     server: {
         port: 3005,
         proxy: {
-            '/api': "http://localhost:3000"
+            '/api': 'http://localhost:3000',
+            '/auth': 'http://localhost:3000'
         }
     }
 })

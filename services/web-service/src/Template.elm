@@ -1,4 +1,4 @@
-module Template exposing (Template, decoder, fetchAll)
+module Template exposing (Template, TemplateId, decoder, fetchAll, id, toId)
 
 import Http
 import Iso8601
@@ -43,6 +43,16 @@ fetchAll msg =
         { url = path
         , expect = Http.expectJson (RemoteData.fromResult >> msg) (Decode.list decoder)
         }
+
+
+toId : Int -> TemplateId
+toId =
+    TemplateId
+
+
+id : TemplateId -> Int
+id (TemplateId value) =
+    value
 
 
 path : String

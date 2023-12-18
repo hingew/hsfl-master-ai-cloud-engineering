@@ -5,6 +5,7 @@ import Components
 import Css
 import Html.Styled exposing (Html, a, div, form, h2, p, text)
 import Html.Styled.Attributes as Attrs
+import Html.Styled.Events exposing (onSubmit)
 import Http
 import Http.Extra
 import Input
@@ -41,8 +42,8 @@ type Msg
     | GotRegisterResult (Result Http.Error ())
 
 
-init : ( Model, Cmd Msg )
-init =
+init : Session -> ( Model, Cmd Msg )
+init session =
     ( { form = LoginForm { email = "", password = "" }
       , error = Nothing
       , loading = False
@@ -171,6 +172,7 @@ viewLoginForm loginForm error loading =
         , form
             [ Attrs.css
                 [ Tw.space_y_6 ]
+            , onSubmit Submit
             ]
             [ Input.email
                 { value = loginForm.email
@@ -180,7 +182,7 @@ viewLoginForm loginForm error loading =
                 , required = True
                 }
             , Input.password
-                { value = loginForm.email
+                { value = loginForm.password
                 , label = "Password"
                 , name = "password"
                 , msg = PasswordUpdate
@@ -218,6 +220,7 @@ viewRegisterForm registerForm err loading =
         , form
             [ Attrs.css
                 [ Tw.space_y_6 ]
+            , onSubmit Submit
             ]
             [ Input.email
                 { value = registerForm.email
