@@ -20,7 +20,6 @@ toString posix =
         ++ String.fromInt (Time.toMinute Time.utc posix)
 
 
-
 toMonth : Posix -> String
 toMonth posix =
     case Time.toMonth Time.utc posix of
