@@ -64,29 +64,37 @@ parseRoute url =
 
 fromRoute : Route.Route -> Model -> ( Model, Cmd Msg )
 fromRoute route model =
-    if Session.authenticated model.session then
-        case route of
-            Route.Login ->
-                let
-                    ( m, cmd ) =
-                        Page.Login.init model.session
-                in
-                ( { model | page = Login m }, Cmd.map LoginMsg cmd )
+    case Session.authToken model.session of
+        Just token ->
+            case route of
+                Route.Login ->
+                    let
+                        ( m, cmd ) =
+                            Page.Login.init model.session
+                    in
+                    ( { model | page = Login m }, Cmd.map LoginMsg cmd )
 
-            _ ->
-                ( { model | page = NotFound }, Cmd.none )
+                Route.TemplateList ->
+                    let
+                        ( m, cmd ) =
+                            Page.TemplateList.init token
+                    in
+                    ( { model | page = TemplateList m }, Cmd.map TemplateListMsg cmd )
 
-    else
-        case model.page of
-            Login _ ->
-                ( model, Cmd.none )
+                _ ->
+                    ( { model | page = NotFound }, Cmd.none )
 
-            _ ->
-                let
-                    ( m, _ ) =
-                        Page.Login.init model.session
-                in
-                ( { model | page = Login m }, Route.replaceUrl (Session.navKey model.session) Route.Login )
+        Nothing ->
+            case model.page of
+                Login _ ->
+                    ( model, Cmd.none )
+
+                _ ->
+                    let
+                        ( m, _ ) =
+                            Page.Login.init model.session
+                    in
+                    ( { model | page = Login m }, Route.replaceUrl (Session.navKey model.session) Route.Login )
 
 
 navigate : Url.Url -> Model -> ( Model, Cmd Msg )

@@ -3,7 +3,8 @@ import { Elm } from './Main.elm'
 const app = Elm.Main.init({
     node: document.getElementById('root'),
     flags: {
-        token: localStorage.getItem("token")
+        //token: localStorage.getItem("token")
+        token: "test-token"
     }
 })
 

@@ -1,4 +1,15 @@
-port module Session exposing (Session, Token, authToken, authenticated, decoder, gotToken, init, navKey, setToken)
+port module Session exposing
+    ( Session
+    , Token
+    , authToken
+    , authenticated
+    , decoder
+    , gotToken
+    , init
+    , navKey
+    , setToken
+    , tokenValue
+    )
 
 import Browser.Navigation as Nav
 import Json.Decode as Decode exposing (Decoder)
@@ -51,6 +62,11 @@ authToken session =
 
         LoggedIn _ token ->
             Just token
+
+
+tokenValue : Token -> String
+tokenValue (Token value) =
+    value
 
 
 decoder : Decoder Token

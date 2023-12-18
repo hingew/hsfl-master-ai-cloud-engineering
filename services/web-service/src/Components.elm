@@ -1,13 +1,37 @@
-module Components exposing (viewButton, viewRemoteData, viewSubmitButton)
+module Components exposing
+    ( viewButton
+    , viewContainer
+    , viewRemoteData
+    , viewSubmitButton
+    , viewTable
+    )
 
 import Css exposing (disabled)
-import Html.Styled exposing (Html, button, div, pre, span, text)
+import Html.Styled
+    exposing
+        ( Html
+        , button
+        , div
+        , h1
+        , header
+        , main_
+        , pre
+        , span
+        , table
+        , tbody
+        , td
+        , text
+        , th
+        , thead
+        , tr
+        )
 import Html.Styled.Attributes as Attrs
 import Html.Styled.Events exposing (onClick)
 import Http.Extra
 import RemoteData exposing (WebData)
 import Svg.Styled exposing (path, svg)
 import Svg.Styled.Attributes as SvgAttrs
+import Tailwind.Breakpoints as Breakpoint
 import Tailwind.Theme as Theme
 import Tailwind.Utilities as Tw
 
@@ -58,7 +82,7 @@ viewButton content type_ disabled msg =
             ]
         , onClick msg
         , Attrs.type_ type_
-        , Attrs.disabled disabled 
+        , Attrs.disabled disabled
         ]
         content
 
@@ -98,3 +122,88 @@ viewLoading =
             ]
             [ text "Loading..." ]
         ]
+
+
+viewContainer : String -> List (Html msg) -> Html msg
+viewContainer title children =
+    div
+        [ Attrs.css
+            [ Tw.min_h_full
+            ]
+        ]
+        [ viewHeader title
+        , viewContent children
+        ]
+
+
+viewHeader : String -> Html msg
+viewHeader title =
+    header
+        [ Attrs.css
+            [ Tw.bg_color Theme.white
+            , Tw.shadow
+            ]
+        ]
+        [ div
+            [ Attrs.css
+                [ Tw.mx_auto
+                , Tw.max_w_7xl
+                , Tw.px_4
+                , Tw.py_6
+                , Breakpoint.lg
+                    [ Tw.px_8
+                    ]
+                , Breakpoint.sm
+                    [ Tw.px_6
+                    ]
+                ]
+            ]
+            [ h1
+                [ Attrs.css
+                    [ Tw.text_3xl
+                    , Tw.font_bold
+                    , Tw.tracking_tight
+                    , Tw.text_color Theme.gray_900
+                    ]
+                ]
+                [ text title ]
+            ]
+        ]
+
+
+viewContent : List (Html msg) -> Html msg
+viewContent children =
+    main_ []
+        [ div
+            [ Attrs.css
+                [ Tw.mx_auto
+                , Tw.max_w_7xl
+                , Tw.py_6
+                , Breakpoint.lg
+                    [ Tw.px_8
+                    ]
+                , Breakpoint.sm
+                    [ Tw.px_6
+                    ]
+                ]
+            ]
+            children
+        ]
+
+
+viewTable : List String -> List (a -> Html msg) -> List a -> Html msg
+viewTable headers cols data =
+    table [ Attrs.css [ Tw.table_auto ] ]
+        [ thead []
+            [ tr []
+                (List.map (\title -> th [] [ text title ]) headers)
+            ]
+        , tbody
+            []
+            (List.map (viewTableRow cols) data)
+        ]
+
+
+viewTableRow : List (a -> Html msg) -> a -> Html msg
+viewTableRow cols data =
+    tr [] (List.map (\col -> td [] [ col data ]) cols)

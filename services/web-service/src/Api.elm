@@ -5,15 +5,14 @@ module Api exposing
     )
 
 import Http exposing (Body)
+import Session exposing (Token)
 
 
-get : { url : String, expect : Http.Expect msg } -> Cmd msg
-get { url, expect } =
+get : { url : String, expect : Http.Expect msg , token : Token} -> Cmd msg
+get { url, expect, token } =
     Http.request
         { method = "GET"
-
-        --, headers = [ Http.header "Authorization" ("Bearer " ++ token) ]
-        , headers = []
+        , headers = [ Http.header "Authorization" ("Bearer " ++ (Session.tokenValue token)) ]
         , body = Http.emptyBody
         , url = url
         , expect = expect
@@ -26,7 +25,7 @@ post : { url : String, expect : Http.Expect msg, body : Body } -> Cmd msg
 post { url, expect, body } =
     Http.request
         { method = "POST"
-        , headers []
+        , headers = []
         , body = body
         , url = url
         , expect = expect

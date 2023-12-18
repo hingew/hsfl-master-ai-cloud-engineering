@@ -2,9 +2,11 @@ module Template exposing (Template, TemplateId, decoder, fetchAll, id, toId)
 
 import Http
 import Iso8601
+import Api
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline as DecodePipeline
 import RemoteData exposing (WebData)
+import Session exposing (Token)
 import Template.Element as Element exposing (Element)
 import Time
 
@@ -37,11 +39,12 @@ idDecoder =
     Decode.int |> Decode.map TemplateId
 
 
-fetchAll : (WebData (List Template) -> msg) -> Cmd msg
-fetchAll msg =
-    Http.get
+fetchAll : Token -> (WebData (List Template) -> msg) -> Cmd msg
+fetchAll token msg =
+    Api.get
         { url = path
         , expect = Http.expectJson (RemoteData.fromResult >> msg) (Decode.list decoder)
+        , token = token
         }
 
 
