@@ -1,4 +1,4 @@
-module Page.Login exposing (Model, Msg, init, update, view)
+module Page.Login exposing (Model, Msg, init, subscriptions, update, view)
 
 import Auth
 import Components
@@ -11,6 +11,8 @@ import Http.Extra
 import Input
 import Platform.Cmd as Cmd
 import RemoteData exposing (WebData)
+import Route
+import Session exposing (Session)
 import Svg.Styled.Events exposing (onClick)
 import Tailwind.Theme as Theme
 import Tailwind.Utilities as Tw
@@ -24,6 +26,7 @@ type alias Model =
     { form : Form
     , error : Maybe Http.Error
     , loading : Bool
+    , session : Session
     }
 
 
@@ -38,18 +41,26 @@ type Msg
     | PasswordConfirmationUpdate String
     | ToggleRegisterLogin
     | Submit
-    | GotLoginResult (WebData Auth.Token)
+    | GotLoginResult (WebData Session.Token)
     | GotRegisterResult (Result Http.Error ())
+    | SessionSaved
 
 
 init : Session -> ( Model, Cmd Msg )
 init session =
-    ( { form = LoginForm { email = "", password = "" }
-      , error = Nothing
-      , loading = False
-      }
-    , Cmd.none
-    )
+    let
+        model =
+            { form = LoginForm { email = "", password = "" }
+            , error = Nothing
+            , loading = False
+            , session = session
+            }
+    in
+    if Session.authenticated session then
+        ( model, Route.replaceUrl (Session.navKey session) Route.TemplateList )
+
+    else
+        ( model, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -90,8 +101,7 @@ update msg model =
         GotLoginResult response ->
             case response of
                 RemoteData.Success token ->
-                    -- TODO: redirect after login
-                    ( model, Cmd.none )
+                    ( model, Session.setToken token )
 
                 RemoteData.Failure err ->
                     ( { model | error = Just err }, Cmd.none )
@@ -114,6 +124,13 @@ update msg model =
 
                 RegisterForm form ->
                     ( model, Auth.register form GotRegisterResult )
+
+        SessionSaved ->
+            let
+                key =
+                    Session.navKey model.session
+            in
+            ( model, Route.replaceUrl key Route.TemplateList )
 
 
 view : Model -> Html Msg
@@ -273,3 +290,8 @@ viewError maybeError =
 
         Nothing ->
             text ""
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Session.gotToken (\_ -> SessionSaved)

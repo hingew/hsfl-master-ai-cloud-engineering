@@ -5,6 +5,7 @@ import Browser.Navigation as Navigation
 import Css.Global
 import Html.Styled exposing (Html, div, text)
 import Page.Login
+import Page.TemplateList
 import Route
 import Session exposing (Session)
 import Tailwind.Utilities as Tw
@@ -14,6 +15,7 @@ import Url.Parser
 
 type Page
     = Login Page.Login.Model
+    | TemplateList Page.TemplateList.Model
     | NotFound
 
 
@@ -27,6 +29,7 @@ type Msg
     = UrlChanged Url.Url
     | LinkClicked Browser.UrlRequest
     | LoginMsg Page.Login.Msg
+    | TemplateListMsg Page.TemplateList.Msg
 
 
 type alias Flags =
@@ -125,13 +128,21 @@ viewPage page =
         Login login ->
             Html.Styled.map LoginMsg (Page.Login.view login)
 
+        TemplateList templateList ->
+            Html.Styled.map TemplateListMsg (Page.TemplateList.view templateList)
+
         NotFound ->
             text "Not Found"
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.none
+subscriptions model =
+    case model.page of
+        Login loginModel ->
+            Sub.map LoginMsg (Page.Login.subscriptions loginModel)
+
+        _ ->
+            Sub.none
 
 
 main : Program Flags Model Msg

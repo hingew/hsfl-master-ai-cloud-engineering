@@ -1,4 +1,4 @@
-port module Session exposing (Session, Token, authToken, authenticated, decoder, init, navKey)
+port module Session exposing (Session, Token, authToken, authenticated, decoder, gotToken, init, navKey, setToken)
 
 import Browser.Navigation as Nav
 import Json.Decode as Decode exposing (Decoder)
@@ -13,14 +13,14 @@ type Session
     | Guest Nav.Key
 
 
-init : Nav.Key -> Maybe String -> ( Session, Cmd msg )
+init : Nav.Key -> Maybe String -> Session
 init key maybeToken =
     case maybeToken of
         Just token ->
-            ( LoggedIn key (Token token), setToken (Token token) )
+            LoggedIn key (Token token)
 
         Nothing ->
-            ( Guest key, Cmd.none )
+            Guest key
 
 
 authenticated : Session -> Bool
