@@ -192,17 +192,17 @@ viewLoginForm loginForm error loading =
             , onSubmit Submit
             ]
             [ Input.email
-                { value = loginForm.email
-                , label = "Email"
+                loginForm.email
+                NameUpdate
+                { label = "Email"
                 , name = "mail"
-                , msg = NameUpdate
                 , required = True
                 }
             , Input.password
-                { value = loginForm.password
-                , label = "Password"
+                loginForm.password
+                PasswordUpdate
+                { label = "Password"
                 , name = "password"
-                , msg = PasswordUpdate
                 , required = True
                 }
             , div [] [ Components.viewSubmitButton loading Submit ]
@@ -240,24 +240,24 @@ viewRegisterForm registerForm err loading =
             , onSubmit Submit
             ]
             [ Input.email
-                { value = registerForm.email
-                , label = "Email"
+                registerForm.email
+                NameUpdate
+                { label = "Email"
                 , name = "mail"
-                , msg = NameUpdate
                 , required = True
                 }
             , Input.password
-                { value = registerForm.password
-                , label = "Password"
+                registerForm.password
+                PasswordUpdate
+                { label = "Password"
                 , name = "password"
-                , msg = PasswordUpdate
                 , required = True
                 }
             , Input.password
-                { value = registerForm.passwordConfirmation
-                , label = "Password confirmation"
+                registerForm.passwordConfirmation
+                PasswordConfirmationUpdate
+                { label = "Password confirmation"
                 , name = "password_confirmation"
-                , msg = PasswordConfirmationUpdate
                 , required = True
                 }
             , div [] [ Components.viewSubmitButton loading Submit ]

@@ -3,8 +3,10 @@ module Main exposing (main)
 import Browser exposing (Document)
 import Browser.Navigation as Navigation
 import Css.Global
-import Html.Styled exposing (Html, div, text)
+import Html.Styled exposing (Html, div)
 import Page.Login
+import Page.NotFound
+import Page.TemplateCreate
 import Page.TemplateList
 import Route
 import Session exposing (Session)
@@ -16,6 +18,7 @@ import Url.Parser
 type Page
     = Login Page.Login.Model
     | TemplateList Page.TemplateList.Model
+    | TemplateCreate Page.TemplateCreate.Model
     | NotFound
 
 
@@ -30,6 +33,7 @@ type Msg
     | LinkClicked Browser.UrlRequest
     | LoginMsg Page.Login.Msg
     | TemplateListMsg Page.TemplateList.Msg
+    | TemplateCreateMsg Page.TemplateCreate.Msg
 
 
 type alias Flags =
@@ -81,6 +85,13 @@ fromRoute route model =
                     in
                     ( { model | page = TemplateList m }, Cmd.map TemplateListMsg cmd )
 
+                Route.TemplateCreate ->
+                    let
+                        ( m, cmd ) =
+                            Page.TemplateCreate.init token
+                    in
+                    ( { model | page = TemplateCreate m }, Cmd.map TemplateCreateMsg cmd )
+
                 _ ->
                     ( { model | page = NotFound }, Cmd.none )
 
@@ -105,12 +116,42 @@ navigate url model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( msg, model.page ) of
+        ( LinkClicked urlRequest, _ ) ->
+            case urlRequest of
+                Browser.Internal url ->
+                    let
+                        key =
+                            model.session
+                                |> Session.navKey
+                    in
+                    ( model, Navigation.pushUrl key (Url.toString url) )
+
+                Browser.External href ->
+                    ( model, Navigation.load href )
+
+        ( UrlChanged url, _ ) ->
+            navigate url model
+
         ( LoginMsg loginMsg, Login login ) ->
             let
-                ( updatedLogin, loginCmd ) =
+                ( updatedPage, cmd ) =
                     Page.Login.update loginMsg login
             in
-            ( { model | page = Login updatedLogin }, Cmd.map LoginMsg loginCmd )
+            ( { model | page = Login updatedPage }, Cmd.map LoginMsg cmd )
+
+        ( TemplateListMsg templateListMsg, TemplateList templateList ) ->
+            let
+                ( updatePage, cmd ) =
+                    Page.TemplateList.update templateListMsg templateList
+            in
+            ( { model | page = TemplateList updatePage }, Cmd.map TemplateListMsg cmd )
+
+        ( TemplateCreateMsg templateCreateMsg, TemplateCreate templateCreate ) ->
+            let
+                ( updatePage, cmd ) =
+                    Page.TemplateCreate.update templateCreateMsg templateCreate
+            in
+            ( { model | page = TemplateCreate updatePage }, Cmd.map TemplateCreateMsg cmd )
 
         _ ->
             ( model, Cmd.none )
@@ -133,14 +174,17 @@ view model =
 viewPage : Page -> Html Msg
 viewPage page =
     case page of
-        Login login ->
-            Html.Styled.map LoginMsg (Page.Login.view login)
+        Login pageModel ->
+            Html.Styled.map LoginMsg (Page.Login.view pageModel)
 
-        TemplateList templateList ->
-            Html.Styled.map TemplateListMsg (Page.TemplateList.view templateList)
+        TemplateList pageModel ->
+            Html.Styled.map TemplateListMsg (Page.TemplateList.view pageModel)
+
+        TemplateCreate pageModel ->
+            Html.Styled.map TemplateCreateMsg (Page.TemplateCreate.view pageModel)
 
         NotFound ->
-            text "Not Found"
+            Page.NotFound.view
 
 
 subscriptions : Model -> Sub Msg

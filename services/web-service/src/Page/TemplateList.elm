@@ -6,6 +6,7 @@ import RemoteData exposing (WebData)
 import Session
 import Template exposing (Template)
 import Time.Extra
+import Route
 
 
 type alias Model =
@@ -32,7 +33,12 @@ view : Model -> Html Msg
 view model =
     Components.viewContainer "Templates"
         [ Components.viewRemoteData viewTemplates model.templates ]
+        [ viewCreate ]
 
+viewCreate : Html Msg
+viewCreate = 
+    Components.viewLinkButton "Create Template" Route.TemplateCreate
+    
 
 viewTemplates : List Template -> Html Msg
 viewTemplates templates =

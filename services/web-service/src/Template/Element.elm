@@ -1,4 +1,9 @@
-module Template.Element exposing (Element, decoder)
+module Template.Element exposing
+    ( Element
+    , Form
+    , decoder
+    , initForm
+    )
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline as DecodePipeline
@@ -19,9 +24,34 @@ type alias Element =
     }
 
 
+type alias Form =
+    { x : Int
+    , y : Int
+    , width : Int
+    , height : Int
+    , valueFrom : String
+    , type_ : ElementType
+    }
+
+
 type ElementType
     = Text String Int
     | Rect
+
+
+initForm : Form
+initForm =
+    { x = 0
+    , y = 0
+    , width = 5
+    , height = 5
+    , valueFrom = "value"
+    , type_ = Rect
+    }
+
+
+
+-- Decode / Encode
 
 
 decoder : Decoder Element

@@ -1,6 +1,7 @@
 module Components exposing
     ( viewButton
     , viewContainer
+    , viewLinkButton
     , viewRemoteData
     , viewSubmitButton
     , viewTable
@@ -10,11 +11,14 @@ import Css exposing (disabled)
 import Html.Styled
     exposing
         ( Html
+        , a
         , button
         , div
         , h1
+        , h2
         , header
         , main_
+        , p
         , pre
         , span
         , table
@@ -29,6 +33,7 @@ import Html.Styled.Attributes as Attrs
 import Html.Styled.Events exposing (onClick)
 import Http.Extra
 import RemoteData exposing (WebData)
+import Route
 import Svg.Styled exposing (path, svg)
 import Svg.Styled.Attributes as SvgAttrs
 import Tailwind.Breakpoints as Breakpoint
@@ -65,6 +70,29 @@ viewButton : List (Html msg) -> String -> Bool -> msg -> Html msg
 viewButton content type_ disabled msg =
     button
         [ Attrs.css
+            [ Tw.rounded_md
+            , Tw.px_3
+            , Tw.py_1_dot_5
+            , Tw.text_sm
+            , Tw.font_semibold
+            , Tw.leading_6
+            , Tw.text_color Theme.white
+            , Tw.bg_color Theme.indigo_600
+            , Tw.shadow_sm
+            , Css.hover [ Tw.bg_color Theme.indigo_500 ]
+            , Css.focus [ Tw.outline, Tw.outline_2, Tw.outline_offset_2, Tw.outline_color Theme.indigo_600 ]
+            ]
+        , onClick msg
+        , Attrs.type_ type_
+        , Attrs.disabled disabled
+        ]
+        content
+
+
+viewLinkButton : String -> Route.Route -> Html msg
+viewLinkButton label route =
+    a
+        [ Attrs.css
             [ Tw.flex
             , Tw.w_full
             , Tw.justify_center
@@ -80,11 +108,9 @@ viewButton content type_ disabled msg =
             , Css.hover [ Tw.bg_color Theme.indigo_500 ]
             , Css.focus [ Tw.outline, Tw.outline_2, Tw.outline_offset_2, Tw.outline_color Theme.indigo_600 ]
             ]
-        , onClick msg
-        , Attrs.type_ type_
-        , Attrs.disabled disabled
+        , Attrs.href (Route.path route)
         ]
-        content
+        [ text label ]
 
 
 viewLoading : Html msg
@@ -124,20 +150,20 @@ viewLoading =
         ]
 
 
-viewContainer : String -> List (Html msg) -> Html msg
-viewContainer title children =
+viewContainer : String -> List (Html msg) -> List (Html msg) -> Html msg
+viewContainer title children actions =
     div
         [ Attrs.css
             [ Tw.min_h_full
             ]
         ]
-        [ viewHeader title
+        [ viewHeader title actions
         , viewContent children
         ]
 
 
-viewHeader : String -> Html msg
-viewHeader title =
+viewHeader : String -> List (Html msg) -> Html msg
+viewHeader title actions =
     header
         [ Attrs.css
             [ Tw.bg_color Theme.white
@@ -146,7 +172,10 @@ viewHeader title =
         ]
         [ div
             [ Attrs.css
-                [ Tw.mx_auto
+                [ Tw.flex
+                , Tw.justify_between
+                , Tw.flex_row
+                , Tw.mx_auto
                 , Tw.max_w_7xl
                 , Tw.px_4
                 , Tw.py_6
@@ -167,6 +196,7 @@ viewHeader title =
                     ]
                 ]
                 [ text title ]
+            , div [] actions
             ]
         ]
 
@@ -177,7 +207,7 @@ viewContent children =
         [ div
             [ Attrs.css
                 [ Tw.mx_auto
-                , Tw.max_w_7xl
+                , Tw.max_w_xl
                 , Tw.py_6
                 , Breakpoint.lg
                     [ Tw.px_8
@@ -193,15 +223,35 @@ viewContent children =
 
 viewTable : List String -> List (a -> Html msg) -> List a -> Html msg
 viewTable headers cols data =
-    table [ Attrs.css [ Tw.table_auto ] ]
-        [ thead []
-            [ tr []
-                (List.map (\title -> th [] [ text title ]) headers)
-            ]
-        , tbody
-            []
-            (List.map (viewTableRow cols) data)
-        ]
+    case data of
+        [] ->
+            div [ Attrs.css [ Tw.min_h_full, Tw.flex, Tw.pt_32, Tw.flex_col, Tw.justify_center, Tw.items_center ] ]
+                [ h2
+                    [ Attrs.css
+                        [ Tw.text_xl
+                        , Tw.font_bold
+                        , Tw.text_color Theme.gray_900
+                        ]
+                    ]
+                    [ text "Its empty here ..." ]
+                , p
+                    [ Attrs.css
+                        [ Tw.text_color Theme.gray_900
+                        ]
+                    ]
+                    [ text "Please create a new one, to get started!" ]
+                ]
+
+        _ ->
+            table [ Attrs.css [ Tw.table_auto ] ]
+                [ thead []
+                    [ tr []
+                        (List.map (\title -> th [] [ text title ]) headers)
+                    ]
+                , tbody
+                    []
+                    (List.map (viewTableRow cols) data)
+                ]
 
 
 viewTableRow : List (a -> Html msg) -> a -> Html msg
