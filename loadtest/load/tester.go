@@ -34,7 +34,7 @@ func (tester *Tester) Run() error {
 
 		for i := 0; i < steps; i++ {
 			currentRPS += rpsIncrement
-			targetRoutines = currentRPS * spec.Duration / 60
+			targetRoutines = currentRPS * spec.Duration
 
 			for activeRoutines < targetRoutines {
 				wg.Add(1)
