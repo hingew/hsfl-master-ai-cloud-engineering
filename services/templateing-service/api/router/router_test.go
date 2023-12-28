@@ -6,9 +6,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/golang/mock/gomock"
 	mock_controller "github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/_mocks"
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/mock/gomock"
 )
 
 func TestRouter(t *testing.T) {
