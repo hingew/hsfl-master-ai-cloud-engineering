@@ -2,13 +2,40 @@ package main
 
 import (
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"sync"
 	"time"
+
+	"gopkg.in/yaml.v2"
 )
+
+type TestConfig struct {
+	NumSteps                int    `yaml:"numSteps"`
+	StepSize                int    `yaml:"stepSize"`
+	NoCoalescingUrl         string `yaml:"noCoalescingUrl"`
+	ControllerCoalescingUrl string `yaml:"controllerCoalescingUrl"`
+	GatewayCoalescingUrl    string `yaml:"gatewayCoalescingUrl"`
+}
+
+func readConfig(configPath string) TestConfig {
+	file, err := os.Open(configPath)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	var config TestConfig
+	err = yaml.NewDecoder(file).Decode(&config)
+	if err != nil {
+		panic(err)
+	}
+
+	return config
+}
 
 func doRequest(url string, wg *sync.WaitGroup, durations chan<- time.Duration) {
 	defer wg.Done()
@@ -117,24 +144,21 @@ func writeCSVRow(writer *csv.Writer, numRequests int, durationNoCoalescing *time
 }
 
 func main() {
-	urls := []string{
-		"http://localhost:3000/api/templates/1",
-		"http://localhost:3000/api/templates/1/controller_coalescing",
-		"http://localhost:3000/api/templates/1/gateway_coalescing",
-	}
-	numRequestSteps := 20
-	requestStepSize := 10
+	configPath := flag.String("config", "config.yaml", "Path to the configuration file")
+	flag.Parse()
+
+	config := readConfig(*configPath)
 
 	writer := createCSVFile()
 
 	writeCSVHeader(writer)
 
-	for numRequests := 1; numRequests <= numRequestSteps; numRequests++ {
-		numRequests := numRequests * requestStepSize
+	for steps := 1; steps <= config.NumSteps; steps++ {
+		numRequests := steps * config.StepSize
 
-		durationNoCoalescing := measureTimeToDoRequests(urls[0], numRequests)
-		durationControllerCoalescing := measureTimeToDoRequests(urls[1], numRequests)
-		durationGatewayCoalescing := measureTimeToDoRequests(urls[2], numRequests)
+		durationNoCoalescing := measureTimeToDoRequests(config.NoCoalescingUrl, numRequests)
+		durationControllerCoalescing := measureTimeToDoRequests(config.ControllerCoalescingUrl, numRequests)
+		durationGatewayCoalescing := measureTimeToDoRequests(config.GatewayCoalescingUrl, numRequests)
 
 		writeCSVRow(writer, numRequests, durationNoCoalescing, durationControllerCoalescing, durationGatewayCoalescing)
 	}

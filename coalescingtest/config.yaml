@@ -1,0 +1,5 @@
+noCoalescingUrl: "http://localhost:3000/api/templates/1"
+controllerCoalescingUrl: "http://localhost:3000/api/templates/1/controller_coalescing"
+gatewayCoalescingUrl: "http://localhost:3000/api/templates/1/gateway_coalescing"
+numSteps: 30
+stepSize: 10
