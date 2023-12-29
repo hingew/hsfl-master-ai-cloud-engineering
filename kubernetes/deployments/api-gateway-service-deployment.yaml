@@ -32,7 +32,7 @@ spec:
             - name: WEB_ROUTES
               value: "/;/static/"
             - name: TEMPLATE_ROUTES
-              value: "/api/templates;/api/templates/:id"
+              value: "/api/templates;/api/templates/:id;/api/templates/:id/controller_coalescing;/api/templates/:id/gateway_coalescing"
             - name: CREATION_ROUTES
               value: "/api/render/:id"
             - name: USER_ROUTES

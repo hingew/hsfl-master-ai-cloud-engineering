@@ -14,7 +14,7 @@ func NewTemplateRouter(
 
 	templateRouter.GET("/api/templates", myController.GetAllTemplates)
 	templateRouter.GET("/api/templates/:id", myController.GetTemplate)
-	templateRouter.GET("/api/templates/:id/coalecing", myController.GetTemplateWithCoalecing)
+	templateRouter.GET("/api/templates/:id/controller_coalescing", myController.GetTemplateWithCoalecing)
 	templateRouter.POST("/api/templates", myController.CreateTemplate)
 	templateRouter.PUT("/api/templates/:id", myController.UpdateTemplate)
 	templateRouter.DELETE("/api/templates/:id", myController.DeleteTemplate)
