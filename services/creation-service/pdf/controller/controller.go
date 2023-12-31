@@ -41,7 +41,6 @@ func (c *Controller) CreatePdf(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// GET the template from the templating service
 	template, err := c.templatingClient.FetchTemplate(id)
 	log.Print(template)
 	log.Print(err)
