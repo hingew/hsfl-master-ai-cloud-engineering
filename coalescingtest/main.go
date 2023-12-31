@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sort"
 	"sync"
 	"time"
 
@@ -75,20 +76,36 @@ func doMultipleRequests(url string, numRequests int) <-chan time.Duration {
 	return durations
 }
 
-func calculateTotalDuration(durations <-chan time.Duration) *time.Duration {
+func calculateAverageDuration(durations <-chan time.Duration) *time.Duration {
 	var totalDuration time.Duration
+	var validDurations []time.Duration
+
 	for d := range durations {
 		if d <= -1 {
 			return nil
 		}
-		totalDuration += d
+		validDurations = append(validDurations, d)
 	}
-	return &totalDuration
+
+	sort.Slice(validDurations, func(i, j int) bool {
+		return validDurations[i] < validDurations[j]
+	})
+
+	lowerBound := int(0.1 * float64(len(validDurations)))
+	upperBound := int(0.9 * float64(len(validDurations)))
+
+	for i := lowerBound; i < upperBound; i++ {
+		totalDuration += validDurations[i]
+	}
+
+	averageDuration := totalDuration / time.Duration(upperBound-lowerBound)
+
+	return &averageDuration
 }
 
 func measureTimeToDoRequests(url string, numRequests int) *time.Duration {
 	durations := doMultipleRequests(url, numRequests)
-	return calculateTotalDuration(durations)
+	return calculateAverageDuration(durations)
 }
 
 func createCSVFile() *csv.Writer {
