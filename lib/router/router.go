@@ -32,7 +32,7 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		matches := route.pattern.FindStringSubmatch(r.URL.Path)
 
 		if len(matches) > 0 {
-			r = createRequestContect(r, route.params, matches[1:])
+			r = createRequestContext(r, route.params, matches[1:])
 			route.handler(w, r)
 			return
 
@@ -43,7 +43,7 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
 }
 
-func createRequestContect(r *http.Request, paramKeys []string, paramValues []string) *http.Request {
+func createRequestContext(r *http.Request, paramKeys []string, paramValues []string) *http.Request {
 	if len(paramKeys) == 0 {
 		return r
 	}
