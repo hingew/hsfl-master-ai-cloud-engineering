@@ -56,26 +56,9 @@ func (orc *Orchestrator) Start() {
 
 	defer orc.stopContainers(*containerIds)
 
-	weights := make([]int, orc.replicas)
-	for index, _ := range weights {
-		weights[index] = rand.Intn(orc.replicas)
-	}
+	weights := orc.initalizeWeights()
 
-	balancer_algorithm_tag := os.Getenv("BALANCER_ALGORITHM")
-	balancer_algorithm := loadbalancer.RoundRobin
-	switch balancer_algorithm_tag {
-	case "RoundRobin":
-		balancer_algorithm = loadbalancer.RoundRobin
-		break
-	case "WeightedRoundRobin":
-		balancer_algorithm = loadbalancer.WeightedRoundRobin
-		break
-	case "IPHash":
-		balancer_algorithm = loadbalancer.IPHash
-		break
-	default:
-		log.Print("No balancing algorithm provided. Use RoundRobin as default")
-	}
+	balancer_algorithm := orc.evaluateBalancerAlgorithm()
 
 	balancer := loadbalancer.NewLoadBalancer(containerEndpoints, weights, balancer_algorithm)
 
@@ -90,10 +73,32 @@ func (orc *Orchestrator) Start() {
 	go func() {
 		<-sigChan
 		server.Shutdown(context.Background())
-
 	}()
 
 	server.ListenAndServe()
+}
+
+func (orc *Orchestrator) initalizeWeights() []int {
+	weights := make([]int, orc.replicas)
+	for index, _ := range weights {
+		weights[index] = rand.Intn(orc.replicas)
+	}
+	return weights
+}
+
+func (orc *Orchestrator) evaluateBalancerAlgorithm() loadbalancer.BalancerAlgorithm {
+	balancer_algorithm_tag := os.Getenv("BALANCER_ALGORITHM")
+	switch balancer_algorithm_tag {
+	case "RoundRobin":
+		return loadbalancer.RoundRobin
+	case "WeightedRoundRobin":
+		return loadbalancer.WeightedRoundRobin
+	case "IPHash":
+		return loadbalancer.IPHash
+	default:
+		log.Print("No balancing algorithm provided. Use RoundRobin as default")
+		return loadbalancer.RoundRobin
+	}
 }
 
 func (orc *Orchestrator) evaluateContainerEndpoints(containerIds []string) ([]*url.URL, error) {
