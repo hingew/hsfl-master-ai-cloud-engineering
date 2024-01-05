@@ -140,18 +140,28 @@ update msg model =
             ( { model | page = Login updatedPage }, Cmd.map LoginMsg cmd )
 
         ( TemplateListMsg templateListMsg, TemplateList templateList ) ->
-            let
-                ( updatePage, cmd ) =
-                    Page.TemplateList.update templateListMsg templateList
-            in
-            ( { model | page = TemplateList updatePage }, Cmd.map TemplateListMsg cmd )
+            case Session.authToken model.session of
+                Just token ->
+                    let
+                        ( updatePage, cmd ) =
+                            Page.TemplateList.update token templateListMsg templateList
+                    in
+                    ( { model | page = TemplateList updatePage }, Cmd.map TemplateListMsg cmd )
+
+                Nothing ->
+                    ( model, Route.replaceUrl (Session.navKey model.session) Route.Login )
 
         ( TemplateCreateMsg templateCreateMsg, TemplateCreate templateCreate ) ->
-            let
-                ( updatePage, cmd ) =
-                    Page.TemplateCreate.update templateCreateMsg templateCreate
-            in
-            ( { model | page = TemplateCreate updatePage }, Cmd.map TemplateCreateMsg cmd )
+            case Session.authToken model.session of
+                Just token ->
+                    let
+                        ( updatePage, cmd ) =
+                            Page.TemplateCreate.update token (Session.navKey model.session) templateCreateMsg templateCreate
+                    in
+                    ( { model | page = TemplateCreate updatePage }, Cmd.map TemplateCreateMsg cmd )
+
+                Nothing ->
+                    ( model, Route.replaceUrl (Session.navKey model.session) Route.Login )
 
         _ ->
             ( model, Cmd.none )

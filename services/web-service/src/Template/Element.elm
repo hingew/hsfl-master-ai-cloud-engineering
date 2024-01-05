@@ -1,12 +1,18 @@
 module Template.Element exposing
     ( Element
+    , ElementType(..)
     , Form
     , decoder
+    , encode
     , initForm
+    , typeFromString
+    , typeOptions
+    , typeToString
     )
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline as DecodePipeline
+import Json.Encode as Encode
 
 
 type ElementId
@@ -50,6 +56,36 @@ initForm =
     }
 
 
+typeOptions : List ( String, String )
+typeOptions =
+    [ ( "Rect", "react" )
+    , ( "Text", "text" )
+    ]
+
+
+typeToString : ElementType -> String
+typeToString type_ =
+    case type_ of
+        Rect ->
+            "rect"
+
+        Text _ _ ->
+            "text"
+
+
+typeFromString : String -> Maybe ElementType
+typeFromString string =
+    case string of
+        "rect" ->
+            Just Rect
+
+        "text" ->
+            Just (Text "" 0)
+
+        _ ->
+            Nothing
+
+
 
 -- Decode / Encode
 
@@ -83,8 +119,35 @@ typeDecoder =
                     "text" ->
                         Decode.map2 Text
                             (Decode.field "font" Decode.string)
-                            (Decode.field "fontSize" Decode.int)
+                            (Decode.field "font_size" Decode.int)
 
                     _ ->
                         Decode.fail ("Unknown element type: " ++ string)
             )
+
+
+encode : Form -> Encode.Value
+encode element =
+    Encode.object
+        ([ ( "x", Encode.int element.x )
+         , ( "y", Encode.int element.y )
+         , ( "width", Encode.int element.width )
+         , ( "height", Encode.int element.height )
+         , ( "value_from", Encode.string element.valueFrom )
+         ]
+            ++ encodeType element.type_
+        )
+
+
+encodeType : ElementType -> List ( String, Encode.Value )
+encodeType type_ =
+    case type_ of
+        Rect ->
+            [ ( "type", Encode.string (typeToString type_) )
+            ]
+
+        Text font fontSize ->
+            [ ( "type", Encode.string (typeToString type_) )
+            , ( "font", Encode.string font )
+            , ( "font_size", Encode.int fontSize )
+            ]

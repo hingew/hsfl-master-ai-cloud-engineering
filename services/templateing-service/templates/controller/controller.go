@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -15,6 +14,10 @@ import (
 type ControllerImp struct {
 	repo    repository.Repository
 	sfGroup *singleflight.Group
+}
+
+type createResponse struct {
+	id uint `json:"id"`
 }
 
 func NewController(
@@ -105,9 +108,11 @@ func (c *ControllerImp) CreateTemplate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := fmt.Sprintf("id: %d", id)
-	w.Write([]byte(response))
-	w.WriteHeader(http.StatusOK)
+	w.Header().Add("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(createResponse{
+		id: *id,
+	})
+
 }
 
 func (c *ControllerImp) UpdateTemplate(w http.ResponseWriter, r *http.Request) {

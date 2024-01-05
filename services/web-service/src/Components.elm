@@ -1,6 +1,8 @@
 module Components exposing
     ( viewButton
+    , viewCancelButton
     , viewContainer
+    , viewHttpError
     , viewLinkButton
     , viewRemoteData
     , viewSubmitButton
@@ -17,6 +19,7 @@ import Html.Styled
         , h1
         , h2
         , header
+        , input
         , main_
         , p
         , pre
@@ -31,6 +34,7 @@ import Html.Styled
         )
 import Html.Styled.Attributes as Attrs
 import Html.Styled.Events exposing (onClick)
+import Http
 import Http.Extra
 import RemoteData exposing (WebData)
 import Route
@@ -57,31 +61,35 @@ viewRemoteData fn response =
             fn data
 
 
-viewSubmitButton : Bool -> msg -> Html msg
-viewSubmitButton loading msg =
-    if loading then
-        viewButton [ viewLoading ] "" True msg
+viewSubmitButton : Bool -> Html msg
+viewSubmitButton loading =
+    input
+        [ Attrs.css (buttonStyles Theme.indigo_600 Theme.indigo_500)
+        , Attrs.type_ "submit"
+        , Attrs.disabled loading
+        , Attrs.value "Submit"
+        ]
+        [ if loading then
+            viewLoading
 
-    else
-        viewButton [ text "Submit" ] "" False msg
+          else
+            text "Submit"
+        ]
+
+
+viewCancelButton : Route.Route -> Html msg
+viewCancelButton route =
+    a
+        [ Attrs.css (buttonStyles Theme.red_600 Theme.red_500)
+        , Attrs.href (Route.path route)
+        ]
+        [ text "Cancel" ]
 
 
 viewButton : List (Html msg) -> String -> Bool -> msg -> Html msg
 viewButton content type_ disabled msg =
     button
-        [ Attrs.css
-            [ Tw.rounded_md
-            , Tw.px_3
-            , Tw.py_1_dot_5
-            , Tw.text_sm
-            , Tw.font_semibold
-            , Tw.leading_6
-            , Tw.text_color Theme.white
-            , Tw.bg_color Theme.indigo_600
-            , Tw.shadow_sm
-            , Css.hover [ Tw.bg_color Theme.indigo_500 ]
-            , Css.focus [ Tw.outline, Tw.outline_2, Tw.outline_offset_2, Tw.outline_color Theme.indigo_600 ]
-            ]
+        [ Attrs.css (buttonStyles Theme.indigo_600 Theme.indigo_500)
         , onClick msg
         , Attrs.type_ type_
         , Attrs.disabled disabled
@@ -92,22 +100,7 @@ viewButton content type_ disabled msg =
 viewLinkButton : String -> Route.Route -> Html msg
 viewLinkButton label route =
     a
-        [ Attrs.css
-            [ Tw.flex
-            , Tw.w_full
-            , Tw.justify_center
-            , Tw.rounded_md
-            , Tw.bg_color Theme.indigo_600
-            , Tw.px_3
-            , Tw.py_1_dot_5
-            , Tw.text_sm
-            , Tw.font_semibold
-            , Tw.leading_6
-            , Tw.text_color Theme.white
-            , Tw.shadow_sm
-            , Css.hover [ Tw.bg_color Theme.indigo_500 ]
-            , Css.focus [ Tw.outline, Tw.outline_2, Tw.outline_offset_2, Tw.outline_color Theme.indigo_600 ]
-            ]
+        [ Attrs.css (buttonStyles Theme.indigo_600 Theme.indigo_500)
         , Attrs.href (Route.path route)
         ]
         [ text label ]
@@ -176,7 +169,7 @@ viewHeader title actions =
                 , Tw.justify_between
                 , Tw.flex_row
                 , Tw.mx_auto
-                , Tw.max_w_7xl
+                , Tw.max_w_xl
                 , Tw.px_4
                 , Tw.py_6
                 , Breakpoint.lg
@@ -225,7 +218,7 @@ viewTable : List String -> List (a -> Html msg) -> List a -> Html msg
 viewTable headers cols data =
     case data of
         [] ->
-            div [ Attrs.css [ Tw.min_h_full, Tw.flex, Tw.pt_32, Tw.flex_col, Tw.justify_center, Tw.items_center ] ]
+            div [ Attrs.css [ Tw.min_h_full, Tw.w_full, Tw.flex, Tw.pt_32, Tw.flex_col, Tw.justify_center, Tw.items_center ] ]
                 [ h2
                     [ Attrs.css
                         [ Tw.text_xl
@@ -257,3 +250,42 @@ viewTable headers cols data =
 viewTableRow : List (a -> Html msg) -> a -> Html msg
 viewTableRow cols data =
     tr [] (List.map (\col -> td [] [ col data ]) cols)
+
+
+buttonStyles : Theme.Color -> Theme.Color -> List Css.Style
+buttonStyles baseColor hoverColor =
+    [ Tw.rounded_md
+    , Tw.px_3
+    , Tw.py_1_dot_5
+    , Tw.text_sm
+    , Tw.font_semibold
+    , Tw.leading_6
+    , Tw.text_color Theme.white
+    , Tw.bg_color baseColor
+    , Tw.shadow_sm
+    , Css.hover [ Tw.bg_color hoverColor ]
+    , Css.focus [ Tw.outline, Tw.outline_2, Tw.outline_offset_2, Tw.outline_color baseColor ]
+    ]
+
+
+viewHttpError : Maybe Http.Error -> Html msg
+viewHttpError maybeError =
+    case maybeError of
+        Just err ->
+            div
+                [ Attrs.css
+                    [ Tw.rounded
+                    , Tw.p_6
+                    , Tw.bg_color Theme.red_500
+                    , Tw.text_color Theme.white
+                    , Tw.overflow_scroll
+                    , Tw.mb_6
+                    ]
+                ]
+                [ pre
+                    []
+                    [ text (Http.Extra.errToString err) ]
+                ]
+
+        Nothing ->
+            text ""

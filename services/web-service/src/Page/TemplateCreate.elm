@@ -1,5 +1,6 @@
 module Page.TemplateCreate exposing (Model, Msg, init, subscriptions, update, view)
 
+import Browser.Navigation as Nav
 import Components
 import Html.Styled exposing (Html, div, form, text)
 import Html.Styled.Attributes as Attrs
@@ -8,9 +9,10 @@ import Http
 import Input
 import List.Extra
 import RemoteData exposing (WebData)
+import Route
 import Session
-import Tailwind.Theme as Theme
 import Tailwind.Utilities as Tw
+import Template exposing (Template)
 import Template.Element as Element
 
 
@@ -24,12 +26,14 @@ type alias Model =
 
 type Msg
     = Submit
+    | GotSubmitResult (WebData Template.CreateResponse)
     | NameUpdate String
     | ValueFromUpdate Int String
     | XUpdate Int Int
     | YUpdate Int Int
     | WidthUpdate Int Int
     | HeightUpdate Int Int
+    | TypeUpdate Int Element.ElementType
     | AddElement
 
 
@@ -44,11 +48,27 @@ init token =
     )
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update : Session.Token -> Nav.Key -> Msg -> Model -> ( Model, Cmd Msg )
+update token navKey msg model =
     case msg of
         Submit ->
-            ( model, Cmd.none )
+            ( { model | loading = True }
+            , Template.create token { name = model.name, elements = model.elements } GotSubmitResult
+            )
+
+        GotSubmitResult response ->
+            case response of
+                RemoteData.Success _ ->
+                    ( model, Route.replaceUrl navKey Route.TemplateList )
+
+                RemoteData.Failure err ->
+                    ( { model | loading = False, error = Just err }, Cmd.none )
+
+                RemoteData.NotAsked ->
+                    ( model, Cmd.none )
+
+                RemoteData.Loading ->
+                    ( model, Cmd.none )
 
         NameUpdate value ->
             ( { model | name = value }, Cmd.none )
@@ -106,11 +126,23 @@ update msg model =
             , Cmd.none
             )
 
+        TypeUpdate index elementType ->
+            ( { model
+                | elements =
+                    List.Extra.updateAt index
+                        (\element -> { element | type_ = elementType })
+                        model.elements
+              }
+            , Cmd.none
+            )
+
 
 view : Model -> Html Msg
 view model =
     Components.viewContainer "Create Template"
-        [ viewForm model ]
+        [ Components.viewHttpError model.error
+        , viewForm model
+        ]
         []
 
 
@@ -131,40 +163,86 @@ viewForm { name, elements, loading } =
         , Input.viewLabel "Elements" "elements" True
         , viewElements elements
         , Components.viewButton [ text "Add" ] "button" False AddElement
-        , div [] [ Components.viewSubmitButton loading Submit ]
+        , div
+            [ Attrs.css
+                [ Tw.flex
+                , Tw.justify_between
+                ]
+            ]
+            [ Components.viewSubmitButton loading
+            , Components.viewCancelButton Route.TemplateList
+            ]
         ]
 
 
 viewElements : List Element.Form -> Html Msg
 viewElements elements =
-        div [ Attrs.css [ Tw.space_y_6 ]] (List.indexedMap viewElement elements)
+    div [ Attrs.css [ Tw.divide_y ] ] (List.indexedMap viewElement elements)
 
 
 viewElement : Int -> Element.Form -> Html Msg
 viewElement index element =
-    div [ Attrs.css [ Tw.space_y_6 ] ]
-        [ Input.string
+    div [ Attrs.css [ Tw.space_y_6, Tw.py_6 ] ]
+        ([ Input.string
             element.valueFrom
             (ValueFromUpdate index)
             { label = "Property name in JSON"
             , name = "valueFrom"
             , required = True
             }
-        , Input.number element.x
+         , Input.number element.x
             (XUpdate index)
             { label = "X"
             , name = "x"
             , required = True
             }
-        , Input.number element.y
+         , Input.number element.y
             (YUpdate index)
             { label = "Y"
             , name = "y"
             , required = True
             }
-        ]
+         , Input.select
+            (Element.typeToString element.type_)
+            Element.typeOptions
+            (\string ->
+                string
+                    |> Element.typeFromString
+                    |> Maybe.withDefault element.type_
+                    |> TypeUpdate index
+            )
+            { label = "Type"
+            , name = "type"
+            , required = True
+            }
+         ]
+            ++ viewElementType index element.type_
+        )
+
+
+viewElementType : Int -> Element.ElementType -> List (Html Msg)
+viewElementType index type_ =
+    case type_ of
+        Element.Rect ->
+            []
+
+        Element.Text text fontSize ->
+            [ Input.string
+                text
+                (\newValue -> TypeUpdate index (Element.Text newValue fontSize))
+                { label = "Text"
+                , name = "text"
+                , required = True
+                }
+            , Input.number fontSize
+                (\newValue -> TypeUpdate index (Element.Text text newValue))
+                { label = "Font size"
+                , name = "fontSize"
+                , required = True
+                }
+            ]
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.none

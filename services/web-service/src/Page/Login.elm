@@ -185,7 +185,7 @@ viewLoginForm loginForm error loading =
             , Tw.max_w_sm
             ]
         ]
-        [ viewError error
+        [ Components.viewHttpError error
         , form
             [ Attrs.css
                 [ Tw.space_y_6 ]
@@ -205,7 +205,7 @@ viewLoginForm loginForm error loading =
                 , name = "password"
                 , required = True
                 }
-            , div [] [ Components.viewSubmitButton loading Submit ]
+            , div [] [ Components.viewSubmitButton loading]
             ]
         , p [ Attrs.css [ Tw.mt_10, Tw.text_center, Tw.text_sm, Tw.text_color Theme.gray_600 ] ]
             [ text "Not a member? "
@@ -233,7 +233,7 @@ viewRegisterForm registerForm err loading =
             , Tw.max_w_sm
             ]
         ]
-        [ viewError err
+        [ Components.viewHttpError err
         , form
             [ Attrs.css
                 [ Tw.space_y_6 ]
@@ -260,7 +260,7 @@ viewRegisterForm registerForm err loading =
                 , name = "password_confirmation"
                 , required = True
                 }
-            , div [] [ Components.viewSubmitButton loading Submit ]
+            , div [] [ Components.viewSubmitButton loading]
             ]
         , p [ Attrs.css [ Tw.mt_10, Tw.text_center, Tw.text_sm, Tw.text_color Theme.gray_600 ] ]
             [ text "Allready a member? "
@@ -277,19 +277,6 @@ viewRegisterForm registerForm err loading =
             ]
         ]
 
-
-viewError : Maybe Http.Error -> Html Msg
-viewError maybeError =
-    case maybeError of
-        Just err ->
-            p
-                [ Attrs.css
-                    [ Tw.text_color Theme.red_900 ]
-                ]
-                [ text (Http.Extra.errToString err) ]
-
-        Nothing ->
-            text ""
 
 
 subscriptions : Model -> Sub Msg

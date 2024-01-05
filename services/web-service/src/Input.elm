@@ -3,6 +3,7 @@ module Input exposing
     , email
     , number
     , password
+    , select
     , string
     , view
     , viewLabel
@@ -10,7 +11,7 @@ module Input exposing
     )
 
 import Css
-import Html.Styled exposing (Html, div, label, text)
+import Html.Styled exposing (Html, div, label, option, text)
 import Html.Styled.Attributes as Attrs
 import Html.Styled.Events exposing (onInput)
 import Tailwind.Breakpoints as Breakpoints
@@ -31,6 +32,7 @@ type InputType msg
     | Text String (String -> msg)
     | Password String (String -> msg)
     | Integer Int (Int -> msg)
+    | Select String (List ( String, String )) (String -> msg)
 
 
 type alias InputConfig =
@@ -80,6 +82,16 @@ number value msg config =
         }
 
 
+select : String -> List ( String, String ) -> (String -> msg) -> InputConfig -> Html msg
+select value options msg config =
+    viewLabeled
+        { label = config.label
+        , name = config.name
+        , required = config.required
+        , input = Select value options msg
+        }
+
+
 viewLabeled : Input msg -> Html msg
 viewLabeled input =
     div
@@ -116,80 +128,92 @@ viewLabel value name required =
 
 
 view : Input msg -> Html msg
-view input =
-    Html.Styled.input
-        (inputStyle
-            :: inputAttrs input
-        )
-        []
-
-
-inputAttrs : Input msg -> List (Html.Styled.Attribute msg)
-inputAttrs { name, required, input } =
+view { name, required, input } =
     case input of
         Email value msg ->
-            [ Attrs.id name
-            , Attrs.type_ "email"
-            , Attrs.required required
-            , Attrs.value value
-            , onInput msg
-            ]
+            Html.Styled.input
+                [ Attrs.css inputStyle
+                , Attrs.id name
+                , Attrs.type_ "email"
+                , Attrs.required required
+                , Attrs.value value
+                , onInput msg
+                ]
+                []
 
         Text value msg ->
-            [ Attrs.id name
-            , Attrs.type_ "text"
-            , Attrs.required required
-            , Attrs.value value
-            , onInput msg
-            ]
+            Html.Styled.input
+                [ Attrs.css inputStyle
+                , Attrs.id name
+                , Attrs.type_ "text"
+                , Attrs.required required
+                , Attrs.value value
+                , onInput msg
+                ]
+                []
 
         Password value msg ->
-            [ Attrs.id name
-            , Attrs.type_ "password"
-            , Attrs.required required
-            , Attrs.value value
-            , onInput msg
-            ]
+            Html.Styled.input
+                [ Attrs.css inputStyle
+                , Attrs.id name
+                , Attrs.type_ "password"
+                , Attrs.required required
+                , Attrs.value value
+                , onInput msg
+                ]
+                []
 
         Integer value msg ->
-            [ Attrs.id name
-            , Attrs.type_ "number"
-            , Attrs.required required
-            , Attrs.value (String.fromInt value)
-            , onInput
-                (\newValue ->
-                    case String.toInt newValue of
-                        Just newInt ->
-                            msg newInt
+            Html.Styled.input
+                [ Attrs.css inputStyle
+                , Attrs.id name
+                , Attrs.type_ "number"
+                , Attrs.required required
+                , Attrs.value (String.fromInt value)
+                , onInput
+                    (\newValue ->
+                        case String.toInt newValue of
+                            Just newInt ->
+                                msg newInt
 
-                        Nothing ->
-                            msg value
-                )
-            ]
+                            Nothing ->
+                                msg value
+                    )
+                ]
+                []
+
+        Select value options msg ->
+            Html.Styled.select
+                [ Attrs.css inputStyle
+                , Attrs.id name
+                , Attrs.required required
+                , Attrs.value value
+                , onInput msg
+                ]
+                (List.map (\( label, optionValue ) -> option [ Attrs.value optionValue ] [ text label ]) options)
 
 
-inputStyle : Html.Styled.Attribute msg
+inputStyle : List Css.Style
 inputStyle =
-    Attrs.css
-        [ Tw.block
-        , Tw.w_full
-        , Tw.rounded_md
-        , Tw.border_0
-        , Tw.py_1_dot_5
-        , Tw.px_3
-        , Tw.text_color Theme.gray_900
-        , Tw.shadow_sm
-        , Tw.ring_1
+    [ Tw.block
+    , Tw.w_full
+    , Tw.rounded_md
+    , Tw.border_0
+    , Tw.py_1_dot_5
+    , Tw.px_3
+    , Tw.text_color Theme.gray_900
+    , Tw.shadow_sm
+    , Tw.ring_1
+    , Tw.ring_inset
+    , Tw.ring_color Theme.gray_300
+    , Tw.placeholder_color Theme.gray_400
+    , Css.focus
+        [ Tw.ring_2
         , Tw.ring_inset
-        , Tw.ring_color Theme.gray_300
-        , Tw.placeholder_color Theme.gray_400
-        , Css.focus
-            [ Tw.ring_2
-            , Tw.ring_inset
-            , Tw.ring_color Theme.indigo_600
-            ]
-        , Breakpoints.sm
-            [ Tw.text_sm
-            , Tw.leading_6
-            ]
+        , Tw.ring_color Theme.indigo_600
         ]
+    , Breakpoints.sm
+        [ Tw.text_sm
+        , Tw.leading_6
+        ]
+    ]
