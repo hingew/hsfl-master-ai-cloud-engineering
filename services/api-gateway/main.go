@@ -8,32 +8,13 @@ import (
 	"strings"
 
 	my_proxy "github.com/hingew/hsfl-master-ai-cloud-engineering/api-gateway/proxy"
-	"gopkg.in/yaml.v2"
 )
 
 type RoutesConfig struct {
-	TemplateingService []string `yaml:"templateing-service"`
-	UserService        []string `yaml:"user-service"`
-	WebService         []string `yaml:"web-service"`
-	CreationService    []string `yaml:"creation-service"`
-}
-
-func readRoutesConfig() RoutesConfig {
-	data, err := os.ReadFile("config.yml")
-	if err != nil {
-		log.Fatalf("Couldn't read Routes Config: %v", err)
-	}
-
-	var routes RoutesConfig
-
-	err = yaml.Unmarshal(data, &routes)
-	if err != nil {
-		log.Fatalf("Error during parsing yaml-file: %v", err)
-	}
-
-	log.Printf("Read config: %s", routes)
-
-	return routes
+	TemplateingService []string
+	UserService        []string
+	WebService         []string
+	CreationService    []string
 }
 
 func readRoutesFromEnv() RoutesConfig {
