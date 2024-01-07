@@ -33,8 +33,6 @@ type alias Element =
 type alias Form =
     { x : Int
     , y : Int
-    , width : Int
-    , height : Int
     , valueFrom : String
     , type_ : ElementType
     }
@@ -42,23 +40,21 @@ type alias Form =
 
 type ElementType
     = Text String Int
-    | Rect
+    | Rect Int Int
 
 
 initForm : Form
 initForm =
     { x = 0
     , y = 0
-    , width = 5
-    , height = 5
     , valueFrom = "value"
-    , type_ = Rect
+    , type_ = Rect 5 5
     }
 
 
 typeOptions : List ( String, String )
 typeOptions =
-    [ ( "Rect", "react" )
+    [ ( "Rect", "rect" )
     , ( "Text", "text" )
     ]
 
@@ -66,7 +62,7 @@ typeOptions =
 typeToString : ElementType -> String
 typeToString type_ =
     case type_ of
-        Rect ->
+        Rect _ _ ->
             "rect"
 
         Text _ _ ->
@@ -77,7 +73,7 @@ typeFromString : String -> Maybe ElementType
 typeFromString string =
     case string of
         "rect" ->
-            Just Rect
+            Just (Rect 0 0)
 
         "text" ->
             Just (Text "" 0)
@@ -114,7 +110,9 @@ typeDecoder =
             (\string ->
                 case string of
                     "rect" ->
-                        Decode.succeed Rect
+                        Decode.map2 Rect
+                            (Decode.field "width" Decode.int)
+                            (Decode.field "height" Decode.int)
 
                     "text" ->
                         Decode.map2 Text
@@ -131,8 +129,6 @@ encode element =
     Encode.object
         ([ ( "x", Encode.int element.x )
          , ( "y", Encode.int element.y )
-         , ( "width", Encode.int element.width )
-         , ( "height", Encode.int element.height )
          , ( "value_from", Encode.string element.valueFrom )
          ]
             ++ encodeType element.type_
@@ -142,8 +138,10 @@ encode element =
 encodeType : ElementType -> List ( String, Encode.Value )
 encodeType type_ =
     case type_ of
-        Rect ->
+        Rect width height ->
             [ ( "type", Encode.string (typeToString type_) )
+            , ( "width", Encode.int width )
+            , ( "height", Encode.int height )
             ]
 
         Text font fontSize ->

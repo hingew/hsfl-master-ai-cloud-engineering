@@ -1,5 +1,6 @@
 module Components exposing
-    ( viewButton
+    ( Style(..)
+    , viewButton
     , viewCancelButton
     , viewContainer
     , viewHttpError
@@ -45,6 +46,11 @@ import Tailwind.Theme as Theme
 import Tailwind.Utilities as Tw
 
 
+type Style
+    = Default
+    | Danger
+
+
 viewRemoteData : (a -> Html msg) -> WebData a -> Html msg
 viewRemoteData fn response =
     case response of
@@ -55,7 +61,7 @@ viewRemoteData fn response =
             div [] [ text "Not asked..." ]
 
         RemoteData.Failure err ->
-            pre [] [ text (Http.Extra.errToString err) ]
+            viewHttpError (Just err)
 
         RemoteData.Success data ->
             fn data
@@ -64,7 +70,7 @@ viewRemoteData fn response =
 viewSubmitButton : Bool -> Html msg
 viewSubmitButton loading =
     input
-        [ Attrs.css (buttonStyles Theme.indigo_600 Theme.indigo_500)
+        [ Attrs.css (buttonStyles Default)
         , Attrs.type_ "submit"
         , Attrs.disabled loading
         , Attrs.value "Submit"
@@ -80,27 +86,27 @@ viewSubmitButton loading =
 viewCancelButton : Route.Route -> Html msg
 viewCancelButton route =
     a
-        [ Attrs.css (buttonStyles Theme.red_600 Theme.red_500)
+        [ Attrs.css (buttonStyles Danger)
         , Attrs.href (Route.path route)
         ]
         [ text "Cancel" ]
 
 
-viewButton : List (Html msg) -> String -> Bool -> msg -> Html msg
-viewButton content type_ disabled msg =
+viewButton : String -> Style -> Bool -> msg -> Html msg
+viewButton label style disabled msg =
     button
-        [ Attrs.css (buttonStyles Theme.indigo_600 Theme.indigo_500)
+        [ Attrs.css (buttonStyles style)
         , onClick msg
-        , Attrs.type_ type_
+        , Attrs.type_ "button"
         , Attrs.disabled disabled
         ]
-        content
+        [ text label ]
 
 
 viewLinkButton : String -> Route.Route -> Html msg
 viewLinkButton label route =
     a
-        [ Attrs.css (buttonStyles Theme.indigo_600 Theme.indigo_500)
+        [ Attrs.css (buttonStyles Default)
         , Attrs.href (Route.path route)
         ]
         [ text label ]
@@ -169,7 +175,7 @@ viewHeader title actions =
                 , Tw.justify_between
                 , Tw.flex_row
                 , Tw.mx_auto
-                , Tw.max_w_xl
+                , Tw.max_w_3xl
                 , Tw.px_4
                 , Tw.py_6
                 , Breakpoint.lg
@@ -200,7 +206,7 @@ viewContent children =
         [ div
             [ Attrs.css
                 [ Tw.mx_auto
-                , Tw.max_w_xl
+                , Tw.max_w_3xl
                 , Tw.py_6
                 , Breakpoint.lg
                     [ Tw.px_8
@@ -236,10 +242,9 @@ viewTable headers cols data =
                 ]
 
         _ ->
-            table [ Attrs.css [ Tw.table_auto ] ]
-                [ thead []
-                    [ tr []
-                        (List.map (\title -> th [] [ text title ]) headers)
+            table [ Attrs.css [ Tw.table_auto, Tw.w_full, Tw.text_sm, Tw.text_left, Tw.border, Tw.rounded_md ] ]
+                [ thead [ Attrs.css [ Tw.text_color Theme.gray_700, Tw.bg_color Theme.gray_50 ] ]
+                    [ tr [] (viewTableHeader headers)
                     ]
                 , tbody
                     []
@@ -249,11 +254,46 @@ viewTable headers cols data =
 
 viewTableRow : List (a -> Html msg) -> a -> Html msg
 viewTableRow cols data =
-    tr [] (List.map (\col -> td [] [ col data ]) cols)
+    tr [ Attrs.css [ Tw.bg_color Theme.white, Tw.border_b ] ] (viewTableCols cols data)
 
 
-buttonStyles : Theme.Color -> Theme.Color -> List Css.Style
-buttonStyles baseColor hoverColor =
+viewTableHeader : List String -> List (Html msg)
+viewTableHeader headers =
+    case headers of
+        [] ->
+            []
+
+        x :: [] ->
+            [ th [ Attrs.css [ Tw.px_6, Tw.py_3, Tw.text_right ] ] [ text x ] ]
+
+        x :: xs ->
+            th [ Attrs.css [ Tw.px_6, Tw.py_3 ] ] [ text x ] :: viewTableHeader xs
+
+
+viewTableCols : List (a -> Html msg) -> a -> List (Html msg)
+viewTableCols cols data =
+    case cols of
+        [] ->
+            []
+
+        x :: [] ->
+            [ td [ Attrs.css [ Tw.px_6, Tw.py_4, Tw.text_right ] ] [ x data ] ]
+
+        x :: xs ->
+            td [ Attrs.css [ Tw.px_6, Tw.py_4 ] ] [ x data ] :: viewTableCols xs data
+
+
+buttonStyles : Style -> List Css.Style
+buttonStyles style =
+    let
+        ( baseColor, hoverColor ) =
+            case style of
+                Default ->
+                    ( Theme.indigo_500, Theme.indigo_600 )
+
+                Danger ->
+                    ( Theme.red_500, Theme.red_600 )
+    in
     [ Tw.rounded_md
     , Tw.px_3
     , Tw.py_1_dot_5
@@ -264,7 +304,6 @@ buttonStyles baseColor hoverColor =
     , Tw.bg_color baseColor
     , Tw.shadow_sm
     , Css.hover [ Tw.bg_color hoverColor ]
-    , Css.focus [ Tw.outline, Tw.outline_2, Tw.outline_offset_2, Tw.outline_color baseColor ]
     ]
 
 
@@ -279,7 +318,7 @@ viewHttpError maybeError =
                     , Tw.bg_color Theme.red_500
                     , Tw.text_color Theme.white
                     , Tw.overflow_scroll
-                    , Tw.mb_6
+                    , Tw.my_6
                     ]
                 ]
                 [ pre

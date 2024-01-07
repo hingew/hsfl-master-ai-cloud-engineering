@@ -2,8 +2,9 @@ module Page.TemplateList exposing (Model, Msg, init, subscriptions, update, view
 
 import Components
 import Html.Styled exposing (Html, div, text)
+import Html.Styled.Attributes as Attrs
+import Tailwind.Utilities as Tw
 import Http
-import List.Extra
 import RemoteData exposing (WebData)
 import Route
 import Session
@@ -87,8 +88,10 @@ viewTemplates templates =
 
 viewActions : Template -> Html Msg
 viewActions template =
-    div []
-        [ Components.viewButton [ text "Delete" ] "button" False (DeleteTemplate template.id) ]
+    div [ Attrs.css [ Tw.space_x_3 ] ]
+        [ Components.viewButton "Delete" Components.Danger False (DeleteTemplate template.id)
+        , Components.viewLinkButton "Print" (Route.TemplatePrint template.id)
+        ]
 
 
 subscriptions : Model -> Sub Msg

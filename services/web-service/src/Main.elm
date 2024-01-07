@@ -8,6 +8,7 @@ import Page.Login
 import Page.NotFound
 import Page.TemplateCreate
 import Page.TemplateList
+import Page.TemplatePrint
 import Route
 import Session exposing (Session)
 import Tailwind.Utilities as Tw
@@ -19,6 +20,7 @@ type Page
     = Login Page.Login.Model
     | TemplateList Page.TemplateList.Model
     | TemplateCreate Page.TemplateCreate.Model
+    | TemplatePrint Page.TemplatePrint.Model
     | NotFound
 
 
@@ -34,6 +36,7 @@ type Msg
     | LoginMsg Page.Login.Msg
     | TemplateListMsg Page.TemplateList.Msg
     | TemplateCreateMsg Page.TemplateCreate.Msg
+    | TemplatePrintMsg Page.TemplatePrint.Msg
 
 
 type alias Flags =
@@ -92,8 +95,19 @@ fromRoute route model =
                     in
                     ( { model | page = TemplateCreate m }, Cmd.map TemplateCreateMsg cmd )
 
-                _ ->
+                Route.TemplatePrint templateId ->
+                    let
+                        ( m, cmd ) =
+                            Page.TemplatePrint.init templateId token
+                    in
+                    ( { model | page = TemplatePrint m }, Cmd.map TemplatePrintMsg cmd )
+
+                Route.NotFound ->
                     ( { model | page = NotFound }, Cmd.none )
+
+                Route.Register ->
+                    Debug.todo "branch 'Register' not implemented"
+
 
         Nothing ->
             case model.page of
@@ -163,6 +177,18 @@ update msg model =
                 Nothing ->
                     ( model, Route.replaceUrl (Session.navKey model.session) Route.Login )
 
+        ( TemplatePrintMsg templatePrintMsg, TemplatePrint templatePrint ) ->
+            case Session.authToken model.session of
+                Just token ->
+                    let
+                        ( updatePage, cmd ) =
+                            Page.TemplatePrint.update token (Session.navKey model.session) templatePrintMsg templatePrint
+                    in
+                    ( { model | page = TemplatePrint updatePage }, Cmd.map TemplatePrintMsg cmd )
+
+                Nothing ->
+                    ( model, Route.replaceUrl (Session.navKey model.session) Route.Login )
+
         _ ->
             ( model, Cmd.none )
 
@@ -172,10 +198,10 @@ view model =
     { title = "PDF Designer"
     , body =
         List.map Html.Styled.toUnstyled
-            [ div
+            [ Css.Global.global Tw.globalStyles
+            , div
                 []
-                [ Css.Global.global Tw.globalStyles
-                , viewPage model.page
+                [ viewPage model.page
                 ]
             ]
     }
@@ -192,6 +218,9 @@ viewPage page =
 
         TemplateCreate pageModel ->
             Html.Styled.map TemplateCreateMsg (Page.TemplateCreate.view pageModel)
+
+        TemplatePrint pageModel ->
+            Html.Styled.map TemplatePrintMsg (Page.TemplatePrint.view pageModel)
 
         NotFound ->
             Page.NotFound.view

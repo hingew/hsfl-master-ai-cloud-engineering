@@ -31,8 +31,6 @@ type Msg
     | ValueFromUpdate Int String
     | XUpdate Int Int
     | YUpdate Int Int
-    | WidthUpdate Int Int
-    | HeightUpdate Int Int
     | TypeUpdate Int Element.ElementType
     | AddElement
 
@@ -106,26 +104,6 @@ update token navKey msg model =
             , Cmd.none
             )
 
-        WidthUpdate index value ->
-            ( { model
-                | elements =
-                    List.Extra.updateAt index
-                        (\element -> { element | width = value })
-                        model.elements
-              }
-            , Cmd.none
-            )
-
-        HeightUpdate index value ->
-            ( { model
-                | elements =
-                    List.Extra.updateAt index
-                        (\element -> { element | height = value })
-                        model.elements
-              }
-            , Cmd.none
-            )
-
         TypeUpdate index elementType ->
             ( { model
                 | elements =
@@ -162,7 +140,7 @@ viewForm { name, elements, loading } =
             }
         , Input.viewLabel "Elements" "elements" True
         , viewElements elements
-        , Components.viewButton [ text "Add" ] "button" False AddElement
+        , Components.viewButton "Add" Components.Default False AddElement
         , div
             [ Attrs.css
                 [ Tw.flex
@@ -223,8 +201,21 @@ viewElement index element =
 viewElementType : Int -> Element.ElementType -> List (Html Msg)
 viewElementType index type_ =
     case type_ of
-        Element.Rect ->
-            []
+        Element.Rect width height ->
+            [ Input.number
+                width
+                (\newValue -> TypeUpdate index (Element.Rect newValue height))
+                { label = "Width"
+                , name = "width"
+                , required = True
+                }
+            , Input.number height
+                (\newValue -> TypeUpdate index (Element.Rect width newValue))
+                { label = "Height"
+                , name = "height"
+                , required = True
+                }
+            ]
 
         Element.Text text fontSize ->
             [ Input.string

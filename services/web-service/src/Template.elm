@@ -1,17 +1,25 @@
 module Template exposing
     ( CreateResponse
+    , PrintForm
     , Template
     , TemplateId
     , create
     , decoder
     , delete
+    , fetch
     , fetchAll
     , id
+    , print
+    , setFormValue
+    , toForm
     , toId
     )
 
 import Api
+import Bytes exposing (Bytes)
+import Dict exposing (Dict)
 import Http
+import Http.Extra
 import Iso8601
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline as DecodePipeline
@@ -35,6 +43,10 @@ type alias Template =
     }
 
 
+type alias PrintForm =
+    { id : TemplateId, values : Dict String String }
+
+
 
 -- Utils
 
@@ -47,6 +59,31 @@ toId =
 id : TemplateId -> Int
 id (TemplateId value) =
     value
+
+
+toForm : Template -> PrintForm
+toForm template =
+    { id = template.id
+    , values =
+        template.elements
+            |> List.filterMap toFormValue
+            |> Dict.fromList
+    }
+
+
+toFormValue : Element -> Maybe ( String, String )
+toFormValue element =
+    case element.type_ of
+        Element.Rect _ _ ->
+            Nothing
+
+        Element.Text _ _ ->
+            Just ( element.valueFrom, "" )
+
+
+setFormValue : String -> String -> PrintForm -> PrintForm
+setFormValue key value form =
+    { form | values = Dict.insert key value form.values }
 
 
 
@@ -82,6 +119,14 @@ encode template =
         ]
 
 
+encodePrintForm : PrintForm -> Encode.Value
+encodePrintForm { values } =
+    values
+        |> Dict.toList
+        |> List.map (\( k, v ) -> ( k, Encode.string v ))
+        |> Encode.object
+
+
 
 -- HTTP requests
 
@@ -91,6 +136,15 @@ fetchAll token msg =
     Api.get
         { url = path
         , expect = Http.expectJson (RemoteData.fromResult >> msg) (Decode.list decoder)
+        , token = token
+        }
+
+
+fetch : TemplateId -> Token -> (WebData Template -> msg) -> Cmd msg
+fetch templateId token msg =
+    Api.get
+        { url = detailPath templateId
+        , expect = Http.expectJson (RemoteData.fromResult >> msg) decoder
         , token = token
         }
 
@@ -115,10 +169,20 @@ create token template msg =
         }
 
 
+print : Token -> PrintForm -> (WebData Bytes -> msg) -> Cmd msg
+print token form msg =
+    Api.post
+        { url = "/api/render/" ++ String.fromInt (id form.id)
+        , expect = Http.expectBytesResponse (RemoteData.fromResult >> msg) (Http.Extra.resolveBytes Ok)
+        , body = Http.jsonBody (encodePrintForm form)
+        , token = token
+        }
+
+
 delete : Token -> TemplateId -> (WebData () -> msg) -> Cmd msg
-delete token (TemplateId templateId) msg =
+delete token templateId msg =
     Api.delete
-        { url = path ++ "/" ++ String.fromInt templateId
+        { url = detailPath templateId
         , expect = Http.expectWhatever (RemoteData.fromResult >> msg)
         , token = token
         }
@@ -127,3 +191,8 @@ delete token (TemplateId templateId) msg =
 path : String
 path =
     "/api/templates"
+
+
+detailPath : TemplateId -> String
+detailPath (TemplateId templateId) =
+    path ++ "/" ++ String.fromInt templateId

@@ -1,4 +1,4 @@
-module Route exposing (Route(..), parser, path, title, replaceUrl)
+module Route exposing (Route(..), parser, path, replaceUrl, title)
 
 import Browser.Navigation as Nav
 import Template exposing (TemplateId)
@@ -9,9 +9,8 @@ type Route
     = Login
     | Register
     | TemplateList
-    | TemplateDetail TemplateId
     | TemplateCreate
-    | TemplateEdit TemplateId
+    | TemplatePrint TemplateId
     | NotFound
 
 
@@ -19,9 +18,8 @@ parser : Parser (Route -> a) a
 parser =
     Parser.oneOf
         [ Parser.map TemplateList Parser.top
-        , Parser.map TemplateDetail (Parser.s "templates" </> templateIdParser)
         , Parser.map TemplateCreate (Parser.s "templates" </> Parser.s "new")
-        , Parser.map TemplateEdit (Parser.s "templates" </> templateIdParser </> Parser.s "edit")
+        , Parser.map TemplatePrint (Parser.s "templates" </> templateIdParser)
         , Parser.map Login (Parser.s "login")
         , Parser.map Register (Parser.s "register")
         ]
@@ -44,14 +42,11 @@ title route =
         TemplateList ->
             "Templates"
 
-        TemplateDetail _ ->
-            "Template Detail"
+        TemplatePrint _ ->
+            "Print Template"
 
         TemplateCreate ->
             "Create Template"
-
-        TemplateEdit _ ->
-            "Edit Template"
 
         NotFound ->
             "Not found"
@@ -69,17 +64,12 @@ path route =
         TemplateList ->
             "/"
 
-        TemplateDetail id ->
+        TemplatePrint id ->
             "/templates/"
                 ++ String.fromInt (Template.id id)
 
         TemplateCreate ->
             "/templates/new"
-
-        TemplateEdit id ->
-            "/templates/"
-                ++ String.fromInt (Template.id id)
-                ++ "/edit"
 
         NotFound ->
             "/404"
