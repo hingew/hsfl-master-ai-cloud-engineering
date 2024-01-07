@@ -17,7 +17,7 @@ type ControllerImp struct {
 }
 
 type createResponse struct {
-	id uint `json:"id"`
+	Id uint `json:"id"`
 }
 
 func NewController(
@@ -110,7 +110,7 @@ func (c *ControllerImp) CreateTemplate(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(createResponse{
-		id: *id,
+		Id: *id,
 	})
 
 }
