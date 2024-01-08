@@ -1,4 +1,0 @@
-# The listen port
-port: 3000
-# The url to the templating service
-templating_service_url: "http://templates:3000"

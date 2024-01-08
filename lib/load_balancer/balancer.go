@@ -69,6 +69,18 @@ func (balancer *LoadBalancer) balanceByWeightedRoundRobin(w http.ResponseWriter,
 	balancer.mutex.Lock()
 	defer balancer.mutex.Unlock()
 
+	target := balancer.findTargetByWeight()
+
+	if target != nil {
+		target.Current++
+		defer func() { target.Current-- }()
+		target.Proxy.ServeHTTP(w, r)
+	} else {
+		http.Error(w, "Service Unavailable", http.StatusServiceUnavailable)
+	}
+}
+
+func (balancer *LoadBalancer) findTargetByWeight() *Target {
 	var min float64 = -1
 	var target *Target
 	for _, t := range balancer.targets {
@@ -78,14 +90,7 @@ func (balancer *LoadBalancer) balanceByWeightedRoundRobin(w http.ResponseWriter,
 			target = t
 		}
 	}
-
-	if target != nil {
-		target.Current++
-		defer func() { target.Current-- }()
-		target.Proxy.ServeHTTP(w, r)
-	} else {
-		http.Error(w, "Service Unavailable", http.StatusServiceUnavailable)
-	}
+	return target
 }
 
 func (balancer *LoadBalancer) balanceByIPHash(w http.ResponseWriter, r *http.Request) {
