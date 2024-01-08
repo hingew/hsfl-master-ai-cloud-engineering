@@ -48,7 +48,6 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DBNAME=postgres
     volumes:
-      - ./services/templateing-service/config.yml:/app/config.yml
       - ./services/templateing-service/test_data.json:/app/test_data.json
     depends_on:
       postgres:
@@ -58,11 +57,14 @@ services:
     build: 
       context: ./
       dockerfile: ./services/creation-service/Dockerfile
-    volumes:
-      - ./services/creation-service/config.yml:/app/config.yml
+    environment:
+        PORT: 3000
+        TEMPLATE_ENDPOINT: templates:3001
     ports:
       - 3003:3000
     links:
+      - templates
+    depends_on:
       - templates
 
   postgres:
