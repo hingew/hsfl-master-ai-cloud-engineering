@@ -21,7 +21,6 @@ type ApplicationConfig struct {
 	Database database.PsqlConfig `yaml:"database"`
 }
 
-
 func LoadTestData(path string) (*[]model.PdfTemplate, error) {
 	f, err := os.Open(path)
 	if err != nil {
@@ -68,7 +67,7 @@ func main() {
 	}
 
 	ctr := controller.NewController(repo)
-    grpcSrv := controller.NewGrpcServer(repo)
+	grpcSrv := controller.NewGrpcServer(repo)
 	handler := router.NewTemplateRouter(ctr)
 
 	if err := repo.Setup(testdata); err != nil {
@@ -79,18 +78,16 @@ func main() {
 		log.Fatalf("error while listen and serve: %s", err.Error())
 	}
 
-    // GRPC Server
-    listener, err := net.Listen("tcp", ":3001")
-    if err != nil {
-        log.Fatalf("GRPC could not listen: %v", err)
-    }
+	// GRPC Server
+	listener, err := net.Listen("tcp", ":3001")
+	if err != nil {
+		log.Fatalf("GRPC could not listen: %v", err)
+	}
 
+	srv := grpc.NewServer()
+	proto.RegisterTemplateServiceServer(srv, grpcSrv)
 
-
-    srv := grpc.NewServer()
-    proto.RegisterTemplateServiceServer(srv, grpcSrv)
-
-    if err := srv.Serve(listener); err != nil {
-        log.Fatalf("GRPC could not serve: %v", err)
-    }
+	if err := srv.Serve(listener); err != nil {
+		log.Fatalf("GRPC could not serve: %v", err)
+	}
 }

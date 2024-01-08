@@ -81,6 +81,13 @@ fromRoute route model =
                     in
                     ( { model | page = Login m }, Cmd.map LoginMsg cmd )
 
+                Route.Register ->
+                    let
+                        ( m, cmd ) =
+                            Page.Login.init model.session
+                    in
+                    ( { model | page = Login m }, Cmd.map LoginMsg cmd )
+
                 Route.TemplateList ->
                     let
                         ( m, cmd ) =
@@ -104,10 +111,6 @@ fromRoute route model =
 
                 Route.NotFound ->
                     ( { model | page = NotFound }, Cmd.none )
-
-                Route.Register ->
-                    Debug.todo "branch 'Register' not implemented"
-
 
         Nothing ->
             case model.page of

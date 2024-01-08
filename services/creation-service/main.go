@@ -23,7 +23,7 @@ type ApplicationConfig struct {
 
 func LoadConfigFromEnv() (*ApplicationConfig, error) {
 	var config ApplicationConfig
-	portStr := os.Getenv("port")
+	portStr := os.Getenv("PORT")
 
 	if port, err := strconv.Atoi(portStr); err == nil {
 		config.Port = port
@@ -32,7 +32,7 @@ func LoadConfigFromEnv() (*ApplicationConfig, error) {
 		config.Port = 3000
 	}
 
-	config.TemplatingServiceURL = os.Getenv("templating_service_url")
+	config.TemplatingServiceURL = os.Getenv("TEMPLATE_ENDPOINT")
 	return &config, nil
 }
 
