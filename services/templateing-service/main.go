@@ -18,7 +18,7 @@ import (
 )
 
 type ApplicationConfig struct {
-	Database database.PsqlConfig `yaml:"database"`
+	Database database.PsqlConfig
 }
 
 func LoadTestData(path string) (*[]model.PdfTemplate, error) {
