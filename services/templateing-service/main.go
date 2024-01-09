@@ -74,9 +74,11 @@ func main() {
 		log.Fatalf("could not setup database: %s", err.Error())
 	}
 
-	if err := http.ListenAndServe(":3000", handler); err != nil {
-		log.Fatalf("error while listen and serve: %s", err.Error())
-	}
+	go func() {
+		if err := http.ListenAndServe(":3000", handler); err != nil {
+			log.Fatalf("error while listen and serve: %s", err.Error())
+		}
+	}()
 
 	// GRPC Server
 	listener, err := net.Listen("tcp", ":3001")

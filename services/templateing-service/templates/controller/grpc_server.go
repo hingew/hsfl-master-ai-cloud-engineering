@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/constants"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/model"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/proto"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/repository"
@@ -37,8 +38,8 @@ func toGrpcTemplate(template *model.PdfTemplate) *proto.Template {
 
 	return &proto.Template{
 		Id:        uint32(template.ID),
-		CreatedAt: template.CreatedAt.String(),
-		UpdatedAt: template.UpdatedAt.String(),
+		CreatedAt: template.CreatedAt.Format(constants.GRPC_DATE_FORMAT),
+		UpdatedAt: template.UpdatedAt.Format(constants.GRPC_DATE_FORMAT),
 		Name:      template.Name,
 		Elements:  elements,
 	}
