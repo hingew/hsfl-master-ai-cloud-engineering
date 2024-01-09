@@ -7,15 +7,14 @@ import (
 )
 
 type JwtConfig struct {
-	SignKey string `yaml:"signKey"`
+	PrivateKey string
+}
+
+func LoadConfigFromEnv() (JwtConfig) {
+	return JwtConfig{PrivateKey: os.Getenv("AUTH_SIGN_KEY")}
 }
 
 func (config JwtConfig) ReadPrivateKey() (any, error) {
-	bytes, err := os.ReadFile(config.SignKey)
-	if err != nil {
-		return nil, err
-	}
-
-	block, _ := pem.Decode(bytes)
+	block, _ := pem.Decode([]byte(config.PrivateKey))
 	return x509.ParseECPrivateKey(block.Bytes)
 }
