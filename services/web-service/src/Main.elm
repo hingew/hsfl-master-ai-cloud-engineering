@@ -81,12 +81,6 @@ fromRoute route model =
                     in
                     ( { model | page = Login m }, Cmd.map LoginMsg cmd )
 
-                Route.Register ->
-                    let
-                        ( m, cmd ) =
-                            Page.Login.init model.session
-                    in
-                    ( { model | page = Login m }, Cmd.map LoginMsg cmd )
 
                 Route.TemplateList ->
                     let
@@ -109,7 +103,7 @@ fromRoute route model =
                     in
                     ( { model | page = TemplatePrint m }, Cmd.map TemplatePrintMsg cmd )
 
-                Route.NotFound ->
+                _ ->
                     ( { model | page = NotFound }, Cmd.none )
 
         Nothing ->

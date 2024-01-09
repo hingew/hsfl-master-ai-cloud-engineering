@@ -2,5 +2,6 @@
 module.exports = {
     content: [],
     variants: [],
+    plugins: [],
 }
 

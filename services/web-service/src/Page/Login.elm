@@ -7,7 +7,6 @@ import Html.Styled exposing (Html, a, div, form, h2, p, text)
 import Html.Styled.Attributes as Attrs
 import Html.Styled.Events exposing (onSubmit)
 import Http
-import Http.Extra
 import Input
 import Platform.Cmd as Cmd
 import RemoteData exposing (WebData)
@@ -16,6 +15,7 @@ import Session exposing (Session)
 import Svg.Styled.Events exposing (onClick)
 import Tailwind.Theme as Theme
 import Tailwind.Utilities as Tw
+import Html.Styled exposing (button)
 
 
 
@@ -209,7 +209,7 @@ viewLoginForm loginForm error loading =
             ]
         , p [ Attrs.css [ Tw.mt_10, Tw.text_center, Tw.text_sm, Tw.text_color Theme.gray_600 ] ]
             [ text "Not a member? "
-            , a
+            , button
                 [ Attrs.css
                     [ Tw.font_semibold
                     , Tw.leading_6
@@ -264,7 +264,7 @@ viewRegisterForm registerForm err loading =
             ]
         , p [ Attrs.css [ Tw.mt_10, Tw.text_center, Tw.text_sm, Tw.text_color Theme.gray_600 ] ]
             [ text "Allready a member? "
-            , a
+            , button
                 [ Attrs.css
                     [ Tw.font_semibold
                     , Tw.leading_6
