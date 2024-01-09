@@ -32,7 +32,7 @@ func LoadConfigFromEnv() (*ApplicationConfig, error) {
 		config.Port = 3000
 	}
 
-	config.TemplatingServiceURL = os.Getenv("TEMPLATE_ENDPOINT")
+	config.TemplatingServiceURL = os.Getenv("TEMPLATE_GRPC_ENDPOINT")
 	return &config, nil
 }
 
@@ -46,6 +46,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("GRPC could not connect: %v", err)
 	}
+
 	defer grpcConn.Close()
 
 	templatingServiceClient := client.NewGrpcClient(grpcConn)
