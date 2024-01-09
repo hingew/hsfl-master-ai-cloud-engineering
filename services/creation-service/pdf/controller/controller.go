@@ -42,21 +42,22 @@ func (c *Controller) CreatePdf(w http.ResponseWriter, r *http.Request) {
 	}
 
 	template, err := c.templatingClient.FetchTemplate(id)
-	log.Print(template)
-	log.Print(err)
 
 	if err != nil {
+        log.Print(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	var request map[string]interface{}
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+        log.Print(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if !isValid(template, request) {
+        log.Print("IS not valid", request)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -66,6 +67,7 @@ func (c *Controller) CreatePdf(w http.ResponseWriter, r *http.Request) {
 	buf, err := report.Out()
 
 	if err != nil {
+        log.Print(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
