@@ -52,7 +52,7 @@ func main() {
 	templatingServiceClient := client.NewGrpcClient(grpcConn)
 
 	pdf := pdf.New()
-	controller := controller.NewController(pdf, templatingServiceClient)
+	controller := controller.NewController(pdf, &templatingServiceClient)
 
 	router := router.New()
 	router.GET("/api/health/creation", health.Check)

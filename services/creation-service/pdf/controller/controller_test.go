@@ -58,7 +58,7 @@ func TestController(t *testing.T) {
 
 		client.
 			EXPECT().
-			GetTemplate(id).
+			FetchTemplate(id).
 			Return(nil, errors.New("Templating service unavialable")).
 			Times(1)
 
@@ -98,7 +98,7 @@ func TestController(t *testing.T) {
 
 		client.
 			EXPECT().
-			GetTemplate(id).
+			FetchTemplate(id).
 			Return(template, nil).
 			Times(1)
 
@@ -143,7 +143,7 @@ func TestController(t *testing.T) {
 
 		client.
 			EXPECT().
-			GetTemplate(id).
+			FetchTemplate(id).
 			Return(template, nil).
 			Times(1)
 
@@ -185,7 +185,7 @@ func TestController(t *testing.T) {
 
 		client.
 			EXPECT().
-			GetTemplate(id).
+			FetchTemplate(id).
 			Return(template, nil).
 			Times(1)
 
@@ -232,7 +232,7 @@ func TestController(t *testing.T) {
 
 		client.
 			EXPECT().
-			GetTemplate(id).
+			FetchTemplate(id).
 			Return(template, nil).
 			Times(1)
 
