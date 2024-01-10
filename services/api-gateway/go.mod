@@ -3,7 +3,7 @@ module github.com/hingew/hsfl-master-ai-cloud-engineering/api-gateway
 go 1.21.2
 
 require (
-	gopkg.in/yaml.v2 v2.4.0
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	gotest.tools/v3 v3.5.1
 )
 

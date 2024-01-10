@@ -17,20 +17,18 @@ services:
       - CREATION_ROUTES=$CREATION_ROUTES
       - USER_ROUTES=$USER_ROUTES
     depends_on:
-      # - web
+      - web
       - templates
       - creation
   
-        #web:
-        #  build:
-        #    context: ./ 
-        #    dockerfile: ./services/web-service/Dockerfile
-        #  ports:
-        #    - 3001:3000
-        #  links:
-        #    - templates
-        #  volumes:
-        #    - ./services/web-service/public:/app/services/web-service/public
+  web:
+    build:
+      context: ./ 
+      dockerfile: ./services/web-service/Dockerfile
+    ports:
+      - 3001:3000
+    links:
+      - templates
     
   templates:
     build:

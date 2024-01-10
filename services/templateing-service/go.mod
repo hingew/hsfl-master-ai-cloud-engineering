@@ -4,7 +4,6 @@ go 1.21.1
 
 require (
 	github.com/hingew/hsfl-master-ai-cloud-engineering/lib v0.0.0
-	go.uber.org/mock v0.3.0
 	google.golang.org/grpc v1.57.0
 	gorm.io/gorm v1.25.5
 )
