@@ -3,6 +3,7 @@ package router
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"regexp"
 )
@@ -39,7 +40,7 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
-
+	log.Println(fmt.Sprintf("Route not found: %s", r.URL.Path))
 	w.WriteHeader(http.StatusNotFound)
 }
 

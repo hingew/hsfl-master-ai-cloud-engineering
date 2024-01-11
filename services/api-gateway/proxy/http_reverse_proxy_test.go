@@ -79,6 +79,7 @@ func TestController(t *testing.T) {
 		proxy.routes["/test2/:id"] = "http://newEndpoint:3000/test2/:id"
 		proxy.routes["/test3"] = "http://newEndpoint2:3000/test3"
 		proxy.routes["/test3/:id"] = "http://newEndpoint2:3000/test3/:id"
+		proxy.routes["/test4/*"] = "http://newEndpoint2:3000/test4/"
 
 		t.Run("Client answers with http.StatusAccepted", func(t *testing.T) {
 			response := &http.Response{
@@ -108,6 +109,24 @@ func TestController(t *testing.T) {
 				// arrange
 				proxyReq := httptest.NewRequest(http.MethodGet, "/test3/691", nil)
 				serverReq := httptest.NewRequest(http.MethodGet, "http://newEndpoint2:3000/test3/691", nil)
+				serverReq.RequestURI = ""
+
+				w := httptest.NewRecorder()
+
+				client.EXPECT().Do(serverReq).Return(response, nil).Times(1)
+
+				// act
+				proxy.ServeHTTP(w, proxyReq)
+
+				// assert
+				assert.Equal(t, http.StatusOK, w.Code)
+				assert.Equal(t, "", w.Body.String())
+			})
+
+			t.Run("Route contains a wildcard", func(t *testing.T) {
+				// arrange
+				proxyReq := httptest.NewRequest(http.MethodGet, "/test4/691", nil)
+				serverReq := httptest.NewRequest(http.MethodGet, "http://newEndpoint2:3000/test4/691", nil)
 				serverReq.RequestURI = ""
 
 				w := httptest.NewRecorder()

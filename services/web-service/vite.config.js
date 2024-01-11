@@ -6,7 +6,7 @@ export default defineConfig({
         elmPlugin()
     ],
     build: {
-        outDir: "./public/"
+        outDir: "../public/"
     },
     server: {
         port: 3005,

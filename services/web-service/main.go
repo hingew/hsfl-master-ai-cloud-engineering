@@ -13,8 +13,8 @@ func healthCheck() http.HandlerFunc {
 
 func main() {
 	router := http.NewServeMux()
-	router.Handle("/", http.StripPrefix("/static/", http.FileServer(http.Dir("public"))))
+	router.Handle("/", http.FileServer(http.Dir("public")))
 	router.HandleFunc("/api/health/web", healthCheck())
 
-	log.Fatal(http.ListenAndServe("0.0.0.0:3001", router))
+	log.Fatal(http.ListenAndServe("0.0.0.0:3000", router))
 }

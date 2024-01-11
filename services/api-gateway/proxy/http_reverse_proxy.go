@@ -82,7 +82,7 @@ func (reverseProxy *HttpReverseProxy) doRequest(req *http.Request, rw http.Respo
 
 func (reverseProxy *HttpReverseProxy) evaluateEndpointServer(sourceUrl string) (*string, error) {
 	ok, rawDestinationURL := reverseProxy.matchSupportedRoute(sourceUrl)
-	if ok != true {
+	if !ok {
 		errorMsg := fmt.Sprintf("Could not found: %s\n", sourceUrl)
 		errorMsg += "Supported URLs:\n"
 		for key := range reverseProxy.routes {
@@ -101,17 +101,18 @@ func (reverseProxy *HttpReverseProxy) matchSupportedRoute(source_route string) (
 	}
 
 	for key, value := range reverseProxy.routes {
-		if !strings.Contains(key, ":id") {
-			continue
-		}
-		expression := strings.Replace(key, ":id", `(\d+)`, 1)
-		reg := regexp.MustCompile(expression)
-		matches := reg.FindStringSubmatch(source_route)
-		if len(matches) == 2 {
-			id := matches[1]
-			destinationRoute := strings.Replace(value, ":id", id, 1)
-			return true, &destinationRoute
-		}
+		if strings.Contains(key, ":id")  {
+            expression := strings.Replace(key, ":id", `(\d+)`, 1)
+            reg := regexp.MustCompile(expression)
+            matches := reg.FindStringSubmatch(source_route)
+            if len(matches) == 2 {
+                id := matches[1]
+                destinationRoute := strings.Replace(value, ":id", id, 1)
+                return true, &destinationRoute
+            }
+		} else if strings.Contains(key, "*") { 
+
+        }
 	}
 
 	return false, nil
