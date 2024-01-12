@@ -7,7 +7,7 @@ import (
 
 type RampSpecification struct {
 	Duration  int `json:"duration"`
-	TargetRPS int `json:"targetRPS"`
+	TargetRPS int `json:"RPSincrement"`
 }
 
 type TesterConfig struct {
