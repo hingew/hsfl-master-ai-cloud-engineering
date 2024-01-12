@@ -1,12 +1,16 @@
 {
     "curve": [
-        {"seconds2TargetRPS": 20, "targetRPS": 2},
-        {"seconds2TargetRPS": 10, "targetRPS": 3},
-        {"seconds2TargetRPS": 20, "targetRPS": 1},
-        {"seconds2TargetRPS": 30, "targetRPS": 1}
+        {"seconds2TargetRPS": 30, "targetRPS": 500},
+        {"seconds2TargetRPS": 30, "targetRPS": 500},
+        {"seconds2TargetRPS": 30, "targetRPS": 50},
+        {"seconds2TargetRPS": 30, "targetRPS": 50},
+        {"seconds2TargetRPS": 30, "targetRPS": 600},
+        {"seconds2TargetRPS": 30, "targetRPS": 700},
+        {"seconds2TargetRPS": 30, "targetRPS": 0}
     ],
-    "target": "192.168.2.149:32350",
+    "target": "192.168.178.98:31153",
     "paths": [
-        "/"
+        "/admin",
+        "/api"
     ]
 }

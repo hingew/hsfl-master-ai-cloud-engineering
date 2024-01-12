@@ -1,8 +1,8 @@
 {
     "rampSpecifications": [
-        {"duration": 5, "RPSincrement": 1},
-        {"duration": 5, "RPSincrement": 2},
-        {"duration": 5, "RPSincrement": 3}
+        {"duration": 5, "TargetRPS": 1},
+        {"duration": 5, "TargetRPS": 2},
+        {"duration": 5, "TargetRPS": 3}
     ],
     "target": "192.168.178.98:31153",
     "paths": [

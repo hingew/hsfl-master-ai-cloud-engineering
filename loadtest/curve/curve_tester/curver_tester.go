@@ -14,13 +14,18 @@ type CurveTester struct {
 	logHeaderPrinted bool
 	startTime        time.Time
 	isRunning        bool
+	rpsChan          chan int
+	currentRPS       int
+	targetRPS        int
 }
 
 func NewCurveTester(config LoadtestConfig, client net.Client) *CurveTester {
 	return &CurveTester{
-		config:    config,
-		client:    client,
-		isRunning: false,
+		config:     config,
+		client:     client,
+		isRunning:  false,
+		currentRPS: 0,
+		targetRPS:  0,
 	}
 }
 
@@ -30,27 +35,28 @@ func (tester *CurveTester) Run() {
 		return
 	}
 
-	fmt.Println("Starting curve load test")
-
-	tester.startTime = time.Now()
-
 	requestHandler := NewRequestHandler(tester.config.Target, tester.config.Paths, tester.client)
 
 	requestWg := sync.WaitGroup{}
 	stopRequestHandlerChan := make(chan struct{})
-	rpsChan := make(chan int)
+	tester.rpsChan = make(chan int, tester.maxTargetRPSChange())
 
-	go requestHandler.Run(stopRequestHandlerChan, rpsChan, &requestWg)
+	fmt.Println("Starting curve load test")
 
-	currentRPS := 0
+	tester.startTime = time.Now()
+
+	go requestHandler.Run(stopRequestHandlerChan, tester.rpsChan, &requestWg)
+	go tester.doLogs(stopRequestHandlerChan)
+
+	tester.currentRPS = 0
 	for _, nextCurvePoint := range tester.config.CurvePoints {
-		tester.interpolate2RPS(currentRPS, nextCurvePoint.TargetRPS, nextCurvePoint.Seconds2TargetRPS, rpsChan)
-		currentRPS = nextCurvePoint.TargetRPS
-		fmt.Println("Step to next curve point")
+		tester.targetRPS = nextCurvePoint.TargetRPS
+		tester.interpolate2RPS(nextCurvePoint.Seconds2TargetRPS)
+		tester.currentRPS = tester.targetRPS
 	}
 
-	fmt.Println("Stop sending requests")
 	close(stopRequestHandlerChan)
+	fmt.Println("Stopped sending requests")
 
 	fmt.Println("Wait for outstanding requests")
 	requestWg.Wait()
@@ -58,45 +64,88 @@ func (tester *CurveTester) Run() {
 	fmt.Println("Load test done")
 }
 
-func (tester *CurveTester) interpolate2RPS(startRps, targetRPS int, seconds2Interpolate int, rpsChan chan int) {
-	rpsChange := targetRPS - startRps
-	steps := rpsChange
-	if steps < 0 {
-		steps = steps * -1
-	}
+func (tester *CurveTester) interpolate2RPS(seconds2Interpolate int) {
+
+	steps := tester.calcInterpolationSteps()
 
 	if steps == 0 {
 		time.Sleep(time.Duration(seconds2Interpolate) * time.Second)
 		return
 	}
 
-	rpsIncrement := 0
-	if rpsChange < 0 {
-		rpsIncrement = -1
-	} else if rpsChange > 0 {
-		rpsIncrement = 1
-	}
-
-	interpolationInterval := time.Duration(float64(seconds2Interpolate)/float64(steps)) * time.Second
-
-	currentRPS := startRps
+	interpolationInterval := tester.calcInterpolationIntervalDuration(seconds2Interpolate, steps)
+	rpsIncrement := tester.calcRpsIncrement()
 
 	for i := 0; i < steps; i++ {
-		currentRPS += rpsIncrement
+		tester.currentRPS += rpsIncrement
 
-		rpsChan <- int(currentRPS)
-
-		tester.logRPS(targetRPS, int(currentRPS))
+		select {
+		case tester.rpsChan <- tester.currentRPS:
+		default:
+		}
 
 		time.Sleep(interpolationInterval)
 	}
 }
 
-func (tester *CurveTester) logRPS(targetRPS int, currentRPS int) {
-	if !tester.logHeaderPrinted {
-		fmt.Println("ElapsedTime\tTargetRPS\tCurrentRPS")
-		tester.logHeaderPrinted = true
+func (tester *CurveTester) doLogs(stopLogs chan struct{}) {
+	fmt.Println("ElapsedTime\tTargetRPS\tCurrentRPS")
+
+	for {
+		select {
+		case <-stopLogs:
+			return
+		default:
+			elapsedTime := time.Since(tester.startTime)
+			fmt.Printf("%.0f\t\t%d\t\t%d\n", elapsedTime.Seconds(), tester.targetRPS, tester.currentRPS)
+			time.Sleep(time.Second)
+		}
 	}
-	elapsedTime := time.Since(tester.startTime)
-	fmt.Printf("%.1f\t\t%d\t\t%d\n", elapsedTime.Seconds(), targetRPS, currentRPS)
+}
+
+func (tester *CurveTester) calcRpsIncrement() int {
+	change := tester.targetRPS - tester.currentRPS
+
+	if change < 0 {
+		return -1
+	} else if change > 0 {
+		return 1
+	}
+
+	return 0
+}
+
+func (tester *CurveTester) calcInterpolationSteps() int {
+	change := tester.targetRPS - tester.currentRPS
+
+	if change < 0 {
+		change = change * -1
+	}
+
+	return change
+}
+
+func (tester *CurveTester) calcInterpolationIntervalDuration(seconds2Interpolate int, steps int) time.Duration {
+	durationPerStepSeconds := float64(seconds2Interpolate) / float64(steps)
+	durationPerStepMilliseconds := int(durationPerStepSeconds * 1000)
+	return time.Duration(durationPerStepMilliseconds) * time.Millisecond
+}
+
+func (tester *CurveTester) maxTargetRPSChange() int {
+	maxTargetRPSChange := 0
+	for i := 0; i < len(tester.config.CurvePoints)-1; i++ {
+		curvePoint := tester.config.CurvePoints[i]
+		nextCurvePoint := tester.config.CurvePoints[i+1]
+
+		rpsChange := nextCurvePoint.TargetRPS - curvePoint.TargetRPS
+		if rpsChange < 0 {
+			rpsChange = rpsChange * -1
+		}
+
+		if rpsChange > maxTargetRPSChange {
+			maxTargetRPSChange = rpsChange
+		}
+	}
+
+	return maxTargetRPSChange
 }
