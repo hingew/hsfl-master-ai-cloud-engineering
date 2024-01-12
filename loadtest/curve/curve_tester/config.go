@@ -5,15 +5,15 @@ import (
 	"io/ioutil"
 )
 
-type NextGraphPoint struct {
-	Seconds2TargetRPS int `json:"duration"`
+type NextCurvePoint struct {
+	Seconds2TargetRPS int `json:"seconds2TargetRPS"`
 	TargetRPS         int `json:"targetRPS"`
 }
 
 type LoadtestConfig struct {
-	Graph  []NextGraphPoint `json:"graph"`
-	Target string           `json:"target"`
-	Paths  []string         `json:"paths"`
+	CurvePoints []NextCurvePoint `json:"curve"`
+	Target      string           `json:"target"`
+	Paths       []string         `json:"paths"`
 }
 
 func ReadConfig(filePath string) (*LoadtestConfig, error) {

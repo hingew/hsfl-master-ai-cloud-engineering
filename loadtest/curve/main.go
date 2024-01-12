@@ -15,13 +15,14 @@ func main() {
 	//}
 
 	config := &curve_tester.LoadtestConfig{
-		Graph: []curve_tester.NextGraphPoint{
-			{Seconds2TargetRPS: 10, TargetRPS: 10},
-			{Seconds2TargetRPS: 5, TargetRPS: 5},
-			{Seconds2TargetRPS: 10, TargetRPS: 25},
-			{Seconds2TargetRPS: 10, TargetRPS: 0},
+		CurvePoints: []curve_tester.NextCurvePoint{
+			{Seconds2TargetRPS: 5, TargetRPS: 3},
+			{Seconds2TargetRPS: 5, TargetRPS: 1},
+			{Seconds2TargetRPS: 5, TargetRPS: 3},
+			{Seconds2TargetRPS: 5, TargetRPS: 3},
+			{Seconds2TargetRPS: 5, TargetRPS: 0},
 		},
-		Target: "192.168.2.149:32350",
+		Target: "192.168.178.98:31153",
 		Paths: []string{
 			"/",
 		},
@@ -29,5 +30,6 @@ func main() {
 
 	client := net.NewTcpClient()
 
-	curve_tester.RunLoadTest(*config, client)
+	tester := curve_tester.NewCurveTester(*config, client)
+	tester.Run()
 }

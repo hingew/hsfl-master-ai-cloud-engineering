@@ -1,14 +1,9 @@
 {
-    "graph": [
-        {"duration": 20, "targetRPS": 20},
-        {"duration": 10, "targetRPS": 50},
-        {"duration": 20, "targetRPS": 50},
-        {"duration": 30, "targetRPS": 100},
-        {"duration": 30, "targetRPS": 60},
-        {"duration": 20, "targetRPS": 60},
-        {"duration": 10, "targetRPS": 80},
-        {"duration": 20, "targetRPS": 40},
-        {"duration": 40, "targetRPS": 0}
+    "curve": [
+        {"seconds2TargetRPS": 20, "targetRPS": 2},
+        {"seconds2TargetRPS": 10, "targetRPS": 3},
+        {"seconds2TargetRPS": 20, "targetRPS": 1},
+        {"seconds2TargetRPS": 30, "targetRPS": 1}
     ],
     "target": "192.168.2.149:32350",
     "paths": [
