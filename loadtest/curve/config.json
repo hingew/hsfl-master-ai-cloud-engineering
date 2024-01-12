@@ -1,0 +1,17 @@
+{
+    "graph": [
+        {"duration": 20, "targetRPS": 20},
+        {"duration": 10, "targetRPS": 50},
+        {"duration": 20, "targetRPS": 50},
+        {"duration": 30, "targetRPS": 100},
+        {"duration": 30, "targetRPS": 60},
+        {"duration": 20, "targetRPS": 60},
+        {"duration": 10, "targetRPS": 80},
+        {"duration": 20, "targetRPS": 40},
+        {"duration": 40, "targetRPS": 0}
+    ],
+    "target": "192.168.2.149:32350",
+    "paths": [
+        "/"
+    ]
+}

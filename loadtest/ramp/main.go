@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hingew/hsfl-master-ai-cloud-engineering/loadtest/load"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/loadtest/net"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/loadtest/ramp/ramp_tester"
 )
 
 func main() {
@@ -14,13 +14,13 @@ func main() {
 	configPath := flag.String("config", "config.json", "Path to the configuration file")
 	flag.Parse()
 
-	config, err := load.ReadConfig(*configPath)
+	config, err := ramp_tester.ReadConfig(*configPath)
 	if err != nil {
 		log.Fatalf("Failed to read config: %v", err)
 	}
 
 	client := net.NewTcpClient()
-	tester := load.NewTester(*config, client)
+	tester := ramp_tester.NewTester(*config, client)
 	if err := tester.Run(); err != nil {
 		log.Fatal(err)
 	}
