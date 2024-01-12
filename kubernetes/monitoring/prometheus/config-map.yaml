@@ -6,24 +6,6 @@ metadata:
     name: prometheus-server-conf
   namespace: monitoring
 data:
-  prometheus.rules: |-
-    groups:
-    - name: aufgabe7
-      rules:
-      - alert: HIGH CPU
-        expr: (1 - rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100 > 80
-        for: 1m
-        labels:
-          job: node-exporter
-        annotations:
-          summary: "High CPU load detected"
-      - alert: HIGH Memory
-        expr: (1 - (node_memory_MemAvailable_bytes{kubernetes_namespace=\"\"} / node_memory_MemTotal_bytes{kubernetes_namespace=\"\"})) * 100 > 95
-        for: 1m
-        labels:
-          job: node-exporter
-        annotations:
-          summary: "High Memory load detected"
   prometheus.yml: |-
     global:
       scrape_interval: 5s
