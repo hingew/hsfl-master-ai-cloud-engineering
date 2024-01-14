@@ -18,42 +18,10 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 2,
   "links": [],
   "liveNow": false,
   "panels": [
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 24,
-        "x": 0,
-        "y": 0
-      },
-      "id": 2,
-      "options": {
-        "alertInstanceLabelFilter": "",
-        "alertName": "",
-        "dashboardAlerts": false,
-        "groupBy": [],
-        "groupMode": "default",
-        "maxItems": 20,
-        "sortOrder": 1,
-        "stateFilter": {
-          "error": true,
-          "firing": true,
-          "noData": false,
-          "normal": false,
-          "pending": true
-        },
-        "viewMode": "list"
-      },
-      "title": "Alarms",
-      "type": "alertlist"
-    },
     {
       "datasource": {
         "type": "prometheus",
@@ -120,7 +88,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 6
+        "y": 0
       },
       "id": 1,
       "options": {
@@ -218,7 +186,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 6
+        "y": 0
       },
       "id": 3,
       "options": {
@@ -314,7 +282,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 14
+        "y": 8
       },
       "id": 4,
       "options": {
@@ -409,7 +377,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 14
+        "y": 8
       },
       "id": 5,
       "options": {
@@ -444,19 +412,19 @@
     }
   ],
   "refresh": "",
-  "schemaVersion": 38,
+  "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": []
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Aufgabe 7",
-  "uid": "c0ca2773-e64f-426e-8d1e-81b0eef03a84",
+  "title": "Monitoring",
+  "uid": "eb712cd3-b0a2-423e-bad3-95bb8af67062",
   "version": 3,
   "weekStart": ""
 }

@@ -1,4 +1,4 @@
-package load
+package ramp_tester
 
 import (
 	"fmt"

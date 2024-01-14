@@ -1,0 +1,16 @@
+{
+    "curve": [
+        {"seconds2TargetRPS": 30, "targetRPS": 500},
+        {"seconds2TargetRPS": 30, "targetRPS": 500},
+        {"seconds2TargetRPS": 30, "targetRPS": 50},
+        {"seconds2TargetRPS": 30, "targetRPS": 50},
+        {"seconds2TargetRPS": 30, "targetRPS": 600},
+        {"seconds2TargetRPS": 30, "targetRPS": 700},
+        {"seconds2TargetRPS": 30, "targetRPS": 0}
+    ],
+    "target": "192.168.178.98:31153",
+    "paths": [
+        "/admin",
+        "/api"
+    ]
+}
