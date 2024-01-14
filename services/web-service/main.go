@@ -4,17 +4,11 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/health"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/web-service/api/router"
 )
 
-func healthCheck() http.HandlerFunc {
-	return health.Check
-}
+const DIR = "./public/"
 
 func main() {
-	router := http.NewServeMux()
-	router.Handle("/", http.FileServer(http.Dir("public")))
-	router.HandleFunc("/api/health/web", healthCheck())
-
-	log.Fatal(http.ListenAndServe("0.0.0.0:3000", router))
+	log.Fatal(http.ListenAndServe("0.0.0.0:3000", &router.Router{}))
 }
