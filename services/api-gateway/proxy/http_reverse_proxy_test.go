@@ -8,158 +8,128 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	_mock "github.com/hingew/hsfl-master-ai-cloud-engineering/api-gateway/_mocks"
+	"go.uber.org/mock/gomock"
 	"gotest.tools/v3/assert"
 )
 
-func TestController(t *testing.T) {
+func TestReverseProxy(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	client := _mock.NewMockHttpClient(ctrl)
+	httpClient := _mock.NewMockHttpClient(ctrl)
 
 	t.Run("Add Routes with Map function", func(t *testing.T) {
 		// arrange
-		proxy := NewHttpReverseProxy(client)
+		proxy := NewHttpReverseProxy(httpClient)
+		url := "http://endpoint:3000/test"
 
 		// act
-		proxy.Map("/test", "http://endpoint:3000/test")
+		proxy.Map("/test", url, false)
 
 		// assert
-		assert.Equal(t, 1, len(proxy.routes))
-		assert.Assert(t, proxy.routes["/test"] == "http://endpoint:3000/test")
+		assert.Equal(t, 1, len(proxy.configs))
+
+		config := proxy.configs[0]
+		assert.Equal(t, config.coalescing, false)
+		assert.Equal(t, config.upstream.String(), url)
+		assert.Equal(t, config.path.String(), "/test")
 	})
 
 	t.Run("Route not supported", func(t *testing.T) {
 
+		// arrange
 		r := httptest.NewRequest(http.MethodGet, "/test", nil)
+		w := httptest.NewRecorder()
 
-		response := &http.Response{
+		proxy := NewHttpReverseProxy(httpClient)
+
+		response := http.Response{
 			StatusCode: http.StatusNotFound,
 			Body:       ioutil.NopCloser(strings.NewReader("")),
 		}
-		client.EXPECT().Do(r).Return(response, nil).Times(0)
 
-		t.Run("No route supported", func(t *testing.T) {
-			// arrange
-			proxy := NewHttpReverseProxy(client)
+		httpClient.EXPECT().Do(r).Return(&response, nil).Times(0)
 
-			w := httptest.NewRecorder()
+		// act
+		proxy.ServeHTTP(w, r)
 
-			// act
-			proxy.ServeHTTP(w, r)
-
-			// assert
-			errorMsg := "Could not found: /test\nSupported URLs:\n"
-			assert.Equal(t, http.StatusNotFound, w.Code)
-			assert.Equal(t, errorMsg, w.Body.String())
-		})
-
-		t.Run("Wrong routes supported", func(t *testing.T) {
-			// arrange
-			proxy := NewHttpReverseProxy(client)
-			proxy.routes["/test2"] = "http://newEndpoint:3000/test2"
-			proxy.routes["/test3"] = "http://newEndpoint2:3000/test3"
-
-			w := httptest.NewRecorder()
-
-			// act
-			proxy.ServeHTTP(w, r)
-
-			// assert
-			errorMsg1 := "Could not found: /test\nSupported URLs:\n\t/test2\n\t/test3\n"
-			errorMsg2 := "Could not found: /test\nSupported URLs:\n\t/test3\n\t/test2\n"
-			assert.Equal(t, http.StatusNotFound, w.Code)
-			assert.Assert(t, w.Body.String() == errorMsg1 || w.Body.String() == errorMsg2)
-		})
+		// assert
+		errorMsg := "Could not found: /test\nSupported URLs:\n"
+		assert.Equal(t, http.StatusNotFound, w.Code)
+		assert.Equal(t, errorMsg, w.Body.String())
 	})
 
-	t.Run("Route supported", func(t *testing.T) {
-		proxy := NewHttpReverseProxy(client)
-		proxy.routes["/test2"] = "http://newEndpoint:3000/test2"
-		proxy.routes["/test2/:id"] = "http://newEndpoint:3000/test2/:id"
-		proxy.routes["/test3"] = "http://newEndpoint2:3000/test3"
-		proxy.routes["/test3/:id"] = "http://newEndpoint2:3000/test3/:id"
-		proxy.routes["/test4/*"] = "http://newEndpoint2:3000/test4/"
+	t.Run("Should route requests to the right upstream by exact match", func(t *testing.T) {
+		proxy := NewHttpReverseProxy(httpClient)
+		proxy.Map("/exact-match", "http://endpoint:3000", false)
+		proxy.Map("/second", "http://endpoint:3001", false)
 
-		t.Run("Client answers with http.StatusAccepted", func(t *testing.T) {
-			response := &http.Response{
-				StatusCode: http.StatusOK,
-				Body:       ioutil.NopCloser(strings.NewReader("")),
-			}
+		response := &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       ioutil.NopCloser(strings.NewReader("")),
+		}
 
-			t.Run("Route contains no id", func(t *testing.T) {
-				// arrange
-				proxyReq := httptest.NewRequest(http.MethodGet, "/test3", nil)
-				serverReq := httptest.NewRequest(http.MethodGet, "http://newEndpoint2:3000/test3", nil)
-				serverReq.RequestURI = ""
+		proxyReq := httptest.NewRequest(http.MethodGet, "/exact-match", nil)
+		serverReq := httptest.NewRequest(http.MethodGet, "http://endpoint:3000/exact-match", nil)
+		serverReq.RequestURI = ""
 
-				w := httptest.NewRecorder()
+		w := httptest.NewRecorder()
 
-				client.EXPECT().Do(serverReq).Return(response, nil).Times(1)
+		httpClient.EXPECT().Do(serverReq).Return(response, nil).Times(1)
 
-				// act
-				proxy.ServeHTTP(w, proxyReq)
+		// act
+		proxy.ServeHTTP(w, proxyReq)
 
-				// assert
-				assert.Equal(t, http.StatusOK, w.Code)
-				assert.Equal(t, "", w.Body.String())
-			})
+		// assert
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, "", w.Body.String())
 
-			t.Run("Route contains an id", func(t *testing.T) {
-				// arrange
-				proxyReq := httptest.NewRequest(http.MethodGet, "/test3/691", nil)
-				serverReq := httptest.NewRequest(http.MethodGet, "http://newEndpoint2:3000/test3/691", nil)
-				serverReq.RequestURI = ""
+	})
 
-				w := httptest.NewRecorder()
+	t.Run("Should route requests to the right upstream by regex", func(t *testing.T) {
+		proxy := NewHttpReverseProxy(httpClient)
+		proxy.Map("/*", "http://endpoint:3000", false)
+		proxy.Map("/exact-match", "http://endpoint-2:3000", false)
 
-				client.EXPECT().Do(serverReq).Return(response, nil).Times(1)
+		response := &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       ioutil.NopCloser(strings.NewReader("")),
+		}
 
-				// act
-				proxy.ServeHTTP(w, proxyReq)
+		proxyReq := httptest.NewRequest(http.MethodGet, "/wild/card/match", nil)
+		serverReq := httptest.NewRequest(http.MethodGet, "http://endpoint:3000/wild/card/match", nil)
+		serverReq.RequestURI = ""
 
-				// assert
-				assert.Equal(t, http.StatusOK, w.Code)
-				assert.Equal(t, "", w.Body.String())
-			})
+		w := httptest.NewRecorder()
 
-			t.Run("Route contains a wildcard", func(t *testing.T) {
-				// arrange
-				proxyReq := httptest.NewRequest(http.MethodGet, "/test4/691", nil)
-				serverReq := httptest.NewRequest(http.MethodGet, "http://newEndpoint2:3000/test4/691", nil)
-				serverReq.RequestURI = ""
+		httpClient.EXPECT().Do(serverReq).Return(response, nil).Times(1)
 
-				w := httptest.NewRecorder()
+		// act
+		proxy.ServeHTTP(w, proxyReq)
 
-				client.EXPECT().Do(serverReq).Return(response, nil).Times(1)
+		// assert
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, "", w.Body.String())
 
-				// act
-				proxy.ServeHTTP(w, proxyReq)
+	})
+	t.Run("Client answers with http.StatusInternalServerError", func(t *testing.T) {
+		proxy := NewHttpReverseProxy(httpClient)
+		proxy.Map("/test", "http://endpoint:3000", false)
 
-				// assert
-				assert.Equal(t, http.StatusOK, w.Code)
-				assert.Equal(t, "", w.Body.String())
-			})
+		// arrange
+		proxyReq := httptest.NewRequest(http.MethodGet, "/test", nil)
+		serverReq := httptest.NewRequest(http.MethodGet, "http://endpoint:3000/test", nil)
+		serverReq.RequestURI = ""
 
-		})
+		w := httptest.NewRecorder()
 
-		t.Run("Client answers with http.StatusInternalServerError", func(t *testing.T) {
-			// arrange
-			proxyReq := httptest.NewRequest(http.MethodGet, "/test2", nil)
-			serverReq := httptest.NewRequest(http.MethodGet, "http://newEndpoint:3000/test2", nil)
-			serverReq.RequestURI = ""
+		err := fmt.Errorf("ErrorMsg")
+		httpClient.EXPECT().Do(serverReq).Return(nil, err).Times(1)
 
-			w := httptest.NewRecorder()
+		// act
+		proxy.ServeHTTP(w, proxyReq)
 
-			err := fmt.Errorf("ErrorMsg")
-			client.EXPECT().Do(serverReq).Return(nil, err).Times(1)
-
-			// act
-			proxy.ServeHTTP(w, proxyReq)
-
-			// assert
-			assert.Equal(t, http.StatusInternalServerError, w.Code)
-			assert.Equal(t, err.Error(), w.Body.String())
-		})
+		// assert
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+		assert.Equal(t, err.Error(), w.Body.String())
 	})
 }

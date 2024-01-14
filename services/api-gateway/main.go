@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -34,15 +33,14 @@ func readRouteEnv(env string) []string {
 	return values
 }
 
-func addRoutes(proxy my_proxy.ReverseProxy, endpoint string, routes []string) {
-	for _, source_route := range routes {
-		target_route := fmt.Sprintf("%s%s", endpoint, source_route)
-		proxy.Map(source_route, target_route)
-	}
-}
+//func addRoutes(proxy my_proxy.ReverseProxy, endpoint string, routes []string) {
+//	for _, source_route := range routes {
+//		target_route := fmt.Sprintf("%s%s", endpoint, source_route)
+//		proxy.Map(source_route, target_route)
+//	}
+//}
 
 func main() {
-
 	templateing_service_endpoint := os.Getenv("TEMPLATE_ENDPOINT")
 	web_service_endpoint := os.Getenv("WEB_ENDPOINT")
 	creation_service_endpoint := os.Getenv("CREATION_ENDPOINT")
@@ -50,11 +48,11 @@ func main() {
 
 	proxy := my_proxy.NewHttpReverseProxy(http.DefaultClient)
 
-	routes := readRoutesFromEnv()
-	addRoutes(proxy, templateing_service_endpoint, routes.TemplateingService)
-	addRoutes(proxy, web_service_endpoint, routes.WebService)
-	addRoutes(proxy, creation_service_endpoint, routes.CreationService)
-	addRoutes(proxy, user_service_endpoint, routes.UserService)
+	// Add configurations to the proxy
+    proxy.Map("/auth/*", user_service_endpoint, false)
+    proxy.Map("/api/templates/*", templateing_service_endpoint, false)
+	proxy.Map("/api/render/*", creation_service_endpoint, false)
+    proxy.Map("/*", web_service_endpoint, false)
 
 	if err := http.ListenAndServe(":3000", proxy); err != nil {
 		log.Fatalf("error while listen and serve: %s", err.Error())

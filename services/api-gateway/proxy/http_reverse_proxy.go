@@ -13,58 +13,59 @@ import (
 	"golang.org/x/sync/singleflight"
 )
 
-type HttpClient interface {
-	Do(*http.Request) (*http.Response, error)
+type Config struct {
+	path       *regexp.Regexp
+	upstream   *url.URL
+	coalescing bool
 }
 
 type HttpReverseProxy struct {
 	client  HttpClient
-	routes  map[string]string
+	configs []Config
 	sfGroup *singleflight.Group
 }
 
 func NewHttpReverseProxy(client HttpClient) *HttpReverseProxy {
-	return &HttpReverseProxy{client: client, routes: make(map[string]string), sfGroup: &singleflight.Group{}}
+	return &HttpReverseProxy{client: client, configs: make([]Config, 0), sfGroup: &singleflight.Group{}}
 }
 
-func (reverseProxy *HttpReverseProxy) Map(sourcePath string, destinationPath string) {
-	reverseProxy.routes[sourcePath] = destinationPath
-	log.Printf("Added Router to Reverse Proxy: %s", destinationPath)
-}
-
-func (reverseProxy *HttpReverseProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	inputUrl := req.URL
-	inputRoute := inputUrl.Path
-
-	shouldCoalesce := reverseProxy.isGatewayCoalescingRoute(inputRoute)
-	if shouldCoalesce {
-		inputRoute = removeCoalescingPrefix(inputRoute)
+func (reverseProxy *HttpReverseProxy) Map(path string, upstream string, coalescing bool) {
+	pathRegex, err := regexp.Compile(path)
+	if err != nil {
+		log.Fatalf("The path %s is not a valid regular expression", path)
 	}
 
-	endpointServerRoute, err := reverseProxy.evaluateEndpointServer(inputRoute)
+	upstreamUrl, err := url.Parse(upstream)
 	if err != nil {
-		rw.WriteHeader(http.StatusNotFound)
-		fmt.Fprintf(rw, "%s", err.Error())
+		log.Fatalf("The url %s is not a valid url", upstream)
+	}
+
+	reverseProxy.configs = append(reverseProxy.configs, Config{pathRegex, upstreamUrl, false})
+	log.Printf("Requests at %s will be proxied to %s", path, upstream)
+}
+
+func (reverseProxy *HttpReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	inputRoute := r.URL.Path
+
+	config, err := reverseProxy.evaluateEndpointServer(inputRoute)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintf(w, "%s", err.Error())
 		log.Print(err.Error())
 		return
 	}
 
-	endpointServerURL, err := url.Parse(*endpointServerRoute)
-	if err != nil {
-		rw.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(rw, "%s", err.Error())
-		return
-	}
+	reverseProxy.modifyRequest(r, config.upstream)
+	log.Println(fmt.Sprintf("%s -> %s", inputRoute, r.URL.String()))
 
-	reverseProxy.modifyRequest(req, endpointServerURL)
-
-	if shouldCoalesce {
-		reverseProxy.sfGroup.Do(*endpointServerRoute, func() (interface{}, error) {
-			reverseProxy.doRequest(req, rw)
+	if config.coalescing {
+		r.URL.Path = removeCoalescingPrefix(r.URL.Path)
+		reverseProxy.sfGroup.Do(config.upstream.String(), func() (interface{}, error) {
+			reverseProxy.doRequest(r, w)
 			return nil, nil
 		})
 	} else {
-		reverseProxy.doRequest(req, rw)
+		reverseProxy.doRequest(r, w)
 	}
 }
 
@@ -80,42 +81,20 @@ func (reverseProxy *HttpReverseProxy) doRequest(req *http.Request, rw http.Respo
 	reverseProxy.copyResponseStreamBody(response, rw)
 }
 
-func (reverseProxy *HttpReverseProxy) evaluateEndpointServer(sourceUrl string) (*string, error) {
-	ok, rawDestinationURL := reverseProxy.matchSupportedRoute(sourceUrl)
-	if !ok {
-		errorMsg := fmt.Sprintf("Could not found: %s\n", sourceUrl)
-		errorMsg += "Supported URLs:\n"
-		for key := range reverseProxy.routes {
-			errorMsg += fmt.Sprintf("\t%s\n", key)
+func (p *HttpReverseProxy) evaluateEndpointServer(sourceUrl string) (*Config, error) {
+	for _, config := range p.configs {
+		if config.path.MatchString(sourceUrl) {
+			return &config, nil
 		}
-		return nil, fmt.Errorf(errorMsg)
 	}
 
-	return rawDestinationURL, nil
-}
-
-func (reverseProxy *HttpReverseProxy) matchSupportedRoute(source_route string) (bool, *string) {
-	if !reverseProxy.containsId(source_route) {
-		destination_route, ok := reverseProxy.routes[source_route]
-		return ok, &destination_route
+	errorMsg := fmt.Sprintf("Could not found: %s\n", sourceUrl)
+	errorMsg += "Supported URLs:\n"
+	for _, config := range p.configs {
+		errorMsg += fmt.Sprintf("\t%s\n", config.upstream.String())
 	}
+	return nil, fmt.Errorf(errorMsg)
 
-	for key, value := range reverseProxy.routes {
-		if strings.Contains(key, ":id")  {
-            expression := strings.Replace(key, ":id", `(\d+)`, 1)
-            reg := regexp.MustCompile(expression)
-            matches := reg.FindStringSubmatch(source_route)
-            if len(matches) == 2 {
-                id := matches[1]
-                destinationRoute := strings.Replace(value, ":id", id, 1)
-                return true, &destinationRoute
-            }
-		} else if strings.Contains(key, "*") { 
-
-        }
-	}
-
-	return false, nil
 }
 
 func (reverseProxy *HttpReverseProxy) containsId(str string) bool {
@@ -136,7 +115,7 @@ func (reverseProxy *HttpReverseProxy) modifyRequest(req *http.Request, endpoint 
 	req.URL.Host = endpoint.Host
 	req.URL.Scheme = endpoint.Scheme
 	req.RequestURI = ""
-	req.URL.Path = endpoint.Path
+	//req.URL.Path = req.UR.Path
 }
 
 func (reverseProxy *HttpReverseProxy) copyResponseHeader(response *http.Response, rw http.ResponseWriter) {
