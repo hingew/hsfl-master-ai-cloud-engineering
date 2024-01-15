@@ -97,4 +97,4 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - ./services/templateing-service/sql:/docker-entrypoint-initdb.d
+      - ./.docker/postgres:/docker-entrypoint-initdb.d
