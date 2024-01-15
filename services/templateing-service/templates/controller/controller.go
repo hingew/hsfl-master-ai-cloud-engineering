@@ -2,7 +2,7 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -17,6 +17,10 @@ type ControllerImp struct {
 	sfGroup *singleflight.Group
 }
 
+type createResponse struct {
+	Id uint `json:"id"`
+}
+
 func NewController(
 	repo repository.Repository,
 ) *ControllerImp {
@@ -27,6 +31,7 @@ func NewController(
 func (c *ControllerImp) GetAllTemplates(w http.ResponseWriter, r *http.Request) {
 	templates, err := c.repo.GetAllTemplates()
 	if err != nil {
+        log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -38,6 +43,7 @@ func (c *ControllerImp) GetAllTemplates(w http.ResponseWriter, r *http.Request) 
 func (c *ControllerImp) GetTemplateWithCoalecing(w http.ResponseWriter, r *http.Request) {
 	id, err := c.extractId(r)
 	if err != nil {
+        log.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -46,6 +52,7 @@ func (c *ControllerImp) GetTemplateWithCoalecing(w http.ResponseWriter, r *http.
 		return c.repo.GetTemplateById(*id)
 	})
 	if err != nil {
+        log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -56,12 +63,14 @@ func (c *ControllerImp) GetTemplateWithCoalecing(w http.ResponseWriter, r *http.
 func (c *ControllerImp) GetTemplate(w http.ResponseWriter, r *http.Request) {
 	id, err := c.extractId(r)
 	if err != nil {
+        log.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	template, err := c.repo.GetTemplateById(*id)
 	if err != nil {
+        log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -75,6 +84,7 @@ func (c *ControllerImp) extractId(r *http.Request) (*uint, error) {
 	id_, err := strconv.Atoi(templateId)
 	id := uint(id_)
 	if err != nil {
+        log.Println(err)
 		return nil, err
 	}
 
@@ -105,9 +115,11 @@ func (c *ControllerImp) CreateTemplate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := fmt.Sprintf("id: %d", id)
-	w.Write([]byte(response))
-	w.WriteHeader(http.StatusOK)
+	w.Header().Add("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(createResponse{
+		Id: *id,
+	})
+
 }
 
 func (c *ControllerImp) UpdateTemplate(w http.ResponseWriter, r *http.Request) {
@@ -116,17 +128,20 @@ func (c *ControllerImp) UpdateTemplate(w http.ResponseWriter, r *http.Request) {
 	id_, err := strconv.Atoi(templateId)
 	id := uint(id_)
 	if err != nil {
+        log.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	var request *model.PdfTemplate
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+        log.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if err := c.repo.UpdateTemplate(id, *request); err != nil {
+        log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -140,11 +155,13 @@ func (c *ControllerImp) DeleteTemplate(w http.ResponseWriter, r *http.Request) {
 	id_, err := strconv.Atoi(templateId)
 	id := uint(id_)
 	if err != nil {
+        log.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if err := c.repo.DeleteTemplate(id); err != nil {
+        log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

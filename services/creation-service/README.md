@@ -12,4 +12,11 @@ Damit kann dieser sehr leicht skaliert werden.
 
 ## Configuration
 
-To Configure the templateing service create your own config.yml file. Look [here](config.example.yml) for an template/example config
+The following environment variables can be configured:
+
+```
+PORT=<application port, default is 3000>
+TEMPLATING_GRPC_ENDPOINT=<endpoint of the grpc templating server>
+```
+
+

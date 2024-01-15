@@ -15,23 +15,21 @@ Create a private key for signing JWT tokens:
 ssh-keygen -t ecdsa -f user-service.pem -m pem
 ```
 
-To configure the user service, create a `config.yml` with the following content:
-
-```yml
-database:
-    host: localhost
-    port: 5432
-    username: postgres
-    password: password
-    dbname: postgres
-jwt:
-    signKey: /path/to/user-service.pem
-```
-
+Put the contents of the `user-service.pem` into the `AUTH_SIGN_KEY` environment variable, or paste it into the 
+`.env` file at the project root.
 
 ## Up and running
 
 ```sh
 go build
-./user-service --config=config.yml
+
+export USE_TESTDATA=$USE_TESTDATA
+export POSTGRES_HOST=$POSTGRES_HOST
+export POSTGRES_PORT=$POSTGRES_PORT
+export POSTGRES_USERNAME=$POSTGRES_USERNAME
+export POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+export POSTGRES_DBNAME=$POSTGRES_DBNAME
+export AUTH_SIGN_KEY=$AUTH_SIGN_KEY
+
+./user-service
 ```

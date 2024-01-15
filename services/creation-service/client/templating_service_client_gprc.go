@@ -2,13 +2,13 @@ package client
 
 import (
 	"context"
+	"time"
+
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/constants"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/model"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/proto"
 	"google.golang.org/grpc"
-	"time"
 )
-
-const DATE_FORMAT = "2006-01-02 15:04:05.999999999 -0700 MST"
 
 type TemplatingGrpcClient struct {
 	proto.TemplateServiceClient
@@ -37,12 +37,12 @@ func fromGrpcTemplate(template *proto.Template) (*model.PdfTemplate, error) {
 		elements = append(elements, fromGrpcElement(element))
 	}
 
-	createdAt, err := time.Parse(template.CreatedAt, DATE_FORMAT)
+	createdAt, err := time.Parse(constants.GRPC_DATE_FORMAT, template.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
 
-	updatedAt, err := time.Parse(template.UpdatedAt, DATE_FORMAT)
+	updatedAt, err := time.Parse(constants.GRPC_DATE_FORMAT, template.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}

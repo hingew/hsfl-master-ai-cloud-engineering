@@ -3,3 +3,8 @@ data/
 user-service/config.yml
 node_modules/
 *.csv
+
+.env
+
+*.pem
+*.pub

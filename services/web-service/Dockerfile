@@ -10,6 +10,7 @@ COPY ./services/web-service ./services/web-service
 
 WORKDIR /app/services/web-service
 RUN yarn
+RUN yarn generate
 RUN yarn build
 RUN go mod tidy
 RUN go build -o ./main

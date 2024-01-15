@@ -1,5 +1,9 @@
 FROM golang:1.21-alpine
 
+RUN apk --no-cache --update-cache --available upgrade \
+    && apk add git bash terminus-font ttf-inconsolata ttf-dejavu font-noto ttf-font-awesome
+
+
 WORKDIR /build
 COPY ./lib ./lib
 COPY ./services/creation-service ./services/creation-service
@@ -7,9 +11,7 @@ COPY ./services/creation-service ./services/creation-service
 WORKDIR /build/services/creation-service
 RUN go build -o /app/creation-service
 
-# Add a empty config.yml to make single file volumes work
 WORKDIR /app
-RUN touch config.yml
 
 EXPOSE 3000
 CMD ["/app/creation-service"]

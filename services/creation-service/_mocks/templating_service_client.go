@@ -38,17 +38,17 @@ func (m *MockTemplatingServiceClient) EXPECT() *MockTemplatingServiceClientMockR
 	return m.recorder
 }
 
-// GetTemplate mocks base method.
-func (m *MockTemplatingServiceClient) GetTemplate(templateID uint) (*model.PdfTemplate, error) {
+// FetchTemplate mocks base method.
+func (m *MockTemplatingServiceClient) FetchTemplate(templateID uint) (*model.PdfTemplate, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetTemplate", templateID)
+	ret := m.ctrl.Call(m, "FetchTemplate", templateID)
 	ret0, _ := ret[0].(*model.PdfTemplate)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetTemplate indicates an expected call of GetTemplate.
-func (mr *MockTemplatingServiceClientMockRecorder) GetTemplate(templateID any) *gomock.Call {
+// FetchTemplate indicates an expected call of FetchTemplate.
+func (mr *MockTemplatingServiceClientMockRecorder) FetchTemplate(templateID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTemplate", reflect.TypeOf((*MockTemplatingServiceClient)(nil).GetTemplate), templateID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchTemplate", reflect.TypeOf((*MockTemplatingServiceClient)(nil).FetchTemplate), templateID)
 }

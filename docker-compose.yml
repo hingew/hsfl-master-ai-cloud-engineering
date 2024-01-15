@@ -8,16 +8,14 @@ services:
     ports:
       - 3000:3000
     environment:
-      - WEB_ENDPOINT=http://web:3000
-      - TEMPLATE_ENDPOINT=http://templates:3000
-      - CREATION_ENDPOINT=http://creation:3000
-      - USER_ENDPOINT=http://user:3000
-      - WEB_ROUTES=/;/static/
-      - TEMPLATE_ROUTES=/api/templates;/api/templates/:id;/api/templates/:id/controller_coalecing;/api/templates/:id/gateway_coalecing
-      - CREATION_ROUTES=/api/render/:id
-      - USER_ROUTES=/auth/register;/auth/login
-    volumes:
-      - ./services/api-gateway/config.yml:/app/config.yml
+      - WEB_ENDPOINT=$WEB_ENDPOINT
+      - TEMPLATE_ENDPOINT=$TEMPLATE_ENDPOINT
+      - CREATION_ENDPOINT=$CREATION_ENDPOINT
+      - USER_ENDPOINT=$USER_ENDPOINT
+      - WEB_ROUTES=$WEB_ROUTES
+      - TEMPLATE_ROUTES=$TEMPLATE_ROUTES
+      - CREATION_ROUTES=$CREATION_ROUTES
+      - USER_ROUTES=$USER_ROUTES
     depends_on:
       - web
       - templates
@@ -29,8 +27,6 @@ services:
       dockerfile: ./services/web-service/Dockerfile
     ports:
       - 3001:3000
-    environment:
-      - TEMPLATE_ENDPOINT=http://templates:3000
     links:
       - templates
     
@@ -40,15 +36,15 @@ services:
       dockerfile: ./services/templateing-service/Dockerfile
     ports:
       - 3002:3000
+      - 3010:3001
     environment:
-      - USE_TESTDATA=false
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_USERNAME=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DBNAME=postgres
+      - USE_TESTDATA=$USE_TESTDATA
+      - POSTGRES_HOST=$POSTGRES_HOST
+      - POSTGRES_PORT=$POSTGRES_PORT
+      - POSTGRES_USERNAME=$POSTGRES_USERNAME
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_DBNAME=$POSTGRES_DBNAME
     volumes:
-      - ./services/templateing-service/config.yml:/app/config.yml
       - ./services/templateing-service/test_data.json:/app/test_data.json
     depends_on:
       postgres:
@@ -58,25 +54,47 @@ services:
     build: 
       context: ./
       dockerfile: ./services/creation-service/Dockerfile
-    volumes:
-      - ./services/creation-service/config.yml:/app/config.yml
+    environment:
+      - TEMPLATE_GRPC_ENDPOINT=$TEMPLATE_GRPC_ENDPOINT
     ports:
       - 3003:3000
     links:
       - templates
+    depends_on:
+      - templates
 
+  user:
+    build:
+      context: ./
+      dockerfile: ./services/user-service/Dockerfile
+    ports:
+      - 3004:3000
+    environment:
+      - USE_TESTDATA=$USE_TESTDATA
+      - POSTGRES_HOST=$POSTGRES_HOST
+      - POSTGRES_PORT=$POSTGRES_PORT
+      - POSTGRES_USERNAME=$POSTGRES_USERNAME
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_DBNAME=$POSTGRES_DBNAME
+      - AUTH_SIGN_KEY=$AUTH_SIGN_KEY
+      - PORT=3000
+    volumes:
+      - ./services/templateing-service/test_data.json:/app/test_data.json
+    depends_on:
+      postgres:
+        condition: service_healthy
   postgres:
     image: postgres:15-alpine
     ports:
       - 5432:5432
     environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_DB=$POSTGRES_DB
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
     volumes:
-      - ./services/templateing-service/sql:/docker-entrypoint-initdb.d
+      - ./.docker/postgres:/docker-entrypoint-initdb.d

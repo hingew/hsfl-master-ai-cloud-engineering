@@ -10,4 +10,5 @@ WORKDIR /build/services/templateing-service
 RUN go build -o /app/templateing-service
 
 EXPOSE 3000
+EXPOSE 3001
 CMD ["/app/templateing-service"]
