@@ -37,6 +37,7 @@ type Msg
     | TemplateListMsg Page.TemplateList.Msg
     | TemplateCreateMsg Page.TemplateCreate.Msg
     | TemplatePrintMsg Page.TemplatePrint.Msg
+    | GotToken String
 
 
 type alias Flags =
@@ -74,14 +75,6 @@ fromRoute route model =
     case Session.authToken model.session of
         Just token ->
             case route of
-                Route.Login ->
-                    let
-                        ( m, cmd ) =
-                            Page.Login.init model.session
-                    in
-                    ( { model | page = Login m }, Cmd.map LoginMsg cmd )
-
-
                 Route.TemplateList ->
                     let
                         ( m, cmd ) =
@@ -142,6 +135,9 @@ update msg model =
 
         ( UrlChanged url, _ ) ->
             navigate url model
+
+        ( GotToken token, _ ) ->
+            ( { model | session = Session.init (Session.navKey model.session) (Just token) }, Cmd.none )
 
         ( LoginMsg loginMsg, Login login ) ->
             let
@@ -225,12 +221,15 @@ viewPage page =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    case model.page of
-        Login loginModel ->
-            Sub.map LoginMsg (Page.Login.subscriptions loginModel)
+    Sub.batch
+        [ case model.page of
+            Login loginModel ->
+                Sub.map LoginMsg (Page.Login.subscriptions loginModel)
 
-        _ ->
-            Sub.none
+            _ ->
+                Sub.none
+        , Session.gotToken GotToken
+        ]
 
 
 main : Program Flags Model Msg
