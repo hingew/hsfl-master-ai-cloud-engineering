@@ -3,16 +3,12 @@
 [![Creation-service](https://github.com/hingew/hsfl-master-ai-cloud-engineering/actions/workflows/creation-service.yml/badge.svg?branch=develop)](https://github.com/hingew/hsfl-master-ai-cloud-engineering/actions/workflows/creation-service.yml)
 [![codecov](https://codecov.io/gh/hingew/hsfl-master-ai-cloud-engineering/graph/badge.svg?token=CDPMA4XLME&flag=creation-service)](https://codecov.io/gh/hingew/hsfl-master-ai-cloud-engineering)
 
-## Beschreibung
+## Description
 
-Der PDF-Creation Service fragt das Template bei dem PDF-Template Service an und nimmt zusätzlich noch die dynamischen
-Felder von dem Client entgegen, damit diese in dem PDF dargestellt werden können.
-Der PDF-Creation Service hat hierbei den Vorteil, dass dieser ohne zusätzliche Datenhaltung auskommt.
-Damit kann dieser sehr leicht skaliert werden.
+The PDF Creation Service requests the template from the PDF Template Service and additionally receives dynamic fields from the client to incorporate them into the generated PDF. The PDF Creation Service has the advantage of operating without additional data storage, making it easily scalable. This design facilitates effortless scaling to meet increased demands
 
 ## Configuration
-
-The following environment variables can be configured:
+Configure the following environment variables:
 
 ```
 PORT=<application port, default is 3000>

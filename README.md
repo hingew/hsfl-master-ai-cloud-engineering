@@ -3,8 +3,8 @@
 [![codecov](https://codecov.io/gh/hingew/hsfl-master-ai-cloud-engineering/graph/badge.svg?token=CDPMA4XLME)](https://codecov.io/gh/hingew/hsfl-master-ai-cloud-engineering)
 
 
-Mit dem Projekt PDF Designer ist es möglich PDFs anhand eines selbst erstellten Templates erstellen zu können.\
-Diese werden dann dynamisch mit Daten gefüllt. Z.B. Rechnungsstellung oder Auflistung von Daten in einer Tabelle.
+## Description
+The PDF Designer project allows users to generate PDFs based on a custom template. These templates can be dynamically populated with data, such as invoice generation or listing data in a table.
 
 ## Authors
 Hauke Ingwersen\
@@ -19,9 +19,15 @@ Jannes Nebendahl\
 jannes.nebendahl@stud.hs-flensburg.de\
 Hochschule Flensburg
 
-## TODO
+## Installation
+Step-by-step instructions for starting all services with Docker.
 
+```docker-compose up```
 
-# Aktuelles Architekturbild
+### Installation with MacOS ARM
+Add the following line under *web* in the *docker-compose.yml* file only if MacOS with ARM is being used:
+```platform: linux/amd64``` 
+
+## Current Architecture
 ![currentArchitecture](currentArchitecture.png)
 

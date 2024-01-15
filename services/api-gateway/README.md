@@ -5,4 +5,5 @@
 
 ## Description
 
-TBD!
+Reverse Proxy Description
+A reverse proxy serves as an intermediary between client devices and a set of backend services, efficiently forwarding requests to the appropriate service based on the specified rules. In this system, the reverse proxy is configured to seamlessly route incoming requests to the designated backend services: *creation-service*, *templateing-service*, *user-service*, and *web-service*.
