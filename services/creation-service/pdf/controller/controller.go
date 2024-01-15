@@ -20,9 +20,13 @@ func NewController(pdf pdf.Pdf, templatingClient client.TemplatingServiceClient)
 	return &Controller{pdf, templatingClient}
 }
 
-func isValid(template *model.PdfTemplate, params map[string]interface{}) bool {
+func isValid(template *model.PdfTemplate, params map[string]string) bool {
+	if len(template.Elements) == 0 {
+		return true
+	}
+
 	for _, element := range template.Elements {
-		if element.ValueFrom != "" {
+		if element.Type == "text" && element.ValueFrom != "" {
 			if _, ok := params[element.ValueFrom]; !ok {
 				return false
 			}
@@ -44,20 +48,20 @@ func (c *Controller) CreatePdf(w http.ResponseWriter, r *http.Request) {
 	template, err := c.templatingClient.FetchTemplate(id)
 
 	if err != nil {
-        log.Print(err)
+		log.Print(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	var request map[string]interface{}
+	var request map[string]string
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-        log.Print(err)
+		log.Print(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if !isValid(template, request) {
-        log.Print("IS not valid", request)
+		log.Print("IS not valid: ", request)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -67,7 +71,7 @@ func (c *Controller) CreatePdf(w http.ResponseWriter, r *http.Request) {
 	buf, err := report.Out()
 
 	if err != nil {
-        log.Print(err)
+		log.Print(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

@@ -7,6 +7,6 @@ import (
 )
 
 type Pdf interface {
-	Render(*model.PdfTemplate, map[string]interface{})
+	Render(*model.PdfTemplate, map[string]string)
 	Out() (*bytes.Buffer, error)
 }

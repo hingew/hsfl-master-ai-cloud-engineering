@@ -55,7 +55,7 @@ func (mr *MockPdfMockRecorder) Out() *gomock.Call {
 }
 
 // Render mocks base method.
-func (m *MockPdf) Render(arg0 *model.PdfTemplate, arg1 map[string]any) {
+func (m *MockPdf) Render(arg0 *model.PdfTemplate, arg1 map[string]string) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Render", arg0, arg1)
 }
