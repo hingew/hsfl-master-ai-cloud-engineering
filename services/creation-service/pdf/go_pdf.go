@@ -19,8 +19,6 @@ func New() *Report {
 	r.pdf = gofpdf.New("P", "mm", "A4", "")
 	r.pdf.SetMargins(20, 40, 20)
 	r.pdf.AddPage()
-	r.pdf.SetFont("Arial", "B", 16)
-	r.pdf.Cell(40, 10, "OK")
 
 	return r
 }
