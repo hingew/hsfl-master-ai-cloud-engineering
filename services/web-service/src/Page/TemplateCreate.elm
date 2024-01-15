@@ -2,7 +2,7 @@ module Page.TemplateCreate exposing (Model, Msg, init, subscriptions, update, vi
 
 import Browser.Navigation as Nav
 import Components
-import Html.Styled exposing (Html, div, form, text)
+import Html.Styled exposing (Html, div, form)
 import Html.Styled.Attributes as Attrs
 import Html.Styled.Events exposing (onSubmit)
 import Http
@@ -12,8 +12,9 @@ import RemoteData exposing (WebData)
 import Route
 import Session
 import Tailwind.Utilities as Tw
-import Template exposing (Template)
+import Template
 import Template.Element as Element
+import Template.Font as Font
 
 
 type alias Model =
@@ -28,7 +29,6 @@ type Msg
     = Submit
     | GotSubmitResult (WebData Template.CreateResponse)
     | NameUpdate String
-    | ValueFromUpdate Int String
     | XUpdate Int Int
     | YUpdate Int Int
     | TypeUpdate Int Element.ElementType
@@ -73,16 +73,6 @@ update token navKey msg model =
 
         AddElement ->
             ( { model | elements = model.elements ++ [ Element.initForm ] }, Cmd.none )
-
-        ValueFromUpdate index value ->
-            ( { model
-                | elements =
-                    List.Extra.updateAt index
-                        (\element -> { element | valueFrom = value })
-                        model.elements
-              }
-            , Cmd.none
-            )
 
         XUpdate index value ->
             ( { model
@@ -161,14 +151,7 @@ viewElements elements =
 viewElement : Int -> Element.Form -> Html Msg
 viewElement index element =
     div [ Attrs.css [ Tw.space_y_6, Tw.py_6 ] ]
-        ([ Input.string
-            element.valueFrom
-            (ValueFromUpdate index)
-            { label = "Property name in JSON"
-            , name = "valueFrom"
-            , required = True
-            }
-         , Input.number element.x
+        ([ Input.number element.x
             (XUpdate index)
             { label = "X"
             , name = "x"
@@ -201,32 +184,49 @@ viewElement index element =
 viewElementType : Int -> Element.ElementType -> List (Html Msg)
 viewElementType index type_ =
     case type_ of
-        Element.Rect width height ->
+        Element.Rect { width, height } ->
             [ Input.number
                 width
-                (\newValue -> TypeUpdate index (Element.Rect newValue height))
+                (\newValue -> TypeUpdate index (Element.Rect { width = newValue, height = height }))
                 { label = "Width"
                 , name = "width"
                 , required = True
                 }
             , Input.number height
-                (\newValue -> TypeUpdate index (Element.Rect width newValue))
+                (\newValue -> TypeUpdate index (Element.Rect { width = width, height = newValue }))
                 { label = "Height"
                 , name = "height"
                 , required = True
                 }
             ]
 
-        Element.Text text fontSize ->
+        Element.Text form ->
             [ Input.string
-                text
-                (\newValue -> TypeUpdate index (Element.Text newValue fontSize))
-                { label = "Text"
-                , name = "text"
+                form.valueFrom
+                (\newValue -> TypeUpdate index (Element.Text { form | valueFrom = newValue }))
+                { label = "Property name in JSON"
+                , name = "valueFrom"
                 , required = True
                 }
-            , Input.number fontSize
-                (\newValue -> TypeUpdate index (Element.Text text newValue))
+            , Input.select
+                (Font.toString form.font)
+                Font.options
+                (\string ->
+                    let
+                        newValue =
+                            string
+                                |> Font.fromString
+                                |> Maybe.withDefault form.font
+                    in
+                    TypeUpdate index (Element.Text { form | font = newValue })
+                )
+                { label = "Font"
+                , name = "font"
+                , required = True
+                }
+            , Input.number
+                form.fontSize
+                (\newValue -> TypeUpdate index (Element.Text { form | fontSize = newValue }))
                 { label = "Font size"
                 , name = "fontSize"
                 , required = True

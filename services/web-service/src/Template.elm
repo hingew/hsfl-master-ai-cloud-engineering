@@ -74,11 +74,11 @@ toForm template =
 toFormValue : Element -> Maybe ( String, String )
 toFormValue element =
     case element.type_ of
-        Element.Rect _ _ ->
+        Element.Rect _ ->
             Nothing
 
-        Element.Text _ _ ->
-            Just ( element.valueFrom, "" )
+        Element.Text { valueFrom } ->
+            Just ( valueFrom, "" )
 
 
 setFormValue : String -> String -> PrintForm -> PrintForm
