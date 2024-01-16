@@ -7,6 +7,6 @@ spec:
     app: user-service
   ports:
     - protocol: TCP
-      port: 3004
+      port: 3000
       targetPort: 3000
   type: LoadBalancer
