@@ -7,7 +7,7 @@ import (
 )
 
 func NewTemplateRouter(
-	myController controller.Controller,
+	myController controller.ControllerInterface,
 ) *router.Router {
 	templateRouter := router.New()
 	templateRouter.GET("/api/health/templates", health.Check)

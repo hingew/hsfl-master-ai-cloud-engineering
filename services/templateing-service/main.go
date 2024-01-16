@@ -13,6 +13,7 @@ import (
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/proto"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/api/router"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/controller"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/server"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/repository"
 	"google.golang.org/grpc"
 )
@@ -67,15 +68,15 @@ func main() {
 	}
 
 	ctr := controller.NewController(repo)
-	grpcSrv := controller.NewGrpcServer(repo)
-	handler := router.NewTemplateRouter(ctr)
+	grpcSrv := server.NewGrpcServer(repo)
+	router := router.NewTemplateRouter(ctr)
 
 	if err := repo.Setup(testdata); err != nil {
 		log.Fatalf("could not setup database: %s", err.Error())
 	}
 
 	go func() {
-		if err := http.ListenAndServe(":3000", handler); err != nil {
+		if err := http.ListenAndServe(":3000", router); err != nil {
 			log.Fatalf("error while listen and serve: %s", err.Error())
 		}
 	}()

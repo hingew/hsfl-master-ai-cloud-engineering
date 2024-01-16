@@ -25,7 +25,7 @@ func TestController(t *testing.T) {
 
 	repo := mock_repository.NewMockRepository(ctrl)
 
-	controller := ControllerImp{repo, &singleflight.Group{}}
+	controller := Controller{repo, &singleflight.Group{}}
 
 	t.Run("GetAllTemplates", func(t *testing.T) {
 		t.Run("should return 500 INTERNAL SERVER ERROR if query failed", func(t *testing.T) {
