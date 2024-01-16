@@ -2,11 +2,12 @@
 
 [![codecov](https://codecov.io/gh/hingew/hsfl-master-ai-cloud-engineering/graph/badge.svg?token=CDPMA4XLME)](https://codecov.io/gh/hingew/hsfl-master-ai-cloud-engineering)
 
-
 ## Description
+
 The PDF Designer project allows users to generate PDFs based on a custom template. These templates can be dynamically populated with data, such as invoice generation or listing data in a table.
 
 ## Authors
+
 Hauke Ingwersen\
 hauke.ingwersen@stud.hs-flensburg.de\
 Hochschule Flensburg
@@ -20,26 +21,42 @@ jannes.nebendahl@stud.hs-flensburg.de\
 Hochschule Flensburg
 
 ## Installation
+
 Please copy the .env.example file to .env and adjust the AUTH_SIGN_KEY=.
 
-```cp .env.example .env```
+`cp .env.example .env`
 
 To create a private key for signing JWT tokens, use the following command:
 
-```ssh-keygen -t ecdsa -f user-service.pem -m pem```
+`ssh-keygen -t ecdsa -f user-service.pem -m pem`
 
 Copy the contents of the generated user-service.pem file and paste it into the AUTH_SIGN_KEY environment variable or directly into the .env file located at the project root.
 
-Step-by-step instructions for starting all services with Docker.
+To build the docker container you have to run the following command:
 
-```docker-compose up```
+`docker-compose build`
 
 ### Installation with MacOS ARM
-Add the following line under *web* in the *docker-compose.yml* file only if MacOS with ARM is being used:
-```platform: linux/amd64```
 
+Add the following line under _web_ in the _docker-compose.yml_ file only if MacOS with ARM is being used:
+`platform: linux/amd64`
 
+## Start Application
+
+You can host the application in the following 3 environments. To start them you can use the script files in the script directory.
+
+### Docker
+
+Run the script `script\start_docker`
+
+### Kubernetes with Minicube
+
+Run the script `script\start_minicube`
+
+### Kubernetes on own Cluster
+
+Run the script `script\start_own_cluster`
 
 ## Current Architecture
-![currentArchitecture](currentArchitecture.png)
 
+![currentArchitecture](currentArchitecture.png)
