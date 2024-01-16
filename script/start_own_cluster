@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-minikube start
-
 kubectl apply -f kubernetes/secrets
 kubectl apply -f kubernetes/services
 kubectl apply -f kubernetes/monitoring
+kubectl apply -f kubernetes/monitoring/prometheus
+kubectl apply -f kubernetes/monitoring/grafana
+kubectl apply -f kubernetes/monitoring/kube-state-metrics
 kubectl apply -f kubernetes/deployments
