@@ -2,6 +2,7 @@ version: '3.9'
 
 services:
   reverse_proxy:
+    image: hauing/api-gateway:develop
     build:
       context: ./ 
       dockerfile: ./services/api-gateway/Dockerfile
@@ -12,16 +13,13 @@ services:
       - TEMPLATE_ENDPOINT=$TEMPLATE_ENDPOINT
       - CREATION_ENDPOINT=$CREATION_ENDPOINT
       - USER_ENDPOINT=$USER_ENDPOINT
-      - WEB_ROUTES=$WEB_ROUTES
-      - TEMPLATE_ROUTES=$TEMPLATE_ROUTES
-      - CREATION_ROUTES=$CREATION_ROUTES
-      - USER_ROUTES=$USER_ROUTES
     depends_on:
       - web
       - templates
       - creation
   
   web:
+    image: hauing/web-service:develop
     build:
       context: ./ 
       dockerfile: ./services/web-service/Dockerfile
@@ -31,6 +29,7 @@ services:
       - templates
     
   templates:
+    image: hauing/templateing-service:develop
     build:
       context: ./
       dockerfile: ./services/templateing-service/Dockerfile
@@ -38,7 +37,6 @@ services:
       - 3002:3000
       - 3010:3001
     environment:
-      - USE_TESTDATA=$USE_TESTDATA
       - POSTGRES_HOST=$POSTGRES_HOST
       - POSTGRES_PORT=$POSTGRES_PORT
       - POSTGRES_USERNAME=$POSTGRES_USERNAME
@@ -51,6 +49,7 @@ services:
         condition: service_healthy
   
   creation:
+    image: hauing/creation-service:develop
     build: 
       context: ./
       dockerfile: ./services/creation-service/Dockerfile
@@ -64,25 +63,25 @@ services:
       - templates
 
   user:
+    image: hauing/user-service:develop
     build:
       context: ./
       dockerfile: ./services/user-service/Dockerfile
     ports:
       - 3004:3000
     environment:
-      - USE_TESTDATA=$USE_TESTDATA
       - POSTGRES_HOST=$POSTGRES_HOST
       - POSTGRES_PORT=$POSTGRES_PORT
       - POSTGRES_USERNAME=$POSTGRES_USERNAME
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
       - POSTGRES_DBNAME=$POSTGRES_DBNAME
       - AUTH_SIGN_KEY=$AUTH_SIGN_KEY
-      - PORT=3000
     volumes:
       - ./services/templateing-service/test_data.json:/app/test_data.json
     depends_on:
       postgres:
         condition: service_healthy
+
   postgres:
     image: postgres:15-alpine
     ports:
