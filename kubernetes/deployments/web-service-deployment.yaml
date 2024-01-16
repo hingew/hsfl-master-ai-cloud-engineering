@@ -20,6 +20,3 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
-          env:
-            - name: TEMPLATE_ENDPOINT
-              value: "http://templateing-service:3002"

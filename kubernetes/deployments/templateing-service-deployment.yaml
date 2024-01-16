@@ -21,14 +21,6 @@ spec:
           imagePullPolicy: "Always"
           ports:
             - containerPort: 3000
-          env:
-            - name: POSTGRES_HOST
-              value: "postgres"
-            - name: POSTGRES_PORT
-              value: "5432"
-            - name: POSTGRES_USERNAME
-              value: "postgres"
-            - name: POSTGRES_PASSWORD
-              value: "postgres"
-            - name: POSTGRES_DBNAME
-              value: "postgres"
+          envFrom:
+          - secretRef:
+             name: postgres-secret
