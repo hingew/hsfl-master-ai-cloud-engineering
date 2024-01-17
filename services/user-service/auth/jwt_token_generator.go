@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"crypto/ecdsa"
+	"crypto/rsa"
 	"fmt"
 	"log"
 
@@ -9,8 +9,8 @@ import (
 )
 
 type JwtTokenGenerator struct {
-	privateKey *ecdsa.PrivateKey
-	publicKey  *ecdsa.PublicKey
+	privateKey *rsa.PrivateKey
+	publicKey  *rsa.PublicKey
 }
 
 func NewJwtTokenGenerator(config JwtConfig) (*JwtTokenGenerator, error) {
@@ -24,14 +24,14 @@ func (gen *JwtTokenGenerator) CreateToken(claims map[string]interface{}) (string
 		jwtClaims[k] = v
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, jwtClaims)
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwtClaims)
 	return token.SignedString(gen.privateKey)
 }
 
 func (gen *JwtTokenGenerator) VerifyToken(tokenString string) (map[string]interface{}, error) {
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
-		if t.Method.Alg() != jwt.SigningMethodES256.Name {
-			return nil, fmt.Errorf("Unexpected jwt signing method=%v", t.Header["alg"])
+		if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 		}
 
 		return gen.publicKey, nil

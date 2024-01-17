@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"strings"
 
@@ -21,9 +22,10 @@ func NewGrpcAuthMiddleware(conn grpc.ClientConnInterface) *GrpcAuthMiddleware {
 
 func (m *GrpcAuthMiddleware) AuthMiddleware(w http.ResponseWriter, r *http.Request, next router.Next) {
 	bearerToken := r.Header.Get("Authorization")
-	token, ok := strings.CutPrefix("Bearer ", bearerToken)
+	token, found := strings.CutPrefix(bearerToken, "Bearer ")
 
-	if !ok {
+	if !found {
+		log.Println("No token provied")
 		http.Error(w, "No token provied", http.StatusUnauthorized)
 	}
 
@@ -32,11 +34,14 @@ func (m *GrpcAuthMiddleware) AuthMiddleware(w http.ResponseWriter, r *http.Reque
 	res, err := m.client.IsAuthenticated(context.Background(), request)
 
 	if err != nil {
+		log.Println("error is authenticated", err)
 		http.Error(w, "Could not verify token", http.StatusUnauthorized)
 	}
 
 	if !res.IsAuthenticated {
-		w.WriteHeader(http.StatusUnauthorized)
+		log.Println("user is not authenticated", err)
+		http.Error(w, "Is not authenticated", http.StatusUnauthorized)
+
 	}
 
 	next(r)

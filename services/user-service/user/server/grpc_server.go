@@ -16,7 +16,7 @@ type GrpcServer struct {
 }
 
 func NewGrpcServer(repo repository.Repository, tokenGenerator auth.TokenGenerator) *GrpcServer {
-	return &GrpcServer{repo: repo}
+	return &GrpcServer{repo: repo, tokenGenerator: tokenGenerator}
 }
 
 func (s *GrpcServer) IsAuthenticated(ctx context.Context, r *proto.AuthRequest) (*proto.AuthResponse, error) {
@@ -27,7 +27,8 @@ func (s *GrpcServer) IsAuthenticated(ctx context.Context, r *proto.AuthRequest) 
 		return nil, err
 	}
 
-	expireTime := time.Unix(claims["exp"].(int64), 0)
+	exp := int64(claims["exp"].(float64))
+	expireTime := time.Unix(exp, 0)
 
 	if time.Now().After(expireTime) {
 		return &proto.AuthResponse{IsAuthenticated: false}, nil

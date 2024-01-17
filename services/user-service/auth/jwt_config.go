@@ -1,16 +1,15 @@
 package auth
 
 import (
-	"crypto/ecdsa"
-	"encoding/pem"
+	"crypto/rsa"
 	"os"
 
 	"github.com/golang-jwt/jwt"
 )
 
 type JwtConfig struct {
-	PrivateKey *ecdsa.PrivateKey
-	PublicKey  *ecdsa.PublicKey
+	PrivateKey *rsa.PrivateKey
+	PublicKey  *rsa.PublicKey
 }
 
 func LoadConfigFromEnv() (*JwtConfig, error) {
@@ -31,12 +30,10 @@ func LoadConfigFromEnv() (*JwtConfig, error) {
 
 }
 
-func readPrivateKey(stringKey string) (*ecdsa.PrivateKey, error) {
-	key, _ := pem.Decode([]byte(stringKey))
-	return jwt.ParseECPrivateKeyFromPEM(key.Bytes)
+func readPrivateKey(stringKey string) (*rsa.PrivateKey, error) {
+	return jwt.ParseRSAPrivateKeyFromPEM([]byte(stringKey))
 }
 
-func readPublicKey(stringKey string) (*ecdsa.PublicKey, error) {
-	key, _ := pem.Decode([]byte(stringKey))
-	return jwt.ParseECPublicKeyFromPEM(key.Bytes)
+func readPublicKey(stringKey string) (*rsa.PublicKey, error) {
+	return jwt.ParseRSAPublicKeyFromPEM([]byte(stringKey))
 }

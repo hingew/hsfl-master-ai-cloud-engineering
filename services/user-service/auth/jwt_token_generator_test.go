@@ -1,9 +1,8 @@
 package auth
 
 import (
-	"crypto/ecdsa"
-	"crypto/elliptic"
 	"crypto/rand"
+	"crypto/rsa"
 	"encoding/base64"
 	"encoding/json"
 	"strings"
@@ -14,7 +13,7 @@ import (
 )
 
 func TestJwtAuthorizer(t *testing.T) {
-	privateKey, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+    privateKey, _ := rsa.GenerateKey(rand.Reader, 4096)
 	publicKey := privateKey.PublicKey
 	tokenGenerator := JwtTokenGenerator{privateKey, &publicKey}
 

@@ -76,11 +76,12 @@ func main() {
 	}
 
 	grpcConn, err := grpc.Dial(config.UserServiceGrpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	authMiddleware := middleware.NewGrpcAuthMiddleware(grpcConn)
 
 	if err != nil {
 		log.Fatalf("GRPC could not connect : %v", err)
 	}
+
+	authMiddleware := middleware.NewGrpcAuthMiddleware(grpcConn)
 
 	ctr := controller.NewController(repo)
 	grpcSrv := server.NewGrpcServer(repo)
