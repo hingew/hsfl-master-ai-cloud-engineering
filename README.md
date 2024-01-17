@@ -26,10 +26,18 @@ Please copy the .env.example file to .env and adjust the AUTH_SIGN_KEY=.
 
 To create a private key for signing JWT tokens, use the following command:
 
-```ssh-keygen -t ecdsa -f user-service.pem -m pem```
+Create a private key for signing JWT tokens:
 
-Copy the contents of the generated user-service.pem file and paste it into the AUTH_SIGN_KEY environment variable or directly into the .env file located at the project root.
+``` 
+openssl genrsa -out key.pem 2048
+openssl rsa -in key.pem -outform PEM -pubout -out public.pem
+```
 
+Update the content of your `.env` file in the project root.
+```
+AUTH_PRIVATE_KEY="<your-private-key>"
+AUTH_PUBLIC_KEY="<your-public-key>"
+```
 Step-by-step instructions for starting all services with Docker.
 
 ```docker-compose up```

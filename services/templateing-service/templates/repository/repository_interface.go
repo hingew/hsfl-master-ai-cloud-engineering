@@ -10,4 +10,5 @@ type Repository interface {
 	GetTemplateById(id uint) (*model.PdfTemplate, error)
 	UpdateTemplate(id uint, data model.PdfTemplate) error
 	DeleteTemplate(id uint) error
+	Migrate() error
 }

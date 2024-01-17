@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net"
 	"net/http"
@@ -9,7 +8,6 @@ import (
 
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/database"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/middleware"
-	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/model"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/proto"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/api/router"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/controller"
@@ -24,20 +22,6 @@ type ApplicationConfig struct {
 	UserServiceGrpcEndpoint string
 }
 
-func LoadTestData(path string) (*[]model.PdfTemplate, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-
-	var testdata []model.PdfTemplate
-	if err := json.NewDecoder(f).Decode(&testdata); err != nil {
-		return nil, err
-	}
-
-	return &testdata, nil
-}
-
 func loadConfigFromEnv() (*ApplicationConfig, error) {
 	databaseConfig, err := database.LoadConfigFromEnv()
 	if err != nil {
@@ -50,21 +34,6 @@ func loadConfigFromEnv() (*ApplicationConfig, error) {
 }
 
 func main() {
-	use_testdata := os.Getenv("USE_TESTDATA")
-
-	var testdata []model.PdfTemplate
-	var err error
-
-	if use_testdata == "true" {
-		log.Print("Use testdata")
-		p, err := LoadTestData("test_data.json")
-		if err != nil {
-			log.Fatalf("could not load testdata: %s", err.Error())
-		} else {
-			testdata = *p
-		}
-	}
-
 	config, err := loadConfigFromEnv()
 	if err != nil {
 		log.Fatal("Could not read environment variables: ", err)
@@ -73,6 +42,10 @@ func main() {
 	repo, err := repository.NewGormPsqlRepository(config.Database)
 	if err != nil {
 		log.Fatalf("could not create repository: %s", err.Error())
+	}
+
+	if err := repo.Migrate(); err != nil {
+		log.Fatalf("could not migrate: %s", err.Error())
 	}
 
 	grpcConn, err := grpc.Dial(config.UserServiceGrpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -86,10 +59,6 @@ func main() {
 	ctr := controller.NewController(repo)
 	grpcSrv := server.NewGrpcServer(repo)
 	router := router.NewTemplateRouter(ctr, authMiddleware)
-
-	if err := repo.Setup(testdata); err != nil {
-		log.Fatalf("could not setup database: %s", err.Error())
-	}
 
 	go func() {
 		if err := http.ListenAndServe(":3000", router); err != nil {

@@ -97,6 +97,20 @@ func (mr *MockRepositoryMockRecorder) GetTemplateById(id any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTemplateById", reflect.TypeOf((*MockRepository)(nil).GetTemplateById), id)
 }
 
+// Migrate mocks base method.
+func (m *MockRepository) Migrate() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Migrate")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Migrate indicates an expected call of Migrate.
+func (mr *MockRepositoryMockRecorder) Migrate() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Migrate", reflect.TypeOf((*MockRepository)(nil).Migrate))
+}
+
 // UpdateTemplate mocks base method.
 func (m *MockRepository) UpdateTemplate(id uint, data model.PdfTemplate) error {
 	m.ctrl.T.Helper()

@@ -81,8 +81,6 @@ func createRequestContext(r *http.Request, paramKeys []string, paramValues []str
 
 	ctx := r.Context()
 	for i := 0; i < len(paramKeys); i++ {
-		fmt.Println("context values", paramKeys[i], paramValues[i])
-
 		ctx = context.WithValue(ctx, paramKeys[i], paramValues[i])
 	}
 

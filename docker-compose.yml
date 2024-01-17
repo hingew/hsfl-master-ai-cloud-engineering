@@ -6,6 +6,7 @@ services:
     build:
       context: ./ 
       dockerfile: ./services/api-gateway/Dockerfile
+      target: runtime
     ports:
       - 3000:3000
     environment:
@@ -23,6 +24,7 @@ services:
     build:
       context: ./ 
       dockerfile: ./services/web-service/Dockerfile
+      target: runtime
     ports:
       - 3001:3000
     links:
@@ -54,6 +56,7 @@ services:
     build: 
       context: ./
       dockerfile: ./services/creation-service/Dockerfile
+      target: runtime
     environment:
       - TEMPLATE_GRPC_ENDPOINT=$TEMPLATE_GRPC_ENDPOINT
     ports:
@@ -68,6 +71,7 @@ services:
     build:
       context: ./
       dockerfile: ./services/user-service/Dockerfile
+      target: runtime
     ports:
       - 3004:3000
     environment:
@@ -78,7 +82,6 @@ services:
       - POSTGRES_DBNAME=$POSTGRES_DBNAME
       - AUTH_PRIVATE_KEY=$AUTH_PRIVATE_KEY
       - AUTH_PUBLIC_KEY=$AUTH_PUBLIC_KEY
-      - PORT=3000
     volumes:
       - ./services/templateing-service/test_data.json:/app/test_data.json
     depends_on:
