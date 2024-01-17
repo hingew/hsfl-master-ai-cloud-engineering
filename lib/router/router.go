@@ -15,9 +15,19 @@ type route struct {
 	params  []string
 }
 
-type Router struct {
-	routes []route
+type middleware struct {
+	pattern *regexp.Regexp
+	handler MiddlewareHandler
+	params  []string
 }
+
+type Router struct {
+	routes      []route
+	middlewares []middleware
+}
+
+type Next func(r *http.Request)
+type MiddlewareHandler func(w http.ResponseWriter, r *http.Request, next Next)
 
 func New() *Router {
 	return &Router{}
@@ -25,6 +35,26 @@ func New() *Router {
 
 // ServeHTTP implements the Http.Handler interface
 func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	for _, middleware := range router.middlewares {
+
+		matches := middleware.pattern.FindStringSubmatch(r.URL.Path)
+
+		if len(matches) > 0 {
+			r = createRequestContext(r, middleware.params, matches[1:])
+
+			called := false
+			next := func(req *http.Request) {
+				called = true
+				r = req
+			}
+
+			middleware.handler(w, r, next)
+			if !called {
+				log.Println("Router Middleware: next not called")
+				return
+			}
+		}
+	}
 	for _, route := range router.routes {
 		if r.Method != route.method {
 			continue
@@ -51,6 +81,8 @@ func createRequestContext(r *http.Request, paramKeys []string, paramValues []str
 
 	ctx := r.Context()
 	for i := 0; i < len(paramKeys); i++ {
+		fmt.Println("context values", paramKeys[i], paramValues[i])
+
 		ctx = context.WithValue(ctx, paramKeys[i], paramValues[i])
 	}
 
@@ -58,7 +90,6 @@ func createRequestContext(r *http.Request, paramKeys []string, paramValues []str
 }
 
 func (router *Router) addRoute(method string, pattern string, handler http.HandlerFunc) {
-
 	matcher := regexp.MustCompile(":([a-zA-Z]+)")
 	matches := matcher.FindAllStringSubmatch(pattern, -1)
 
@@ -101,4 +132,30 @@ func (router *Router) PUT(pattern string, handler http.HandlerFunc) {
 
 func (router *Router) DELETE(pattern string, handler http.HandlerFunc) {
 	router.addRoute(http.MethodDelete, pattern, handler)
+}
+
+func (router *Router) USE(pattern string, handler MiddlewareHandler) *Router {
+	matcher := regexp.MustCompile(":([a-zA-Z]+)")
+	matches := matcher.FindAllStringSubmatch(pattern, -1)
+
+	// Match all routes
+	pattern = pattern + "(.*)"
+
+	params := make([]string, len(matches))
+
+	if len(matches) > 0 {
+		pattern = matcher.ReplaceAllLiteralString(pattern, "([^/]+)")
+
+		for i, match := range matches {
+			params[i] = match[1]
+		}
+	}
+
+	router.middlewares = append(router.middlewares, middleware{
+		pattern: regexp.MustCompile("^" + pattern + "$"),
+		handler: handler,
+		params:  params,
+	})
+
+	return router
 }
