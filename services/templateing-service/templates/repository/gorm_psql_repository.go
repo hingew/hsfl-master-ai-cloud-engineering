@@ -21,7 +21,7 @@ func NewGormPsqlRepository(config database.Config) (*GormPsqlRepository, error) 
 }
 
 func (repo *GormPsqlRepository) Migrate() error {
-	return repo.db.AutoMigrate(&model.PdfTemplate{}, &model.Element{} )
+	return repo.db.AutoMigrate(&model.PdfTemplate{}, &model.Element{})
 }
 
 func (repo *GormPsqlRepository) CreateTemplate(data model.PdfTemplate) (*uint, error) {
