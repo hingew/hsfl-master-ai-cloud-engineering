@@ -6,19 +6,22 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"strconv"
 
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/database"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/middleware"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/model"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/proto"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/api/router"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/controller"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/repository"
+	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/server"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type ApplicationConfig struct {
-	Database database.PsqlConfig
+	Database                database.PsqlConfig
+	UserServiceGrpcEndpoint string
 }
 
 func LoadTestData(path string) (*[]model.PdfTemplate, error) {
@@ -33,6 +36,17 @@ func LoadTestData(path string) (*[]model.PdfTemplate, error) {
 	}
 
 	return &testdata, nil
+}
+
+func loadConfigFromEnv() (*ApplicationConfig, error) {
+	databaseConfig, err := database.LoadConfigFromEnv()
+	if err != nil {
+		return nil, err
+	}
+
+	userServiceGrpcEndpoint := os.Getenv("USER_GRPC_ENDPOINT")
+
+	return &ApplicationConfig{*databaseConfig, userServiceGrpcEndpoint}, nil
 }
 
 func main() {
@@ -51,31 +65,34 @@ func main() {
 		}
 	}
 
-	config := ApplicationConfig{}
-	config.Database.Host = os.Getenv("POSTGRES_HOST")
-	config.Database.Port, err = strconv.Atoi(os.Getenv("POSTGRES_PORT"))
+	config, err := loadConfigFromEnv()
 	if err != nil {
-		log.Fatalf("could parse postgres port")
+		log.Fatal("Could not read environment variables: ", err)
 	}
-	config.Database.Username = os.Getenv("POSTGRES_USERNAME")
-	config.Database.Password = os.Getenv("POSTGRES_PASSWORD")
-	config.Database.Database = os.Getenv("POSTGRES_DBNAME")
 
 	repo, err := repository.NewGormPsqlRepository(config.Database)
 	if err != nil {
 		log.Fatalf("could not create repository: %s", err.Error())
 	}
 
+	grpcConn, err := grpc.Dial(config.UserServiceGrpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	if err != nil {
+		log.Fatalf("GRPC could not connect : %v", err)
+	}
+
+	authMiddleware := middleware.NewGrpcAuthMiddleware(grpcConn)
+
 	ctr := controller.NewController(repo)
-	grpcSrv := controller.NewGrpcServer(repo)
-	handler := router.NewTemplateRouter(ctr)
+	grpcSrv := server.NewGrpcServer(repo)
+	router := router.NewTemplateRouter(ctr, authMiddleware)
 
 	if err := repo.Setup(testdata); err != nil {
 		log.Fatalf("could not setup database: %s", err.Error())
 	}
 
 	go func() {
-		if err := http.ListenAndServe(":3000", handler); err != nil {
+		if err := http.ListenAndServe(":3000", router); err != nil {
 			log.Fatalf("error while listen and serve: %s", err.Error())
 		}
 	}()

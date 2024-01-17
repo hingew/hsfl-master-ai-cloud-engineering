@@ -12,24 +12,12 @@ Authentication of the user
 Create a private key for signing JWT tokens:
 
 ``` 
-ssh-keygen -t ecdsa -f user-service.pem -m pem
+openssl genrsa -out key.pem 2048
+openssl rsa -in key.pem -outform PEM -pubout -out public.pem
 ```
 
-Put the contents of the `user-service.pem` into the `AUTH_SIGN_KEY` environment variable, or paste it into the 
-`.env` file at the project root.
-
-## Up and running
-
-```sh
-go build
-
-export USE_TESTDATA=$USE_TESTDATA
-export POSTGRES_HOST=$POSTGRES_HOST
-export POSTGRES_PORT=$POSTGRES_PORT
-export POSTGRES_USERNAME=$POSTGRES_USERNAME
-export POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-export POSTGRES_DBNAME=$POSTGRES_DBNAME
-export AUTH_SIGN_KEY=$AUTH_SIGN_KEY
-
-./user-service
+Update the content of your `.env` file in the project root.
+```
+AUTH_PRIVATE_KEY="<your-private-key>"
+AUTH_PUBLIC_KEY="<your-public-key>"
 ```

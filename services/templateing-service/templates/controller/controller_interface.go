@@ -2,7 +2,7 @@ package controller
 
 import "net/http"
 
-type Controller interface {
+type ControllerInterface interface {
 	GetAllTemplates(http.ResponseWriter, *http.Request)
 	GetTemplate(http.ResponseWriter, *http.Request)
 	GetTemplateWithCoalecing(http.ResponseWriter, *http.Request)

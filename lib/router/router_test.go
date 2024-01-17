@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRouter(t *testing.T) {
+func TestRoutes(t *testing.T) {
 	t.Run("should return 404 NOT FOUND if the path is unknown", func(t *testing.T) {
 		// given
 		router := New()
@@ -128,4 +128,29 @@ func TestRouter(t *testing.T) {
 		})
 	})
 
+}
+
+func TestMiddlewares(t *testing.T) {
+	t.Run("should call middleware with params", func(t *testing.T) {
+		// given
+		router := New()
+		var ctx context.Context
+
+		router.USE("/test/:id", func(w http.ResponseWriter, r *http.Request, next Next) {
+			ctx = r.Context()
+			next(r)
+		})
+
+		router.GET("/test/:id", func(w http.ResponseWriter, r *http.Request) {})
+
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest("GET", "/test/123", nil)
+
+		// when
+		router.ServeHTTP(w, r)
+
+		// then
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, "123", ctx.Value("id"))
+	})
 }

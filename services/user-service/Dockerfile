@@ -10,4 +10,5 @@ RUN go build -o /app/user-service
 WORKDIR /app
 
 EXPOSE 3000
+EXPOSE 3001
 CMD ["/app/user-service"]

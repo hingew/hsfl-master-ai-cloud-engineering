@@ -42,6 +42,7 @@ services:
       - POSTGRES_USERNAME=$POSTGRES_USERNAME
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
       - POSTGRES_DBNAME=$POSTGRES_DBNAME
+      - USER_GRPC_ENDPOINT=$USER_GRPC_ENDPOINT
     volumes:
       - ./services/templateing-service/test_data.json:/app/test_data.json
     depends_on:
@@ -75,7 +76,9 @@ services:
       - POSTGRES_USERNAME=$POSTGRES_USERNAME
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
       - POSTGRES_DBNAME=$POSTGRES_DBNAME
-      - AUTH_SIGN_KEY=$AUTH_SIGN_KEY
+      - AUTH_PRIVATE_KEY=$AUTH_PRIVATE_KEY
+      - AUTH_PUBLIC_KEY=$AUTH_PUBLIC_KEY
+      - PORT=3000
     volumes:
       - ./services/templateing-service/test_data.json:/app/test_data.json
     depends_on:

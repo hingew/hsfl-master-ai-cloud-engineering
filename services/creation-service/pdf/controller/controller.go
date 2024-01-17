@@ -13,10 +13,10 @@ import (
 
 type Controller struct {
 	pdf              pdf.Pdf
-	templatingClient client.TemplatingServiceClient
+	templatingClient client.TemplatingServiceClientInterface
 }
 
-func NewController(pdf pdf.Pdf, templatingClient client.TemplatingServiceClient) *Controller {
+func NewController(pdf pdf.Pdf, templatingClient client.TemplatingServiceClientInterface) *Controller {
 	return &Controller{pdf, templatingClient}
 }
 

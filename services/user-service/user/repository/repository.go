@@ -1,4 +1,4 @@
-package user
+package repository
 
 import "github.com/hingew/hsfl-master-ai-cloud-engineering/user-service/user/model"
 

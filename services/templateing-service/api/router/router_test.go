@@ -6,16 +6,28 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/golang/mock/gomock"
+	mock_middleware "github.com/hingew/hsfl-master-ai-cloud-engineering/lib/_mocks"
 	mock_controller "github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/_mocks"
 	"github.com/stretchr/testify/assert"
+	gomock "go.uber.org/mock/gomock"
 )
 
 func TestRouter(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
-	productsController := mock_controller.NewMockController(ctrl)
-	router := NewTemplateRouter(productsController)
+	templatingController := mock_controller.NewMockControllerInterface(ctrl)
+	authMiddleware := mock_middleware.NewMockAuthMiddleInterface(ctrl)
+	router := NewTemplateRouter(templatingController, authMiddleware)
+
+	passAuthMiddleware := func(w http.ResponseWriter, r *http.Request) {
+		authMiddleware.
+			EXPECT().
+			AuthMiddleware(w, r, gomock.Any()).
+			Do(func(w http.ResponseWriter, r *http.Request, next func(r *http.Request)) {
+				next(r)
+			}).
+			Times(1)
+	}
 
 	t.Run("/templates", func(t *testing.T) {
 		t.Run("should return 404 NOT FOUND if method is not GET or POST", func(t *testing.T) {
@@ -25,6 +37,8 @@ func TestRouter(t *testing.T) {
 				// given
 				w := httptest.NewRecorder()
 				r := httptest.NewRequest(test, "/api/templates", nil)
+
+				passAuthMiddleware(w, r)
 
 				// when
 				router.ServeHTTP(w, r)
@@ -39,10 +53,12 @@ func TestRouter(t *testing.T) {
 			w := httptest.NewRecorder()
 			r := httptest.NewRequest("GET", "/api/templates", nil)
 
-			productsController.
+			templatingController.
 				EXPECT().
 				GetAllTemplates(w, r).
 				Times(1)
+
+			passAuthMiddleware(w, r)
 
 			// when
 			router.ServeHTTP(w, r)
@@ -56,10 +72,12 @@ func TestRouter(t *testing.T) {
 			w := httptest.NewRecorder()
 			r := httptest.NewRequest("POST", "/api/templates", nil)
 
-			productsController.
+			templatingController.
 				EXPECT().
 				CreateTemplate(w, r).
 				Times(1)
+
+			passAuthMiddleware(w, r)
 
 			// when
 			router.ServeHTTP(w, r)
@@ -78,6 +96,7 @@ func TestRouter(t *testing.T) {
 				w := httptest.NewRecorder()
 				r := httptest.NewRequest(test, "/api/templates/1", nil)
 
+				passAuthMiddleware(w, r)
 				// when
 				router.ServeHTTP(w, r)
 
@@ -91,10 +110,12 @@ func TestRouter(t *testing.T) {
 			w := httptest.NewRecorder()
 			r := httptest.NewRequest("GET", "/api/templates/1", nil)
 
-			productsController.
+			templatingController.
 				EXPECT().
 				GetTemplate(w, r.WithContext(context.WithValue(r.Context(), "id", "1"))).
 				Times(1)
+
+			passAuthMiddleware(w, r)
 
 			// when
 			router.ServeHTTP(w, r)
@@ -108,10 +129,12 @@ func TestRouter(t *testing.T) {
 			w := httptest.NewRecorder()
 			r := httptest.NewRequest("PUT", "/api/templates/1", nil)
 
-			productsController.
+			templatingController.
 				EXPECT().
 				UpdateTemplate(w, r.WithContext(context.WithValue(r.Context(), "id", "1"))).
 				Times(1)
+
+			passAuthMiddleware(w, r)
 
 			// when
 			router.ServeHTTP(w, r)
@@ -125,10 +148,12 @@ func TestRouter(t *testing.T) {
 			w := httptest.NewRecorder()
 			r := httptest.NewRequest("DELETE", "/api/templates/1", nil)
 
-			productsController.
+			templatingController.
 				EXPECT().
 				DeleteTemplate(w, r.WithContext(context.WithValue(r.Context(), "id", "1"))).
 				Times(1)
+
+			passAuthMiddleware(w, r)
 
 			// when
 			router.ServeHTTP(w, r)
