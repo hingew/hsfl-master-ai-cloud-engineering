@@ -8,7 +8,7 @@ require (
 	github.com/hingew/hsfl-master-ai-cloud-engineering/lib v0.0.0
 	github.com/lib/pq v1.10.9
 	github.com/stretchr/testify v1.8.4
-	go.uber.org/mock v0.3.0
+	go.uber.org/mock v0.4.0
 	golang.org/x/crypto v0.14.0
 	golang.org/x/net v0.15.0
 	google.golang.org/grpc v1.57.0
