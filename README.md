@@ -68,6 +68,11 @@ Run the script `script\start_minicube`
 
 Run the script `script\start_own_cluster`
 
+# Test account
+User: `test@test.com`
+
+Password: `test`
+
 ## Current Architecture
 
 ![currentArchitecture](currentArchitecture.png)
