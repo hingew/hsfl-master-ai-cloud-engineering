@@ -1,0 +1,35 @@
+name: Creation-Service Tests
+
+on:
+  push:
+    paths:
+      - 'services/creation-service/**'
+      - '.github/workflows/creation-service.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Git checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21.x'
+
+
+    - name: Install dependencies
+      working-directory: ./services/creation-service
+      run: go get .
+
+    - name: Go test
+      working-directory: ./services/creation-service
+      run: go test ./... -race -coverprofile=coverage.txt -covermode=atomic
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        flags: creation-service
+

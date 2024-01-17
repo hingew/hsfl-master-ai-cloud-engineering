@@ -1,0 +1,9 @@
+# This is the build binary for the service
+*.exe
+web-service
+
+## Elm folders
+
+elm-stuff
+node_modules
+generated
