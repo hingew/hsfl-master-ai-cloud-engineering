@@ -13,7 +13,7 @@ import (
 )
 
 type Controller struct {
-	repo           repository.Repository
+	repo           repository.RepositoryInterface
 	hasher         crypto.Hasher
 	tokenGenerator auth.TokenGenerator
 }
@@ -43,7 +43,7 @@ func (r *registerRequest) isValid() bool {
 	return r.Email != "" && r.Password != "" && r.Password == r.PasswordConfirmation
 }
 
-func NewController(repo repository.Repository, hasher crypto.Hasher, tokenGenerator auth.TokenGenerator) *Controller {
+func NewController(repo repository.RepositoryInterface, hasher crypto.Hasher, tokenGenerator auth.TokenGenerator) *Controller {
 	return &Controller{repo, hasher, tokenGenerator}
 }
 

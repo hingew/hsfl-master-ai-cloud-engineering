@@ -11,11 +11,11 @@ import (
 
 type GrpcServer struct {
 	proto.UnimplementedUserServiceServer
-	repo           repository.Repository
+	repo           repository.RepositoryInterface
 	tokenGenerator auth.TokenGenerator
 }
 
-func NewGrpcServer(repo repository.Repository, tokenGenerator auth.TokenGenerator) *GrpcServer {
+func NewGrpcServer(repo repository.RepositoryInterface, tokenGenerator auth.TokenGenerator) *GrpcServer {
 	return &GrpcServer{repo: repo, tokenGenerator: tokenGenerator}
 }
 

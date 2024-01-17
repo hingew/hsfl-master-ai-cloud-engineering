@@ -78,7 +78,6 @@ services:
       - POSTGRES_DBNAME=$POSTGRES_DBNAME
       - AUTH_PRIVATE_KEY=$AUTH_PRIVATE_KEY
       - AUTH_PUBLIC_KEY=$AUTH_PUBLIC_KEY
-      - PORT=3000
     volumes:
       - ./services/templateing-service/test_data.json:/app/test_data.json
     depends_on:

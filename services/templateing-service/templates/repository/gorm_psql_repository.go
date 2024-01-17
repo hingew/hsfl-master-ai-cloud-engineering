@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"log"
-
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/database"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/model"
 	"gorm.io/driver/postgres"
@@ -22,17 +20,8 @@ func NewGormPsqlRepository(config database.Config) (*GormPsqlRepository, error) 
 	return &GormPsqlRepository{db}, nil
 }
 
-func (repo *GormPsqlRepository) Setup(testdata []model.PdfTemplate) error {
-	err := repo.db.AutoMigrate(&model.PdfTemplate{}, &model.Element{})
-
-	for _, data := range testdata {
-		_, err2 := repo.CreateTemplate(data)
-		if err2 != nil {
-			log.Fatalf("Could not create DB entry for testdata!\n%s", err2.Error())
-		}
-	}
-
-	return err
+func (repo *GormPsqlRepository) Migrate() error {
+	return repo.db.AutoMigrate(&model.PdfTemplate{}, &model.Element{} )
 }
 
 func (repo *GormPsqlRepository) CreateTemplate(data model.PdfTemplate) (*uint, error) {
