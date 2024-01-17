@@ -12,17 +12,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/lib/model"
 	mock_repository "github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/_mocks"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 	"golang.org/x/sync/singleflight"
 )
 
 func TestController(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
-
 	repo := mock_repository.NewMockRepository(ctrl)
 
 	controller := Controller{repo, &singleflight.Group{}}
