@@ -35,34 +35,23 @@ func TestIntegrationGormPsqlRepository(t *testing.T) {
 		Password: "postgres",
 		Database: "postgres",
 	})
+
 	if err != nil {
 		t.Fatalf("could not create user repository: %s", err.Error())
 	}
+
 	sqlDb, err := repository.db.DB()
 	if err != nil {
 		t.Fatalf("could not access underlying sql.DB of gorm.DB: %s", err.Error())
 	}
 
-	fmt.Print(repository)
 	t.Cleanup(clearTables(t, sqlDb, []string{"elements", "pdf_templates"}))
-
-	t.Run("Setup", func(t *testing.T) {
-		t.Run("should create pdf_templates and  table", func(t *testing.T) {
-			// arrange
-			t.Cleanup(clearTables(t, sqlDb, []string{"elements", "pdf_templates"}))
-
-			// act
-			err := repository.Setup([]model.PdfTemplate{})
-
-			// assert
-			assert.NoError(t, err)
-			assertTableExists(t, sqlDb, "pdf_templates", []string{"id", "updated_at", "created_at", "name"})
-			assertTableExists(t, sqlDb, "elements", []string{"id", "type", "x", "y", "width", "height", "value_from", "font", "font_size", "pdf_template_id"})
-		})
-	})
 
 	t.Run("CreateTemplate", func(t *testing.T) {
 		// arrange
+		if err := repository.Migrate(); err != nil {
+			t.Fatalf("could not migrate repo: %s", err.Error())
+		}
 		t.Cleanup(clearTables(t, sqlDb, []string{"elements", "pdf_templates"}))
 
 		template := model.PdfTemplate{Name: "test", Elements: []model.Element{
@@ -85,6 +74,10 @@ func TestIntegrationGormPsqlRepository(t *testing.T) {
 
 	t.Run("GetTemplateById", func(t *testing.T) {
 		// arrange
+		if err := repository.Migrate(); err != nil {
+			t.Fatalf("could not migrate repo: %s", err.Error())
+		}
+
 		t.Cleanup(clearTables(t, sqlDb, []string{"elements", "pdf_templates"}))
 
 		template := model.PdfTemplate{Name: "test", Elements: []model.Element{
@@ -106,6 +99,10 @@ func TestIntegrationGormPsqlRepository(t *testing.T) {
 
 	t.Run("GetAllTemplates", func(t *testing.T) {
 		// arrange
+		if err := repository.Migrate(); err != nil {
+			t.Fatalf("could not migrate repo: %s", err.Error())
+		}
+
 		t.Cleanup(clearTables(t, sqlDb, []string{"elements", "pdf_templates"}))
 
 		template1 := model.PdfTemplate{Name: "test", Elements: []model.Element{
@@ -130,6 +127,9 @@ func TestIntegrationGormPsqlRepository(t *testing.T) {
 
 	t.Run("GetAllTemplates", func(t *testing.T) {
 		// arrange
+        if err := repository.Migrate(); err != nil {
+            t.Fatalf("could not migrate repo: %s", err.Error())
+        }
 		t.Cleanup(clearTables(t, sqlDb, []string{"elements", "pdf_templates"}))
 
 		template := model.PdfTemplate{Name: "test", Elements: []model.Element{
@@ -151,6 +151,9 @@ func TestIntegrationGormPsqlRepository(t *testing.T) {
 
 	t.Run("UpdateTemplate", func(t *testing.T) {
 		// arrange
+        if err := repository.Migrate(); err != nil {
+            t.Fatalf("could not migrate repo: %s", err.Error())
+        }
 		t.Cleanup(clearTables(t, sqlDb, []string{"elements", "pdf_templates"}))
 
 		template := model.PdfTemplate{Name: "test", Elements: []model.Element{

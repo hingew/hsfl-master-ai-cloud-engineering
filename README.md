@@ -34,8 +34,13 @@ openssl rsa -in key.pem -outform PEM -pubout -out public.pem
 ```
 
 
+Create a private key for signing JWT tokens:
 
-Copy the contents of the generated user-service.pem file and paste it into the AUTH_SIGN_KEY environment variable or directly into the .env file located at the project root.
+``` 
+openssl genrsa -out key.pem 2048
+openssl rsa -in key.pem -outform PEM -pubout -out public.pem
+```
+
 
 Update the content of your `.env` file in the project root.
 ```
@@ -44,6 +49,7 @@ AUTH_PUBLIC_KEY="<your-public-key>"
 ```
 
 To build the docker container you have to run the following command:
+
 
 `docker-compose up -d --build`
 

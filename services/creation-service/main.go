@@ -17,11 +17,11 @@ import (
 )
 
 type ApplicationConfig struct {
-	Port                 int
-	TemplatingServiceURL string
+	Port                          int
+	TemplatingServiceGrpcEndpoint string
 }
 
-func LoadConfigFromEnv() (*ApplicationConfig, error) {
+func loadConfigFromEnv() (*ApplicationConfig, error) {
 	var config ApplicationConfig
 	portStr := os.Getenv("PORT")
 
@@ -32,17 +32,17 @@ func LoadConfigFromEnv() (*ApplicationConfig, error) {
 		config.Port = 3000
 	}
 
-	config.TemplatingServiceURL = os.Getenv("TEMPLATE_GRPC_ENDPOINT")
+	config.TemplatingServiceGrpcEndpoint = os.Getenv("TEMPLATE_GRPC_ENDPOINT")
 	return &config, nil
 }
 
 func main() {
-	config, err := LoadConfigFromEnv()
+	config, err := loadConfigFromEnv()
 	if err != nil {
 		log.Fatalf("could not load application configuration: %s", err.Error())
 	}
 
-	grpcConn, err := grpc.Dial(config.TemplatingServiceURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	grpcConn, err := grpc.Dial(config.TemplatingServiceGrpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("GRPC could not connect: %v", err)
 	}

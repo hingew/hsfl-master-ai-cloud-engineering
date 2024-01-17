@@ -4,6 +4,7 @@ go 1.21.1
 
 require (
 	github.com/hingew/hsfl-master-ai-cloud-engineering/lib v0.0.0
+	go.uber.org/mock v0.4.0
 	google.golang.org/grpc v1.57.0
 	gorm.io/gorm v1.25.5
 )
@@ -63,7 +64,6 @@ require (
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/golang/mock v1.6.0
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/sync v0.3.0

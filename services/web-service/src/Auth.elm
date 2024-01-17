@@ -23,10 +23,11 @@ encodeLogin { email, password } =
 
 
 encodeRegister : Register -> Encode.Value
-encodeRegister { email, password } =
+encodeRegister { email, password, passwordConfirmation } =
     Encode.object
         [ ( "email", Encode.string email )
         , ( "password", Encode.string password )
+        , ( "password_confirmation", Encode.string passwordConfirmation )
         ]
 
 

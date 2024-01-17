@@ -7,7 +7,7 @@ require github.com/hingew/hsfl-master-ai-cloud-engineering/lib v0.0.0
 require (
 	github.com/jung-kurt/gofpdf v1.16.2
 	github.com/stretchr/testify v1.8.4
-	go.uber.org/mock v0.3.0
+	go.uber.org/mock v0.4.0
 	google.golang.org/grpc v1.57.0
 )
 
