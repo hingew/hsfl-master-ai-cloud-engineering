@@ -12,7 +12,7 @@ import (
 	"github.com/hingew/hsfl-master-ai-cloud-engineering/templateing-service/templates/repository"
 )
 
-type ControllerImp struct {
+type Controller struct {
 	repo    repository.Repository
 	sfGroup *singleflight.Group
 }
@@ -23,12 +23,12 @@ type createResponse struct {
 
 func NewController(
 	repo repository.Repository,
-) *ControllerImp {
+) *Controller {
 	g := &singleflight.Group{}
-	return &ControllerImp{repo, g}
+	return &Controller{repo, g}
 }
 
-func (c *ControllerImp) GetAllTemplates(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) GetAllTemplates(w http.ResponseWriter, r *http.Request) {
 	templates, err := c.repo.GetAllTemplates()
 	if err != nil {
         log.Println(err)
@@ -40,7 +40,7 @@ func (c *ControllerImp) GetAllTemplates(w http.ResponseWriter, r *http.Request) 
 	json.NewEncoder(w).Encode(templates)
 }
 
-func (c *ControllerImp) GetTemplateWithCoalecing(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) GetTemplateWithCoalecing(w http.ResponseWriter, r *http.Request) {
 	id, err := c.extractId(r)
 	if err != nil {
         log.Println(err)
@@ -60,7 +60,7 @@ func (c *ControllerImp) GetTemplateWithCoalecing(w http.ResponseWriter, r *http.
 	c.writeTemplateAsResponse(w, template)
 }
 
-func (c *ControllerImp) GetTemplate(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) GetTemplate(w http.ResponseWriter, r *http.Request) {
 	id, err := c.extractId(r)
 	if err != nil {
         log.Println(err)
@@ -78,7 +78,7 @@ func (c *ControllerImp) GetTemplate(w http.ResponseWriter, r *http.Request) {
 	c.writeTemplateAsResponse(w, template)
 }
 
-func (c *ControllerImp) extractId(r *http.Request) (*uint, error) {
+func (c *Controller) extractId(r *http.Request) (*uint, error) {
 	templateId := r.Context().Value("id").(string)
 
 	id_, err := strconv.Atoi(templateId)
@@ -91,7 +91,7 @@ func (c *ControllerImp) extractId(r *http.Request) (*uint, error) {
 	return &id, nil
 }
 
-func (c *ControllerImp) writeTemplateAsResponse(w http.ResponseWriter, template interface{}) {
+func (c *Controller) writeTemplateAsResponse(w http.ResponseWriter, template interface{}) {
 	pdfTemplate, ok := template.(*model.PdfTemplate)
 	if !ok {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -102,7 +102,7 @@ func (c *ControllerImp) writeTemplateAsResponse(w http.ResponseWriter, template 
 	json.NewEncoder(w).Encode(pdfTemplate)
 }
 
-func (c *ControllerImp) CreateTemplate(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) CreateTemplate(w http.ResponseWriter, r *http.Request) {
 	var request model.PdfTemplate
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -122,7 +122,7 @@ func (c *ControllerImp) CreateTemplate(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (c *ControllerImp) UpdateTemplate(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) UpdateTemplate(w http.ResponseWriter, r *http.Request) {
 	templateId := r.Context().Value("id").(string)
 
 	id_, err := strconv.Atoi(templateId)
@@ -149,7 +149,7 @@ func (c *ControllerImp) UpdateTemplate(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (c *ControllerImp) DeleteTemplate(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) DeleteTemplate(w http.ResponseWriter, r *http.Request) {
 	templateId := r.Context().Value("id").(string)
 
 	id_, err := strconv.Atoi(templateId)

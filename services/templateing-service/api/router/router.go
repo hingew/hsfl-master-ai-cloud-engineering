@@ -7,17 +7,17 @@ import (
 )
 
 func NewTemplateRouter(
-	myController controller.ControllerInterface,
+	templateController controller.ControllerInterface,
 ) *router.Router {
 	templateRouter := router.New()
 	templateRouter.GET("/api/health/templates", health.Check)
 
-	templateRouter.GET("/api/templates", myController.GetAllTemplates)
-	templateRouter.GET("/api/templates/:id", myController.GetTemplate)
-	templateRouter.GET("/api/templates/:id/controller_coalescing", myController.GetTemplateWithCoalecing)
-	templateRouter.POST("/api/templates", myController.CreateTemplate)
-	templateRouter.PUT("/api/templates/:id", myController.UpdateTemplate)
-	templateRouter.DELETE("/api/templates/:id", myController.DeleteTemplate)
+	templateRouter.GET("/api/templates", templateController.GetAllTemplates)
+	templateRouter.GET("/api/templates/:id", templateController.GetTemplate)
+	templateRouter.GET("/api/templates/:id/controller_coalescing", templateController.GetTemplateWithCoalecing)
+	templateRouter.POST("/api/templates", templateController.CreateTemplate)
+	templateRouter.PUT("/api/templates/:id", templateController.UpdateTemplate)
+	templateRouter.DELETE("/api/templates/:id", templateController.DeleteTemplate)
 
 	return templateRouter
 }
