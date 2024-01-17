@@ -1,5 +1,8 @@
 FROM golang:1.21-alpine
 
+
+ENV TEMPLATE_GRPC_ENDPOINT=
+
 RUN apk --no-cache --update-cache --available upgrade \
     && apk add git bash terminus-font ttf-inconsolata ttf-dejavu font-noto ttf-font-awesome
 
